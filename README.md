@@ -1,5 +1,13 @@
-# roar-extension
-Web Extension for ROAR! (Public Feedback Project)
+<p align="center">
+  <a href="https://morehumaninternet.org">
+    <img alt="More Human Internet" src="https://raw.githubusercontent.com/morehumaninternet/roar-extension/main/img/roar_128.png" width="180" />
+  </a>
+</p>
+<h1 align="center">
+  Roar! Web Extension
+</h1>
+
+Built with ❤️ by the team at <a href="https://morehumaninternet.org">More Human Internet</a>
 
 ### Setup
 
