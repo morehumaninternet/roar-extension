@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "name": "roar Local",
+  "short_name": "roar Local",
+  "description": "Public Feedback Tool",
+  "background": {
+    "page": "html/background-page.html"
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "img/roar_19.png",
+      "38": "img/roar_38.png"
+    },
+    "default_popup": "html/popup.html"
+  },
+  "icons": {
+    "128": "img/roar_128.png"
+  },
+  "manifest_version": 2,
+  "permissions": [
+    "<all_urls>",
+    "activeTab",
+    "alarms",
+    "storage",
+    "notifications",
+    "tabs",
+    "webNavigation",
+    "webRequest",
+    "debugger",
+    "tabCapture",
+    "desktopCapture"
+  ],
+  "web_accessible_resources": []
+}

@@ -1,0 +1,70 @@
+{
+  "name": "roar-extension",
+  "version": "1.0.0",
+  "description": "Web Extension for ROAR! (Public Feedback Project)",
+  "scripts": {
+    "build": "npm run clear && npm run compile && npm run bundle",
+    "build:watch": "npm run build && { npm run compile:watch & \n npm run bundle:watch & \n wait \n }",
+    "bundle": "./bundle.sh",
+    "bundle:watch": "npm run bundle -- watchify",
+    "clear": "rm -rf compiled && rm -rf bundled",
+    "compile": "tsc",
+    "compile:watch": "tsc -w",
+    "lint": "{ find src -name '*.ts' | xargs tslint --project tsconfig.json --config tslint.json ; } && { find src -name '*.ts' -exec grep 'only: true' {} + | { ! grep '^'; } }",
+    "publish": "./publish.sh",
+    "test": "npm run clear && npm run compile && mocha --timeout 20000 --require test_setup.js --require source-map-support/register 'compiled/**/*.test.js'",
+    "test:watch": "npm run clear && npm run compile && { npm run compile:watch &\nmocha --timeout 20000 --require test_setup.js --require source-map-support/register 'compiled/**/*.test.js' --watch --watch-extensions js &\nwait\n}",
+    "zip-source-code-for-firefox": "cd .. && find extensions | grep -v 'node_modules' | grep -v '.git' | grep -v 'manifest.json' | grep -v '^extensions/compiled' | grep -v '^extensions/bundled' | grep -v '^extensions/publish' | grep -v '^extensions$' | grep -v '.zip$' | zip -rTg extension-source-code.zip -@ && cd extensions"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morehumaninternet/roar-extension.git"
+  },
+  "keywords": [],
+  "author": "More Human Internet",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/morehumaninternet/roar-extension/issues"
+  },
+  "dependencies": {
+    "@types/firefox-webext-browser": "67.0.2",
+    "draft-js": "^0.11.7",
+    "lodash": "4.17.20",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "redux": "4.0.1",
+    "urijs": "1.19.1",
+    "webextension-polyfill": "0.3.1"
+  },
+  "devDependencies": {
+    "@types/chai": "4.1.7",
+    "@types/chrome": "0.0.81",
+    "@types/draft-js": "^0.10.44",
+    "@types/jquery": "3.3.29",
+    "@types/lodash": "4.14.123",
+    "@types/mocha": "5.2.7",
+    "@types/react": "^16.9.53",
+    "@types/sinon": "7.0.13",
+    "@types/sinon-chai": "3.2.2",
+    "@types/urijs": "1.15.38",
+    "browserify": "16.2.3",
+    "chai": "4.2.0",
+    "husky": "1.3.1",
+    "mocha": "6.2.0",
+    "prettier": "1.17.0",
+    "pretty-quick": "1.10.0",
+    "sinon": "7.3.2",
+    "sinon-chai": "3.3.0",
+    "source-map-support": "0.5.12",
+    "tslint": "5.19.0",
+    "tslint-immutable": "6.0.1",
+    "typescript": "4.0.3",
+    "watchify": "3.11.1"
+  },
+  "homepage": "https://github.com/morehumaninternet/roar-extension#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --pattern \"src/**/*.*(ts|tsx)\""
+    }
+  }
+}
