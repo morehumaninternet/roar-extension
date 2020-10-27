@@ -1,18 +1,33 @@
+:root {
+  --roar-blue: #164176;
+  --roar-pink: #fa759e;
+
+  --window-height: 300px;
+  --window-width: 350px;
+}
+
+html,
+body {
+  height: var(--window-height);
+  width: var(--window-width);
+  background-color: var(--roar-blue);
+  padding: 0;
+  margin: 0;
+}
+
 #app-container {
-  color: #164176;
-  min-height: 500px;
-  min-width: 450px;
-  padding: 16px;
+  min-height: calc(var(--window-height) - 10px);
+  min-width: calc(var(--window-width) - 10px);
+  padding: 5px;
 }
 
 header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 16px;
 }
 
-header > .main-logo {
+/* header > .main-logo {
   height: 64px;
   width: 64px;
 }
@@ -20,18 +35,65 @@ header > .main-logo {
 header > h1 {
   font-size: 24px;
   margin-left: 24px;
-}
+} */
 
 main {
-  height: 100%;
-}
-
-.screenshots {
-  height: 100%;
-  width: 100%;
+  min-height: calc(var(--window-height) - 10px);
+  min-width: calc(var(--window-width) - 10px);
   display: flex;
 }
 
+.profile-img {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  margin-right: 5px;
+}
+
+.twitter-interface {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.DraftEditor-root {
+  color: white;
+  width: 250px;
+
+  /* limit the editor to 3 lines */
+  height: 50px;
+}
+
+.actions-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.actions {
+  display: flex;
+}
+
+.actions svg {
+  height: 25px;
+}
+
+.screenshots {
+  flex: 1 1 auto;
+  display: flex;
+  margin: 10px 0;
+}
+
 .screenshot-thumbnail {
-  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  object-fit: fill;
+  border-radius: 10px;
+}
+
+.post-btn {
+  height: 25px;
+  width: 68px;
+  background-color: var(--roar-pink);
+  color: var(--roar-blue);
+  border: none;
+  border-radius: 50px;
 }
