@@ -6,6 +6,7 @@ const emptyState: AppState = {
     connected: false
   },
   feedbackByTabId: {},
+  twitterAuthState: { state: 'not_authed' },
   alert: null,
   lastAction: null
 }
@@ -26,6 +27,12 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
         ...initialState,
         popup: { connected: false },
         alert: null // closing the popup dismisses any alert
+      }
+    }
+    case 'SIGN_IN_WITH_TWITTER': {
+      return {
+        ...initialState,
+        twitterAuthState: { state: 'authenticating' }
       }
     }
     case 'DISMISS_ALERT': {

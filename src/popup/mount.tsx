@@ -3,12 +3,9 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { App } from './app'
 import { actions } from './actions'
-import { activeFeedback } from '../selectors'
 
 function render(dispatchUserActions: DispatchUserActions, state: AppState, appContainer: HTMLElement) {
-  const feedback = activeFeedback(state)
-
-  return ReactDOM.render(<App feedback={feedback} dispatchUserActions={dispatchUserActions} />, appContainer)
+  return ReactDOM.render(<App state={state} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
 export function mount(chrome: any, window: Window) {
