@@ -1,4 +1,4 @@
-type UserAction = { type: 'POPUP_CONNECT' } | { type: 'POPUP_DISCONNECT' } | { type: 'DISMISS_ALERT' }
+type UserAction = { type: 'POPUP_CONNECT' } | { type: 'POPUP_DISCONNECT' } | { type: 'SIGN_IN_WITH_TWITTER' } | { type: 'DISMISS_ALERT' }
 
 type BackgroundAction =
   | {
@@ -15,6 +15,7 @@ type Action = UserAction | BackgroundAction
 type DispatchUserActions = {
   popupConnect(): void
   popupDisconnect(): void
+  signInWithTwitter(): void
   dismissAlert(): void
 }
 

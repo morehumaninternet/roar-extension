@@ -41,11 +41,14 @@ type FeedbackState = {
   tweetTextBody: string
 }
 
+type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; twitter_details: any }
+
 type AppStateNoLastAction = {
   popup: PopupState
   feedbackByTabId: {
     [tabId: number]: FeedbackState
   }
+  twitterAuthState: TwitterAuthState
   alert: null | string | { __html: string }
 }
 

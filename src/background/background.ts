@@ -4,6 +4,7 @@ import { subscribe } from './subscribe'
 
 declare global {
   interface Window {
+    roarServerUrl: string
     store: Store<AppState, Action>
   }
 }
