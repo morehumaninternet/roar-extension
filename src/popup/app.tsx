@@ -19,7 +19,7 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
 
 function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
   return (
-    <>
+    <div className="app">
       <header>
         <img className="main-logo" src="/img/roar_128.png" />
         <h1>ROAR!</h1>
@@ -28,7 +28,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
         <FeedbackEditor />
         <Screenshots feedback={feedback} />
       </main>
-    </>
+    </div>
   )
 }
 

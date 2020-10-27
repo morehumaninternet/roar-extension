@@ -1,4 +1,10 @@
-#app-container {
+iframe {
+  height: 750px;
+  width: 750px;
+  border: 0;
+}
+
+.app {
   color: #164176;
   min-height: 500px;
   min-width: 450px;
