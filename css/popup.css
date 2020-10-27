@@ -9,11 +9,9 @@
 
 html,
 body {
-  min-height: var(--window-height);
-  width: var(--window-width);
-  background-color: var(--roar-blue);
   padding: 0;
   margin: 0;
+  min-width: calc(var(--window-width));
 }
 
 iframe {
@@ -23,8 +21,7 @@ iframe {
 }
 
 .app {
-  min-height: calc(var(--window-height) - 2 * var(--window-padding));
-  min-width: calc(var(--window-width) - 2 * var(--window-padding));
+  background-color: var(--roar-blue);
   padding: var(--window-padding);
 }
 
