@@ -29,14 +29,14 @@ if [ -f "$ZIP_NAME" ]; then
   exit 1
 fi
 
-# Build the project if the bundled directory doesn't exist
-[ -d bundled ] || npm run build
+# Build the project pointing to https://roar-server.herokuapp.com
+ROAR_SERVER_URL=https://roar-server.herokuapp.com npm run build
 
 # Clear and remake the publish directory
 rm -rf $PUBLISH_DIR && mkdir -p $PUBLISH_DIR
 
 # Copy over the following resources
-for resource in bundled css font html img; do
+for resource in bundled css html img; do
   cp -R $resource ./$PUBLISH_DIR
 done
 
@@ -48,8 +48,6 @@ else
 fi
 
 cat manifest.json | sed "s/1.0.0/$VERSION/" | sed "s/Roar Local/$NAME/" > ./$PUBLISH_DIR/manifest.json
-
-echo "window.baseUrl = '$BASE_URL';" > ./$PUBLISH_DIR/conf.js
 
 ROOT=$(pwd)
 

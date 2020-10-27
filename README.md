@@ -5,8 +5,9 @@ Web Extension for ROAR! (Public Feedback Project)
 
 ```bash
 npm install
-npm run build # Builds once
-npm run build:watch # Builds in watch mode
+npm run build # Builds once, pointing to localhost:5004
+npm run build:watch # Builds in watch mode, pointing to localhost:5004
+ROAR_SERVER_URL=https://roar-server.herokuapp.com npm run build:watch # Pointing to https://roar-server.herokuapp.com
 ```
 
 ### Chrome
@@ -28,10 +29,11 @@ npm test
 
 ### Publishing the Staging Extension
 
-The same artifact is used by both chrome and firefox. Bear this in mind when adding a feature that might only work in chrome or only work in firefox. To create the artifacts, select an appropriate semantic version and run
+Both stage and production point to https://roar-server.herokuapp.com. The same artifact is used by both chrome and firefox. Bear this in mind when adding a feature that might only work in chrome or only work in firefox. To create the artifacts, select an appropriate semantic version and run
 
 ```bash
-npm run publish -- stage X.Y.Z      # Creates artifacts/stage vX.Y.Z.zip
+npm run publish -- stage X.Y.Z # Creates artifacts/stage vX.Y.Z.zip
+npm run publish -- production X.Y.Z # Creates artifacts/production vX.Y.Z.zip
 ```
 
 ### Project Overview

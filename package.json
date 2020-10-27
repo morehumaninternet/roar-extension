@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@types/firefox-webext-browser": "67.0.2",
-    "draft-js": "^0.11.7",
+    "draft-js": "0.11.7",
     "lodash": "4.17.20",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -39,11 +39,10 @@
   "devDependencies": {
     "@types/chai": "4.1.7",
     "@types/chrome": "0.0.81",
-    "@types/draft-js": "^0.10.44",
-    "@types/jquery": "3.3.29",
+    "@types/draft-js": "0.10.44",
     "@types/lodash": "4.14.123",
     "@types/mocha": "5.2.7",
-    "@types/react": "^16.9.53",
+    "@types/react": "16.9.53",
     "@types/sinon": "7.0.13",
     "@types/sinon-chai": "3.2.2",
     "@types/urijs": "1.15.38",
