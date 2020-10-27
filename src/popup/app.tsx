@@ -11,10 +11,6 @@ type AppProps = {
 export function App({ feedback, dispatchUserActions }: AppProps): JSX.Element {
   return (
     <>
-      {/* <header>
-        <img className="main-logo" src="/img/roar_128.png" />
-        <h1>ROAR!</h1>
-      </header> */}
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
