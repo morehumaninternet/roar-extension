@@ -33,8 +33,26 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
   )
 }
 
-function Authenticating() {
-  return <iframe src={`${window.roarServerUrl}/v1/login`} />
+function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(): void }) {
+  React.useEffect(() => {
+    function listener(event) {
+      if (event.origin !== 'http://127.0.0.1:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
+        return
+      }
+      if (event.data === 'twitter-auth-success') {
+        return authenticatedViaTwitter()
+      }
+      if (event.data === 'twitter-auth-failure') {
+        throw new Error('TODO: handle this')
+      }
+      throw new Error(`Unexpected message: ${event.data}`)
+    }
+
+    addEventListener('message', listener)
+    return () => removeEventListener('message', listener)
+  }, [])
+
+  return <iframe src={`${window.roarServerUrl}/v1/auth/twitter`} allow="*" />
 }
 
 export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
@@ -43,7 +61,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
     }
     case 'authenticating': {
-      return <Authenticating />
+      return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
       return <Authenticated feedback={activeFeedback(state)} dispatchUserActions={dispatchUserActions} />

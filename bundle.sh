@@ -21,7 +21,7 @@ cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js ./$bundled_di
 cp node_modules/draft-js/dist/Draft.css ./$bundled_dir
 
 # Write out a conf.js file with configuration variables
-echo "window.roarServerUrl = '${ROAR_SERVER_URL-"http://localhost:5004"}';" > ./$bundled_dir/conf.js
+echo "window.roarServerUrl = '${ROAR_SERVER_URL-"http://127.0.0.1:5004"}';" > ./$bundled_dir/conf.js
 
 # Build the bundles in parallel.
 # Note that this is explicitly necessary when using watchify because those will never exit
