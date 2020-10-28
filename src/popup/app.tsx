@@ -36,7 +36,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
 function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }) {
   React.useEffect(() => {
     function listener(event) {
-      if (event.origin !== 'http://127.0.0.1:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
+      if (event.origin !== 'https://localhost:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
         return
       }
       if (event.data.type === 'twitter-auth-success') {

@@ -13,8 +13,8 @@ Built with ❤️ by the team at <a href="https://morehumaninternet.org">More Hu
 
 ```bash
 npm install
-npm run build # Builds once, pointing to http://127.0.0.1:5004
-npm run build:watch # Builds in watch mode, pointing to http://127.0.0.1:5004
+npm run build # Builds once, pointing to https://localhost:5004
+npm run build:watch # Builds in watch mode, pointing to https://localhost:5004
 ROAR_SERVER_URL=https://roar-server.herokuapp.com npm run build:watch # Pointing to https://roar-server.herokuapp.com
 ```
 
