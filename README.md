@@ -7,15 +7,15 @@
   Roar! Web Extension
 </h1>
 
-Built with ❤️ by the team at <a href="https://morehumaninternet.org">More Human Internet</a>
+Built with ❤️ by the team at <a href="https://morehumaninternet.org">More Human Internet</a>. See also [Roar! Server]()
 
 ### Setup
 
 ```bash
 npm install
-npm run build # Builds once, pointing to https://localhost:5004
-npm run build:watch # Builds in watch mode, pointing to https://localhost:5004
-ROAR_SERVER_URL=https://roar-server.herokuapp.com npm run build:watch # Pointing to https://roar-server.herokuapp.com
+npm run build # Builds the extension, pointing to the production server at https://roar-server.herokuapp.com
+npm run build:watch # Builds in watch mode, pointing to https://roar-server.herokuapp.com
+ROAR_SERVER_URL=https://localhost:5004 npm run build:watch # Builds the server in watch mode, pointing to a Roar! Server running locally
 ```
 
 ### Chrome
