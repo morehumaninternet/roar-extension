@@ -33,16 +33,19 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
   )
 }
 
-function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(): void }) {
+function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }) {
   React.useEffect(() => {
     function listener(event) {
       if (event.origin !== 'http://127.0.0.1:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
         return
       }
-      if (event.data === 'twitter-auth-success') {
-        return authenticatedViaTwitter()
+      if (event.data.type === 'twitter-auth-success') {
+        if (!event.data.cookie) {
+          throw new Error(`Expected cookie`)
+        }
+        return authenticatedViaTwitter(event.data.cookie)
       }
-      if (event.data === 'twitter-auth-failure') {
+      if (event.data.type === 'twitter-auth-failure') {
         throw new Error('TODO: handle this')
       }
       throw new Error(`Unexpected message: ${event.data}`)

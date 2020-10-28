@@ -41,7 +41,7 @@ type FeedbackState = {
   tweetTextBody: string
 }
 
-type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated' }
+type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; cookie: string }
 
 type AppStateNoLastAction = {
   popup: PopupState

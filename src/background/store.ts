@@ -38,7 +38,7 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
     case 'AUTHENTICATED_VIA_TWITTER': {
       return {
         ...initialState,
-        twitterAuthState: { state: 'authenticated' }
+        twitterAuthState: { state: 'authenticated', cookie: action.payload.cookie }
       }
     }
     case 'DISMISS_ALERT': {

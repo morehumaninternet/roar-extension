@@ -11,8 +11,8 @@ export function actions(dispatch: Dispatch<UserAction>, getState: () => AppState
     signInWithTwitter() {
       return dispatch({ type: 'SIGN_IN_WITH_TWITTER' })
     },
-    authenticatedViaTwitter() {
-      return dispatch({ type: 'AUTHENTICATED_VIA_TWITTER' })
+    authenticatedViaTwitter(cookie: string) {
+      return dispatch({ type: 'AUTHENTICATED_VIA_TWITTER', payload: { cookie } })
     },
     dismissAlert() {
       return dispatch({ type: 'DISMISS_ALERT' })

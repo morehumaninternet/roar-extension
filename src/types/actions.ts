@@ -2,7 +2,7 @@ type UserAction =
   | { type: 'POPUP_CONNECT' }
   | { type: 'POPUP_DISCONNECT' }
   | { type: 'SIGN_IN_WITH_TWITTER' }
-  | { type: 'AUTHENTICATED_VIA_TWITTER' }
+  | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { cookie: string } }
   | { type: 'DISMISS_ALERT' }
 
 type BackgroundAction =
@@ -21,7 +21,7 @@ type DispatchUserActions = {
   popupConnect(): void
   popupDisconnect(): void
   signInWithTwitter(): void
-  authenticatedViaTwitter(): void
+  authenticatedViaTwitter(cookie: string): void
   dismissAlert(): void
 }
 
