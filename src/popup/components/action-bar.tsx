@@ -36,8 +36,8 @@ const AddHashtagButton = () => (
   </button>
 )
 
-const AddEmojiButton = () => (
-  <button className="svg-btn">
+const AddEmojiButton = (props: { onClick(): void }) => (
+  <button className="svg-btn" onClick={props.onClick}>
     <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         id="Add Emoji Button"
@@ -48,13 +48,21 @@ const AddEmojiButton = () => (
   </button>
 )
 
-export const ActionBar = () => (
+type ActionBarProps = {
+  onEmojiPicked(emoji: string): void
+}
+
+export const ActionBar = (props: ActionBarProps) => (
   <div className="actions-bar">
     <div className="actions">
       <TakeSnapshotButton />
       <AddImageButton />
       <AddHashtagButton />
-      <AddEmojiButton />
+      <AddEmojiButton
+        onClick={() => {
+          props.onEmojiPicked('😃')
+        }}
+      />
     </div>
     <button className="post-btn">Post</button>
   </div>
