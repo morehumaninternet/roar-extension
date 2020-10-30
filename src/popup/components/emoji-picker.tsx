@@ -3,7 +3,7 @@ import { useState } from 'react'
 // import "emoji-mart/css/emoji-mart.css";
 import { Picker } from 'emoji-mart'
 
-export function EmojiPicker({ onEmojiPicked }: { onEmojiPicked(emoji: string): void }): JSX.Element {
+export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void }): JSX.Element {
   const [pickerActive, setPickerActive] = useState(false)
 
   const emojiPicker = pickerActive && (
@@ -11,7 +11,7 @@ export function EmojiPicker({ onEmojiPicked }: { onEmojiPicked(emoji: string): v
       title="Pick your emoji…"
       emoji="point_up"
       onSelect={emoji => {
-        onEmojiPicked(emoji.native)
+        emojiPicked(emoji.native)
         setPickerActive(false)
       }}
     />

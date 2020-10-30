@@ -50,6 +50,11 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
         alert: null
       }
     }
+    case 'EMOJI_PICKED': {
+      console.log(action.payload.emoji)
+      return initialState
+    }
+
     case 'UPDATE_EDITOR_STATE': {
       if (!initialState.popup.connected || !initialState.popup.activeTab) {
         throw new Error('Posting a tweet without an active tab is not possible')

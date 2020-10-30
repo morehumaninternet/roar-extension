@@ -6,6 +6,7 @@ type UserAction =
   | { type: 'DISMISS_ALERT' }
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
   | { type: 'CLICK_POST' }
+  | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
 
 type BackgroundAction =
   | {
@@ -29,6 +30,7 @@ type DispatchUserActions = {
   dismissAlert(): void
   updateEditorState(editorState: any): void
   clickPost(): void
+  emojiPicked(emoji: string): void
 }
 
 type DispatchBackgroundActions = {
