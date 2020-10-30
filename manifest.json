@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "name": "roar Local",
-  "short_name": "roar Local",
+  "name": "Roar Local",
+  "short_name": "Roar Local",
   "description": "Public Feedback Tool",
   "background": {
     "page": "html/background-page.html"
