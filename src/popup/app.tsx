@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { FeedbackEditor } from './components/feedback-editor'
-import { EditorState } from 'draft-js'
 import { Screenshots } from './components/screenshots'
 import { activeFeedback } from '../selectors'
 import { ActionBar } from './components/action-bar'
@@ -11,7 +10,7 @@ type AppProps = {
 }
 
 type AuthenticatedProps = {
-  feedback: null | FeedbackState
+  feedback: FeedbackState
   dispatchUserActions: DispatchUserActions
 }
 
@@ -19,32 +18,34 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
   return <button onClick={signInWithTwitter}>Sign in with twitter</button>
 }
 
-function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
-  const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
+function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
+  if (!feedback) {
+    return null
+  }
 
-  const onEmojiPicked = (emoji: string) => {
-    //call setEditor state to insert emoji
-    // let tempValue = editorState.concat(emoji)
-    // setEditorState();
+  const editorState = feedback.editorState
+
+  const onEmojiPicked = (emoji: string): void => {
     console.log('emoji picked', emoji)
   }
+
   return (
     <div className="app">
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
-          <FeedbackEditor editorState={editorState} setEditorState={setEditorState} />
+          <FeedbackEditor editorState={editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar onEmojiPicked={onEmojiPicked} />
+          <ActionBar clickPost={dispatchUserActions.clickPost} onEmojiPicked={onEmojiPicked} />
         </div>
       </main>
     </div>
   )
 }
 
-function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }) {
+function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }): JSX.Element {
   React.useEffect(() => {
-    function listener(event) {
+    function listener(event: any): any {
       if (event.origin !== 'https://localhost:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
         return
       }
@@ -76,7 +77,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeFeedback(state)} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeFeedback(state)!} dispatchUserActions={dispatchUserActions} />
     }
   }
 }

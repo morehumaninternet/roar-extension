@@ -51,24 +51,27 @@ const AddEmojiButton = (props: { onClick(): void }) => (
 )
 
 type ActionBarProps = {
+  clickPost: DispatchUserActions['clickPost']
   onEmojiPicked(emoji: string): void
 }
 
-export const ActionBar = (props: ActionBarProps) => (
-  <div className="actions-bar">
-    <div className="actions">
-      <TakeSnapshotButton />
-      <AddImageButton />
-      <AddHashtagButton />
-
-      <AddEmojiButton
-        onClick={() => {
-          props.onEmojiPicked('😃')
-        }}
-      />
-
-      <EmojiPicker onEmojiPicked={props.onEmojiPicked} />
+export const ActionBar = ({ clickPost, onEmojiPicked }: ActionBarProps) => {
+  return (
+    <div className="actions-bar">
+      <div className="actions">
+        <TakeSnapshotButton />
+        <AddImageButton />
+        <AddHashtagButton />
+        <AddEmojiButton
+          onClick={() => {
+            onEmojiPicked('😃')
+          }}
+        />
+        <EmojiPicker onEmojiPicked={onEmojiPicked} />
+      </div>
+      <button className="post-btn" onClick={clickPost}>
+        Post
+      </button>
     </div>
-    <button className="post-btn">Post</button>
-  </div>
-)
+  )
+}

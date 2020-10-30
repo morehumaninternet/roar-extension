@@ -1,11 +1,14 @@
 import * as redux from 'redux'
 import { omit } from 'lodash'
+import { EditorState } from 'draft-js'
 
 const emptyState: AppState = {
   popup: {
     connected: false
   },
   feedbackByTabId: {},
+  toBeTweeted: null,
+  justTweeted: null,
   twitterAuthState: { state: 'not_authed' },
   alert: null,
   lastAction: null
@@ -47,6 +50,40 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
         alert: null
       }
     }
+    case 'UPDATE_EDITOR_STATE': {
+      if (!initialState.popup.connected || !initialState.popup.activeTab) {
+        throw new Error('Posting a tweet without an active tab is not possible')
+      }
+      const tabId = initialState.popup.activeTab.id!
+      const { editorState } = action.payload
+      const feedback = initialState.feedbackByTabId[tabId]
+      if (!feedback) throw new Error('Feedback should exist at this point')
+
+      const nextFeedback = {
+        screenshots: feedback.screenshots,
+        editorState
+      }
+      return {
+        ...initialState,
+        feedbackByTabId: {
+          ...initialState.feedbackByTabId,
+          [tabId]: nextFeedback
+        }
+      }
+    }
+    case 'CLICK_POST': {
+      if (!initialState.popup.connected || !initialState.popup.activeTab) {
+        throw new Error('Posting a tweet without an active tab is not possible')
+      }
+      const tabId = initialState.popup.activeTab.id!
+      return {
+        ...initialState,
+        toBeTweeted: {
+          feedbackState: initialState.feedbackByTabId[tabId],
+          tabId
+        }
+      }
+    }
     // Background Actions
     case 'ACTIVE_TAB_DETECTED': {
       if (!initialState.popup.connected) return initialState
@@ -70,11 +107,11 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
       const tabId = screenshot.tab.id!
       const feedback = initialState.feedbackByTabId[tabId] || {
         screenshots: [],
-        tweetTextBody: ''
+        editorState: EditorState.createEmpty()
       }
       const nextFeedback = {
         screenshots: feedback.screenshots.concat([screenshot]),
-        tweetTextBody: feedback.tweetTextBody
+        editorState: feedback.editorState
       }
       return {
         ...initialState,
@@ -95,6 +132,24 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
       return {
         ...initialState,
         feedbackByTabId: omit(initialState.feedbackByTabId, tabId)
+      }
+    }
+    case 'POST_TWEET_SUCCESS': {
+      const { url } = action.payload.tweetResult
+      return {
+        ...initialState,
+        toBeTweeted: null,
+        justTweeted: {
+          url
+        }
+      }
+    }
+    case 'POST_TWEET_FAILURE': {
+      return {
+        ...initialState,
+        toBeTweeted: null,
+        justTweeted: null,
+        alert: 'POST TWEET FAILURE'
       }
     }
     default: {

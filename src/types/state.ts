@@ -1,3 +1,5 @@
+type Maybe<T> = T | null | undefined
+
 type SystemInfo = {
   user_agent: string
   online: boolean
@@ -38,16 +40,25 @@ type ScreenshotState = {
 
 type FeedbackState = {
   screenshots: ReadonlyArray<Screenshot>
-  tweetTextBody: string
+  editorState: any
 }
 
 type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; cookie: string }
+
+type ToBeTweeted = {
+  tabId: number
+  feedbackState: FeedbackState
+}
 
 type AppStateNoLastAction = {
   popup: PopupState
   feedbackByTabId: {
     [tabId: number]: FeedbackState
   }
+  toBeTweeted: Maybe<ToBeTweeted>
+  justTweeted: Maybe<{
+    url: string
+  }>
   twitterAuthState: TwitterAuthState
   alert: null | string | { __html: string }
 }

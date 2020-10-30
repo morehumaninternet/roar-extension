@@ -23,6 +23,18 @@ export function actions(dispatch: Dispatch<BackgroundAction>): DispatchBackgroun
       dispatch({
         type: 'SCREENSHOT_CAPTURE_FAILURE',
         payload: { error }
+      }),
+
+    postTweetSuccess: tweetResult =>
+      dispatch({
+        type: 'POST_TWEET_SUCCESS',
+        payload: { tweetResult }
+      }),
+
+    postTweetFailure: error =>
+      dispatch({
+        type: 'POST_TWEET_FAILURE',
+        payload: { error }
       })
   }
 }
