@@ -22,7 +22,13 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
   if (!feedback) {
     return null
   }
+
   const editorState = feedback.editorState
+
+  const onEmojiPicked = (emoji: string): void => {
+    console.log('emoji picked', emoji)
+  }
+
   return (
     <div className="app">
       <main>
@@ -30,7 +36,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
         <div className="twitter-interface">
           <FeedbackEditor editorState={editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar clickPost={dispatchUserActions.clickPost} />
+          <ActionBar clickPost={dispatchUserActions.clickPost} onEmojiPicked={onEmojiPicked} />
         </div>
       </main>
     </div>

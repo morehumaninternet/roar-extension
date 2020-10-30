@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { EditorState } from 'draft-js'
+
+import { EmojiPicker } from './emoji-picker'
 
 const TakeSnapshotButton = () => (
   <button className="svg-btn">
@@ -37,8 +38,8 @@ const AddHashtagButton = () => (
   </button>
 )
 
-const AddEmojiButton = () => (
-  <button className="svg-btn">
+const AddEmojiButton = (props: { onClick(): void }) => (
+  <button className="svg-btn" onClick={props.onClick}>
     <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         id="Add Emoji Button"
@@ -51,16 +52,22 @@ const AddEmojiButton = () => (
 
 type ActionBarProps = {
   clickPost: DispatchUserActions['clickPost']
+  onEmojiPicked(emoji: string): void
 }
 
-export const ActionBar = ({ clickPost }: ActionBarProps) => {
+export const ActionBar = ({ clickPost, onEmojiPicked }: ActionBarProps) => {
   return (
     <div className="actions-bar">
       <div className="actions">
         <TakeSnapshotButton />
         <AddImageButton />
         <AddHashtagButton />
-        <AddEmojiButton />
+        <AddEmojiButton
+          onClick={() => {
+            onEmojiPicked('😃')
+          }}
+        />
+        <EmojiPicker onEmojiPicked={onEmojiPicked} />
       </div>
       <button className="post-btn" onClick={clickPost}>
         Post
