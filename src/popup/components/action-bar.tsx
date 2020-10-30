@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { EditorState } from 'draft-js'
 
 const TakeSnapshotButton = () => (
   <button className="svg-btn">
@@ -48,14 +49,22 @@ const AddEmojiButton = () => (
   </button>
 )
 
-export const ActionBar = () => (
-  <div className="actions-bar">
-    <div className="actions">
-      <TakeSnapshotButton />
-      <AddImageButton />
-      <AddHashtagButton />
-      <AddEmojiButton />
+type ActionBarProps = {
+  postTweet: DispatchUserActions['postTweet']
+}
+
+export const ActionBar = ({ postTweet }: ActionBarProps) => {
+  return (
+    <div className="actions-bar">
+      <div className="actions">
+        <TakeSnapshotButton />
+        <AddImageButton />
+        <AddHashtagButton />
+        <AddEmojiButton />
+      </div>
+      <button className="post-btn" onClick={postTweet}>
+        Post
+      </button>
     </div>
-    <button className="post-btn">Post</button>
-  </div>
-)
+  )
+}

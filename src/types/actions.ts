@@ -4,6 +4,8 @@ type UserAction =
   | { type: 'SIGN_IN_WITH_TWITTER' }
   | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { cookie: string } }
   | { type: 'DISMISS_ALERT' }
+  | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
+  | { type: 'POST_TWEET' }
 
 type BackgroundAction =
   | {
@@ -23,6 +25,8 @@ type DispatchUserActions = {
   signInWithTwitter(): void
   authenticatedViaTwitter(cookie: string): void
   dismissAlert(): void
+  updateEditorState(editorState: any): void
+  postTweet(): void
 }
 
 type DispatchBackgroundActions = {

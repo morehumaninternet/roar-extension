@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { EditorState, ContentState } from 'draft-js'
 import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
 import { activeFeedback } from '../selectors'
@@ -10,7 +11,7 @@ type AppProps = {
 }
 
 type AuthenticatedProps = {
-  feedback: null | FeedbackState
+  feedback: FeedbackState
   dispatchUserActions: DispatchUserActions
 }
 
@@ -19,23 +20,26 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
 }
 
 function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
+  console.log('In authenticated')
+  const editorState = feedback.editorState
+  console.log('editorState', editorState)
   return (
     <div className="app">
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
-          <FeedbackEditor />
+          <FeedbackEditor editorState={editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar />
+          <ActionBar postTweet={dispatchUserActions.postTweet} />
         </div>
       </main>
     </div>
   )
 }
 
-function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }) {
+function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }): JSX.Element {
   React.useEffect(() => {
-    function listener(event) {
+    function listener(event: any): any {
       if (event.origin !== 'https://localhost:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
         return
       }
@@ -67,7 +71,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeFeedback(state)} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeFeedback(state)!} dispatchUserActions={dispatchUserActions} />
     }
   }
 }
