@@ -21,11 +21,11 @@ VERSION="$2"
 
 PUBLISH_DIR=publish/$TARGET/$VERSION
 
-ZIP_NAME="$TARGET v$VERSION.zip"
+ARTIFACT_FILE_NAME="artifacts/$TARGET v$VERSION.zip"
 
 # Abort if the zip file already exists
-if [ -f "$ZIP_NAME" ]; then
-  echo "$ZIP_NAME already exists, aborting"
+if [ -f "$ARTIFACT_FILE_NAME" ]; then
+  echo "$ARTIFACT_FILE_NAME already exists, aborting"
   exit 1
 fi
 
@@ -53,4 +53,4 @@ ROOT=$(pwd)
 
 mkdir -p artifacts
 
-cd $PUBLISH_DIR && zip -r -FS "$ROOT/artifacts/$ZIP_NAME" * && cd $ROOT
+cd $PUBLISH_DIR && zip -r -FS "$ROOT/$ARTIFACT_FILE_NAME" * && cd $ROOT
