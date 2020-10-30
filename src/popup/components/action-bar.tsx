@@ -50,10 +50,10 @@ const AddEmojiButton = () => (
 )
 
 type ActionBarProps = {
-  postTweet: DispatchUserActions['postTweet']
+  clickPost: DispatchUserActions['clickPost']
 }
 
-export const ActionBar = ({ postTweet }: ActionBarProps) => {
+export const ActionBar = ({ clickPost }: ActionBarProps) => {
   return (
     <div className="actions-bar">
       <div className="actions">
@@ -62,7 +62,7 @@ export const ActionBar = ({ postTweet }: ActionBarProps) => {
         <AddHashtagButton />
         <AddEmojiButton />
       </div>
-      <button className="post-btn" onClick={postTweet}>
+      <button className="post-btn" onClick={clickPost}>
         Post
       </button>
     </div>

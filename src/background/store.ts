@@ -8,6 +8,7 @@ const emptyState: AppState = {
   },
   feedbackByTabId: {},
   toBeTweeted: null,
+  justTweeted: null,
   twitterAuthState: { state: 'not_authed' },
   alert: null,
   lastAction: null
@@ -71,7 +72,7 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
         }
       }
     }
-    case 'POST_TWEET': {
+    case 'CLICK_POST': {
       if (!initialState.popup.connected || !initialState.popup.activeTab) {
         throw new Error('Posting a tweet without an active tab is not possible')
       }
@@ -132,6 +133,24 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
       return {
         ...initialState,
         feedbackByTabId: omit(initialState.feedbackByTabId, tabId)
+      }
+    }
+    case 'POST_TWEET_SUCCESS': {
+      const { url } = action.payload.tweetResult
+      return {
+        ...initialState,
+        toBeTweeted: null,
+        justTweeted: {
+          url
+        }
+      }
+    }
+    case 'POST_TWEET_FAILURE': {
+      return {
+        ...initialState,
+        toBeTweeted: null,
+        justTweeted: null,
+        alert: 'POST TWEET FAILURE'
       }
     }
     default: {

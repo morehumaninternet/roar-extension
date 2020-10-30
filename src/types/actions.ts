@@ -5,7 +5,7 @@ type UserAction =
   | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { cookie: string } }
   | { type: 'DISMISS_ALERT' }
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
-  | { type: 'POST_TWEET' }
+  | { type: 'CLICK_POST' }
 
 type BackgroundAction =
   | {
@@ -16,6 +16,8 @@ type BackgroundAction =
   | { type: 'TAB_CLOSED'; payload: { tabId: number } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
+  | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
+  | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
 
 type Action = UserAction | BackgroundAction
 
@@ -26,7 +28,7 @@ type DispatchUserActions = {
   authenticatedViaTwitter(cookie: string): void
   dismissAlert(): void
   updateEditorState(editorState: any): void
-  postTweet(): void
+  clickPost(): void
 }
 
 type DispatchBackgroundActions = {
@@ -34,4 +36,6 @@ type DispatchBackgroundActions = {
   noActiveTabDetected(): void
   screenshotCaptureSuccess(screenshot: Screenshot): void
   screenshotCaptureFailure(error: any): void
+  postTweetSuccess(tweetResult: any): void
+  postTweetFailure(error: any): void
 }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { EditorState, ContentState } from 'draft-js'
 import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
 import { activeFeedback } from '../selectors'
@@ -19,8 +18,11 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
   return <button onClick={signInWithTwitter}>Sign in with twitter</button>
 }
 
-function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
+function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
   console.log('In authenticated')
+  if (!feedback) {
+    return null
+  }
   const editorState = feedback.editorState
   console.log('editorState', editorState)
   return (
@@ -30,7 +32,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
         <div className="twitter-interface">
           <FeedbackEditor editorState={editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar postTweet={dispatchUserActions.postTweet} />
+          <ActionBar clickPost={dispatchUserActions.clickPost} />
         </div>
       </main>
     </div>

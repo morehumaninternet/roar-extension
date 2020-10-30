@@ -45,14 +45,19 @@ type FeedbackState = {
 
 type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; cookie: string }
 
+type ToBeTweeted = {
+  tabId: number
+  feedbackState: FeedbackState
+}
+
 type AppStateNoLastAction = {
   popup: PopupState
   feedbackByTabId: {
     [tabId: number]: FeedbackState
   }
-  toBeTweeted: Maybe<{
-    tabId: number
-    feedbackState: FeedbackState
+  toBeTweeted: Maybe<ToBeTweeted>
+  justTweeted: Maybe<{
+    url: string
   }>
   twitterAuthState: TwitterAuthState
   alert: null | string | { __html: string }

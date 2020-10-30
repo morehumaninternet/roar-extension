@@ -2,6 +2,7 @@ import { Store } from 'redux'
 import { actions } from './actions'
 import { checkActiveTab } from './tab'
 import { takeScreenshot } from './screenshot'
+import { postTweet } from './api'
 
 export function subscribe(store: Store<AppState, Action>, browser: typeof window.browser, tabs: typeof browser.tabs): Function {
   const dispatchBackgroundActions: DispatchBackgroundActions = actions(store.dispatch)
@@ -27,6 +28,12 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
       if (!activeTabFeedback.screenshots.length) {
         takeScreenshot((nextState.popup as ConnectedPopupState).activeTab!, tabs, dispatchBackgroundActions)
       }
+    }
+
+    if (nextState.toBeTweeted && !prevState.toBeTweeted) {
+      // The user clicked on the "post" button
+      // send tweet to the server
+      postTweet(nextState.toBeTweeted, dispatchBackgroundActions)
     }
   })
 }

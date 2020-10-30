@@ -20,8 +20,8 @@ export function actions(dispatch: Dispatch<UserAction>, getState: () => AppState
     updateEditorState(editorState: any): UserAction {
       return dispatch({ type: 'UPDATE_EDITOR_STATE', payload: { editorState } })
     },
-    postTweet(): UserAction {
-      return dispatch({ type: 'POST_TWEET' })
+    clickPost(): UserAction {
+      return dispatch({ type: 'CLICK_POST' })
     }
   }
 }
