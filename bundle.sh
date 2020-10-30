@@ -20,6 +20,9 @@ mkdir -p $bundled_dir
 cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js ./$bundled_dir
 cp node_modules/draft-js/dist/Draft.css ./$bundled_dir
 
+# Copy CSS styles from emoji-mart library
+cp node_modules/emoji-mart/css/emoji-mart.css ./$bundled_dir
+
 # Write out a conf.js file with configuration variables
 echo "window.roarServerUrl = '${ROAR_SERVER_URL-"https://roar-server.herokuapp.com"}';" > ./$bundled_dir/conf.js
 

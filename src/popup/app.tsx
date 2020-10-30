@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { FeedbackEditor } from './components/feedback-editor'
+import { EditorState } from 'draft-js'
 import { Screenshots } from './components/screenshots'
 import { activeFeedback } from '../selectors'
 import { ActionBar } from './components/action-bar'
@@ -19,14 +20,22 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
 }
 
 function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
+  const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
+
+  const onEmojiPicked = (emoji: string) => {
+    //call setEditor state to insert emoji
+    // let tempValue = editorState.concat(emoji)
+    // setEditorState();
+    console.log('emoji picked', emoji)
+  }
   return (
     <div className="app">
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
-          <FeedbackEditor />
+          <FeedbackEditor editorState={editorState} setEditorState={setEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar />
+          <ActionBar onEmojiPicked={onEmojiPicked} />
         </div>
       </main>
     </div>
