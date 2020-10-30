@@ -67,7 +67,7 @@ export const ActionBar = (props: ActionBarProps) => (
         }}
       />
 
-      <EmojiPicker />
+      <EmojiPicker onEmojiPicked={props.onEmojiPicked} />
     </div>
     <button className="post-btn">Post</button>
   </div>

@@ -3,25 +3,24 @@ import { useState } from 'react'
 // import "emoji-mart/css/emoji-mart.css";
 import { Picker } from 'emoji-mart'
 
-//
-export const EmojiPicker = () => {
-  const [emojiPickerState, SetEmojiPicker] = useState(false)
-  const [message, SetMessage] = useState('')
+export function EmojiPicker({ onEmojiPicked }: { onEmojiPicked(emoji: string): void }): JSX.Element {
+  const [pickerActive, setPickerActive] = useState(false)
 
-  let emojiPicker
-  if (emojiPickerState) {
-    emojiPicker = <Picker title="Pick your emoji…" emoji="point_up" onSelect={emoji => SetMessage(message + emoji.native)} />
-  }
-
-  function triggerPicker(event) {
-    event.preventDefault()
-    SetEmojiPicker(!emojiPickerState)
-  }
+  const emojiPicker = pickerActive && (
+    <Picker
+      title="Pick your emoji…"
+      emoji="point_up"
+      onSelect={emoji => {
+        onEmojiPicked(emoji.native)
+        setPickerActive(false)
+      }}
+    />
+  )
 
   return (
     <div className="measure">
       {emojiPicker}
-      <button className="svg-btn" onClick={triggerPicker}>
+      <button className="svg-btn" onClick={() => setPickerActive(!pickerActive)}>
         <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             id="Add Emoji Button"
@@ -30,17 +29,6 @@ export const EmojiPicker = () => {
           />
         </svg>
       </button>
-
-      {/*
-            <button
-            onClick={triggerPicker}
-            >
-            Add an Emoji!
-            <span role="img" aria-label="">
-            😁
-            </span>
-            </button>
-          */}
     </div>
   )
 }
