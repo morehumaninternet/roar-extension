@@ -24,6 +24,8 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
 
   const onEmojiPicked = (emoji: string) => {
     //call setEditor state to insert emoji
+    // let tempValue = editorState.concat(emoji)
+    // setEditorState();
     console.log('emoji picked', emoji)
   }
   return (
