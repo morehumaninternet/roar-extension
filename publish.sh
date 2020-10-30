@@ -44,7 +44,7 @@ done
 if [[ $TARGET == "production" ]]; then
   NAME="Roar"
 else
-  NAME="Roar Stage (New)"
+  NAME="Roar Stage"
 fi
 
 cat manifest.json | sed "s/1.0.0/$VERSION/" | sed "s/Roar Local/$NAME/" > ./$PUBLISH_DIR/manifest.json
