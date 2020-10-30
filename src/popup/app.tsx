@@ -19,12 +19,10 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
 }
 
 function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
-  console.log('In authenticated')
   if (!feedback) {
     return null
   }
   const editorState = feedback.editorState
-  console.log('editorState', editorState)
   return (
     <div className="app">
       <main>

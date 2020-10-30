@@ -56,10 +56,9 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
       }
       const tabId = initialState.popup.activeTab.id!
       const { editorState } = action.payload
-      const feedback = initialState.feedbackByTabId[tabId] || {
-        screenshots: [],
-        editorState: ''
-      }
+      const feedback = initialState.feedbackByTabId[tabId]
+      if (!feedback) throw new Error('Feedback should exist at this point')
+
       const nextFeedback = {
         screenshots: feedback.screenshots,
         editorState
