@@ -21,6 +21,7 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
 
 function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element {
   const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
+
   const onEmojiPicked = (emoji: string) => {
     //call setEditor state to insert emoji
     console.log('emoji picked', emoji)

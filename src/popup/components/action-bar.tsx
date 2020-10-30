@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import { EmojiPicker } from './emoji-picker'
+
 const TakeSnapshotButton = () => (
   <button className="svg-btn">
     <svg width="33" height="34" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,11 +60,14 @@ export const ActionBar = (props: ActionBarProps) => (
       <TakeSnapshotButton />
       <AddImageButton />
       <AddHashtagButton />
+
       <AddEmojiButton
         onClick={() => {
           props.onEmojiPicked('😃')
         }}
       />
+
+      <EmojiPicker />
     </div>
     <button className="post-btn">Post</button>
   </div>
