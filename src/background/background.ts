@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill/dist/browser-polyfill.min.js'
 import { Store } from 'redux'
 import { createStore } from './store'
 import { subscribe } from './subscribe'

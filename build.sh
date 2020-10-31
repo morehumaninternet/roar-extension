@@ -3,19 +3,13 @@ set -euo pipefail
 
 # Build Variables ###
 
-scripts_to_bundle=(
-  popup/popup.tsx
-  background/background.ts
-)
-
 stylesheets_to_compile=(
   popup.scss
 )
 
-files_from_node_modules_to_copy_to_bundle_dir=(
-  webextension-polyfill/dist/browser-polyfill.min.js
-  draft-js/dist/Draft.css
-  emoji-mart/css/emoji-mart.css
+scripts_to_bundle=(
+  popup/popup.tsx
+  background/background.ts
 )
 
 ### Build Logic ###
@@ -25,14 +19,6 @@ bundled_dir="bundled"
 
 echo "Clearing $bundled_dir directory"
 rm -rf $bundled_dir && mkdir -p $bundled_dir
-
-for file in "${files_from_node_modules_to_copy_to_bundle_dir[@]}"; do
-  echo "Copying node_modules/$file into $bundled_dir"
-  cp node_modules/$file ./$bundled_dir &
-done
-
-echo "Writing $bundled_dir/conf.js file"
-echo "window.roarServerUrl = '${ROAR_SERVER_URL-"https://roar-server.herokuapp.com"}';" > ./$bundled_dir/conf.js &
 
 for stylesheet in "${stylesheets_to_compile[@]}"; do
   input_file=scss/$stylesheet
@@ -44,7 +30,8 @@ done
 for script in "${scripts_to_bundle[@]}"; do
   input_file=src/$script
   output_file=bundled/"${script%%.*}".js
-  $node_bin/rollup $input_file $@ --file $output_file --config rollup.config.js &
+  ROAR_SERVER_URL="${ROAR_SERVER_URL-"https://roar-server.herokuapp.com"}" \
+    $node_bin/rollup $input_file $@ --file $output_file --config rollup.config.js &
 done
 
 # Wait on the running jobs, if any of them failed, just kill the rest
