@@ -25,6 +25,9 @@ export function actions(dispatch: Dispatch<UserAction>, getState: () => AppState
     },
     emojiPicked(emoji: string): UserAction {
       return dispatch({ type: 'EMOJI_PICKED', payload: { emoji } })
+    },
+    clickTakeScreenshot(): UserAction {
+      return dispatch({ type: 'CLICK_TAKE_SCREENSHOT' })
     }
   }
 }

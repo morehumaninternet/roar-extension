@@ -32,7 +32,11 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
         <div className="twitter-interface">
           <FeedbackEditor editorState={editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Screenshots feedback={feedback} />
-          <ActionBar clickPost={dispatchUserActions.clickPost} emojiPicked={dispatchUserActions.emojiPicked} />
+          <ActionBar
+            clickPost={dispatchUserActions.clickPost}
+            emojiPicked={dispatchUserActions.emojiPicked}
+            clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
+          />
         </div>
       </main>
     </div>
