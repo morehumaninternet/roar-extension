@@ -39,17 +39,14 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
   )
 }
 
-function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(cookie: string): void }): JSX.Element {
+function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(): void }): JSX.Element {
   React.useEffect(() => {
     function listener(event: any): any {
       if (event.origin !== 'https://localhost:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
         return
       }
       if (event.data.type === 'twitter-auth-success') {
-        if (!event.data.cookie) {
-          throw new Error(`Expected cookie`)
-        }
-        return authenticatedViaTwitter(event.data.cookie)
+        return authenticatedViaTwitter()
       }
       if (event.data.type === 'twitter-auth-failure') {
         throw new Error('TODO: handle this')
@@ -65,7 +62,7 @@ function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(c
 }
 
 export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
-  switch (state.twitterAuthState.state) {
+  switch (state.twitterAuth) {
     case 'not_authed': {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
     }

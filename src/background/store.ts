@@ -9,7 +9,7 @@ const emptyState: AppState = {
   feedbackByTabId: {},
   toBeTweeted: null,
   justTweeted: null,
-  twitterAuthState: { state: 'not_authed' },
+  twitterAuth: 'not_authed',
   alert: null,
   lastAction: null
 }
@@ -35,13 +35,13 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
     case 'SIGN_IN_WITH_TWITTER': {
       return {
         ...initialState,
-        twitterAuthState: { state: 'authenticating' }
+        twitterAuth: 'authenticating'
       }
     }
     case 'AUTHENTICATED_VIA_TWITTER': {
       return {
         ...initialState,
-        twitterAuthState: { state: 'authenticated', cookie: action.payload.cookie }
+        twitterAuth: 'authenticated'
       }
     }
     case 'DISMISS_ALERT': {

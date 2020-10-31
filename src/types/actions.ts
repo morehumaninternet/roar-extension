@@ -2,7 +2,7 @@ type UserAction =
   | { type: 'POPUP_CONNECT' }
   | { type: 'POPUP_DISCONNECT' }
   | { type: 'SIGN_IN_WITH_TWITTER' }
-  | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { cookie: string } }
+  | { type: 'AUTHENTICATED_VIA_TWITTER' }
   | { type: 'DISMISS_ALERT' }
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
   | { type: 'CLICK_POST' }
@@ -26,7 +26,7 @@ type DispatchUserActions = {
   popupConnect(): void
   popupDisconnect(): void
   signInWithTwitter(): void
-  authenticatedViaTwitter(cookie: string): void
+  authenticatedViaTwitter(): void
   dismissAlert(): void
   updateEditorState(editorState: any): void
   clickPost(): void

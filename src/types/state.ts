@@ -43,7 +43,7 @@ type FeedbackState = {
   editorState: any
 }
 
-type TwitterAuthState = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; cookie: string }
+type TwitterAuthState = 'not_authed' | 'authenticating' | 'authenticated'
 
 type ToBeTweeted = {
   tabId: number
@@ -59,7 +59,7 @@ type AppStateNoLastAction = {
   justTweeted: Maybe<{
     url: string
   }>
-  twitterAuthState: TwitterAuthState
+  twitterAuth: TwitterAuthState
   alert: null | string | { __html: string }
 }
 
