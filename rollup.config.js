@@ -11,7 +11,8 @@ export default {
   },
   plugins: [
     replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
+      // Use a minified build for react for production
+      'process.env.NODE_ENV': JSON.stringify(process.env.ENV === 'production' ? 'production' : 'development'),
       'window.roarServerUrl': JSON.stringify(process.env.ROAR_SERVER_URL),
     }),
     typescript(),

@@ -4,3 +4,4 @@
 /publish
 artifacts/*.zip
 .DS_Store
+package-lock.json
