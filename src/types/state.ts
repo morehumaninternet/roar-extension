@@ -64,7 +64,7 @@ type AppStateNoLastAction = {
 }
 
 type AppState = AppStateNoLastAction & {
-  lastAction: null | Action
+  mostRecentAction: null | Action
 }
 
 type Feedback = any

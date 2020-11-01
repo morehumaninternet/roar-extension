@@ -7,6 +7,7 @@ type UserAction =
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
   | { type: 'CLICK_POST' }
   | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
+  | { type: 'CLICK_TAKE_SCREENSHOT' }
 
 type BackgroundAction =
   | {
@@ -31,6 +32,7 @@ type DispatchUserActions = {
   updateEditorState(editorState: any): void
   clickPost(): void
   emojiPicked(emoji: string): void
+  clickTakeScreenshot(): void
 }
 
 type DispatchBackgroundActions = {

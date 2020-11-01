@@ -20,7 +20,7 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     }
 
     // Take a screenshot if no screenshots currently present for the active tab
-    if (nextState.lastAction && nextState.lastAction.type === 'ACTIVE_TAB_DETECTED') {
+    if (nextState.mostRecentAction && nextState.mostRecentAction.type === 'ACTIVE_TAB_DETECTED') {
       if (!nextState.popup.connected) throw new Error('Popup should be connected')
       const activeTabId = nextState.popup.activeTab!.id!
       const activeTabFeedback = nextState.feedbackByTabId[activeTabId] || { screenshots: [] }
@@ -28,6 +28,12 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
       if (!activeTabFeedback.screenshots.length) {
         takeScreenshot((nextState.popup as ConnectedPopupState).activeTab!, tabs, dispatchBackgroundActions)
       }
+    }
+
+    // Take a screenshot on request
+    if (nextState.mostRecentAction && nextState.mostRecentAction.type === 'CLICK_TAKE_SCREENSHOT') {
+      if (!nextState.popup.connected) throw new Error('Popup should be connected')
+      takeScreenshot((nextState.popup as ConnectedPopupState).activeTab!, tabs, dispatchBackgroundActions)
     }
 
     if (nextState.toBeTweeted && !prevState.toBeTweeted) {

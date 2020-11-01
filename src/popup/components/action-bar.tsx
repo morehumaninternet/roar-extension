@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import { EmojiPicker } from './emoji-picker'
 
-const TakeSnapshotButton = () => (
-  <button className="svg-btn">
+const TakeSnapshotButton = ({ onClick }) => (
+  <button className="svg-btn" onClick={onClick}>
     <svg width="33" height="34" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         id="Take Screenshot Button"
@@ -41,13 +41,14 @@ const AddHashtagButton = () => (
 type ActionBarProps = {
   clickPost: DispatchUserActions['clickPost']
   emojiPicked(emoji: string): void
+  clickTakeScreenshot: DispatchUserActions['clickTakeScreenshot']
 }
 
-export const ActionBar = ({ clickPost, emojiPicked }: ActionBarProps) => {
+export const ActionBar = ({ clickPost, emojiPicked, clickTakeScreenshot }: ActionBarProps) => {
   return (
     <div className="actions-bar">
       <div className="actions">
-        <TakeSnapshotButton />
+        <TakeSnapshotButton onClick={clickTakeScreenshot} />
         <AddImageButton />
         <AddHashtagButton />
         <EmojiPicker emojiPicked={emojiPicked} />

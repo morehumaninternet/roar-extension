@@ -11,7 +11,7 @@ const emptyState: AppState = {
   justTweeted: null,
   twitterAuth: 'not_authed',
   alert: null,
-  lastAction: null
+  mostRecentAction: null
 }
 
 function reducerNoLastAction(initialState: AppState = emptyState, action: Action): AppState {
@@ -173,7 +173,7 @@ function reducerNoLastAction(initialState: AppState = emptyState, action: Action
 function reducer(initialState: AppState = emptyState, action: Action): AppState {
   return {
     ...reducerNoLastAction(initialState, action),
-    lastAction: action
+    mostRecentAction: action
   }
 }
 
