@@ -1,14 +1,27 @@
-export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActions: DispatchBackgroundActions) => {
+function tweetFormData(toBeTweeted: ToBeTweeted): FormData {
+  const tweetData = new FormData()
+
   const status = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
+  tweetData.append('status', status)
+
+  // Adding all the screenshot files under the same form key - 'screenshots'.
+  toBeTweeted.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
+
+  return tweetData
+}
+
+function makeRequest(formData: FormData): Promise<Response> {
+  return fetch(`${window.roarServerUrl}/v1/feedback`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    body: formData
+  })
+}
+
+export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
-    const res = await fetch(`${window.roarServerUrl}/v1/feedback`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status })
-    })
+    const res = await makeRequest(tweetFormData(toBeTweeted))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure(await res.text())
     }
