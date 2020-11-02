@@ -5,6 +5,7 @@ const stripAnsi = require('strip-ansi')
 const { PassThrough } = require('stream')
 const readline = require('readline')
 const concurrently = require('concurrently')
+const { assert } = require('chai')
 
 // Parse build flags and environment variables
 let watchMode = false
@@ -18,8 +19,9 @@ process.argv.slice(2).forEach(flag => {
 })
 
 const watchFlag = watchMode ? '--watch' : ''
-const ENV = process.env.ENV || 'local'
 const ROAR_SERVER_URL = pointToLocalServer ? 'https://localhost:5004' : 'https://roar-server.herokuapp.com'
+const ENV = process.env.ENV || 'local'
+assert.oneOf(ENV, ['local', 'stage', 'production'])
 
 // Colors!
 const blue = chalk.hex('#164176')
