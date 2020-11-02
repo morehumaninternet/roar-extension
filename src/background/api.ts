@@ -14,7 +14,6 @@ function makeRequest(formData: FormData): Promise<Response> {
   return fetch(`${window.roarServerUrl}/v1/feedback`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'multipart/form-data' },
     body: formData
   })
 }
