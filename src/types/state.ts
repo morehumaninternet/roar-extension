@@ -29,6 +29,7 @@ type PopupState = DisconnectedPopupState | ConnectedPopupState
 
 type Screenshot = {
   tab: browser.tabs.Tab
+  name: string
   uri: string
   blob: Blob
 }

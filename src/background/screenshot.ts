@@ -26,8 +26,10 @@ export async function takeScreenshot(tab: browser.tabs.Tab, tabs: typeof browser
   try {
     const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)
     const screenshotBlob = dataURItoBlob(screenshotUri)
+    const { host } = new URL(tab.url!)
     dispatchBackgroundActions.screenshotCaptureSuccess({
       tab,
+      name: `${host} - ${new Date().toISOString()}`,
       uri: screenshotUri,
       blob: screenshotBlob
     })
