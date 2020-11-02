@@ -1,5 +1,5 @@
 import { omit } from 'lodash'
-import { EditorState } from 'draft-js'
+import { EditorState, Modifier } from 'draft-js'
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT() {
@@ -19,7 +19,28 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   EMOJI_PICKED(state, action) {
     console.log(action.payload.emoji)
-    return state
+    if (!state.popup.connected || !state.popup.activeTab) {
+      throw new Error('Posting a tweet without an active tab is not possible')
+    }
+    const tabId = state.popup.activeTab.id!
+    const { emoji } = action.payload
+    const feedback = state.feedbackByTabId[tabId]
+    if (!feedback) throw new Error('Feedback should exist at this point')
+
+    const editorState: EditorState = feedback.editorState
+    const nextContentState = Modifier.insertText(editorState.getCurrentContent(), editorState.getSelection(), emoji)
+    const nextEditorState = EditorState.createWithContent(nextContentState)
+
+    const nextFeedback = {
+      screenshots: feedback.screenshots,
+      editorState: nextEditorState
+    }
+    return {
+      feedbackByTabId: {
+        ...state.feedbackByTabId,
+        [tabId]: nextFeedback
+      }
+    }
   },
   UPDATE_EDITOR_STATE(state, action) {
     if (!state.popup.connected || !state.popup.activeTab) {
