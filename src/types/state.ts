@@ -50,7 +50,7 @@ type ToBeTweeted = {
   feedbackState: FeedbackState
 }
 
-type AppStateNoLastAction = {
+type AppState = {
   popup: PopupState
   feedbackByTabId: {
     [tabId: number]: FeedbackState
@@ -61,10 +61,10 @@ type AppStateNoLastAction = {
   }>
   twitterAuth: TwitterAuthState
   alert: null | string | { __html: string }
+  mostRecentAction: Action | { type: 'INITIALIZING' }
 }
 
-type AppState = AppStateNoLastAction & {
-  mostRecentAction: null | Action
-}
-
-type Feedback = any
+// A Responder is a function that takes the current state of the application and an action of the corresponding type
+// and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
+// object of responders, each of which only need return those parts of the state that we are updating
+type Responder<T extends Action['type']> = (state: AppState, action: Action & { type: T }) => Partial<AppState>
