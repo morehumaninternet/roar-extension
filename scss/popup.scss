@@ -1,17 +1,17 @@
-:root {
-  --roar-blue: #164176;
-  --roar-pink: #fa759e;
+@import '../node_modules/draft-js/dist/Draft.css';
+@import '../node_modules/emoji-mart/css/emoji-mart.css';
 
-  --window-height: 320px;
-  --window-width: 500px;
-  --window-padding: 10px;
-}
+$human-blue: #164176;
+$human-pink: #fa759e;
+$window-height: 320px;
+$window-width: 500px;
+$window-padding: 10px;
 
 html,
 body {
   padding: 0;
   margin: 0;
-  min-width: calc(var(--window-width));
+  min-width: $window-width;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -22,8 +22,8 @@ iframe {
 }
 
 .app {
-  background-color: var(--roar-blue);
-  padding: var(--window-padding);
+  background-color: $human-blue;
+  padding: $window-padding;
 }
 
 header {
@@ -33,8 +33,8 @@ header {
 }
 
 main {
-  min-height: calc(var(--window-height) - 2 * var(--window-padding));
-  min-width: calc(var(--window-width) - 2 * var(--window-padding));
+  min-height: $window-height - 2 * $window-padding;
+  min-width: $window-width - 2 * $window-padding;
   display: flex;
 }
 
@@ -55,8 +55,6 @@ main {
   width: 430px;
   font-size: 18px;
   margin-top: 7px;
-
-  /* limit the editor to 3 lines */
   min-height: 20px;
 }
 
@@ -99,8 +97,8 @@ main {
   width: 90px;
   font-size: 16px;
   font-weight: bold;
-  background-color: var(--roar-pink);
-  color: var(--roar-blue);
+  background-color: $human-pink;
+  color: $human-blue;
   border: none;
   border-radius: 50px;
 }

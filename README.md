@@ -9,13 +9,48 @@
 
 Built with ❤️ by the team at <a href="https://morehumaninternet.org">More Human Internet</a>. See also [Roar! Server]()
 
-### Setup
+### Install
 
 ```bash
 npm install
-npm run build # Builds the extension, pointing to the production server at https://roar-server.herokuapp.com
-npm run build:watch # Builds in watch mode, pointing to https://roar-server.herokuapp.com
-ROAR_SERVER_URL=https://localhost:5004 npm run build:watch # Builds the server in watch mode, pointing to a Roar! Server running locally
+```
+
+### Build
+
+Run the build once
+
+```bash
+npm run build
+
+# 🛠 Building a local version of Roar! that points to https://roar-server.herokuapp.com
+# [scss] ...
+# [bundle:popup] ...
+# [bundle:background] ...
+# 🎉 Build successful!
+```
+
+Run the build in watch mode
+
+```bash
+npm run build:watch
+
+# 🛠 Building a local version of Roar! in watch mode that points to https://roar-server.herokuapp.com
+# [scss] ...
+# [bundle:popup] ...
+# [bundle:background] ...
+# 🎉 First build successful! Continuing to watch files...
+```
+
+Run the build in watch mode against a local server
+
+```bash
+npm run build:watch -- --local-server
+
+# 🛠 Building a local version of Roar! in watch mode that points to https://localhost:5004
+# [scss] ...
+# [bundle:popup] ...
+# [bundle:background] ...
+# 🎉 First build successful! Continuing to watch files...
 ```
 
 ### Chrome
@@ -30,6 +65,8 @@ web-ext run
 ```
 
 ### Testing
+
+TODO!
 
 ```bash
 npm test
@@ -46,4 +83,4 @@ npm run publish -- production X.Y.Z # Creates artifacts/production vX.Y.Z.zip
 
 ### Project Overview
 
-The [manifest.json](manifest.json) file declares the [popup](html/popup.html) and the [background page](html/background-page.html) which are largely just responsible for loading their corresponding scripts that are compiled & bundled from [src/popup/popup.tsx](src/popup/popup.tsx) and [src/background/background.tsx](src/background/background.tsx) respectively. All state management and interaction with the server takes place in the background script as the popup can be closed at any time. The popup is responsible solely for painting the user interface and sending callbacks that trigger changes to [the store](src/background/store.ts). Those changes are observed in the singleton [background subscription](src/background/subscribe.ts) which will then call functions of its own to do things like take screenshots, etc. Globally available type definitions are declared in [src/types](src/types).
+The [manifest.json](manifest.json) file declares the [popup](html/popup.html) and the [background page](html/background-page.html) which are largely just responsible for loading their corresponding scripts that are compiled & bundled from [src/popup/index.tsx](src/popup/index.tsx) and [src/background/index.ts](src/background/index.ts) respectively. All state management and interaction with the server takes place in the background script as the popup can be closed at any time. The popup is responsible solely for painting the user interface and sending callbacks that trigger changes to [the store](src/background/store.ts). Those changes are observed in the singleton [background subscription](src/background/subscribe.ts) which will then call functions of its own to do things like take screenshots, etc. Globally available type definitions are declared in [src/types](src/types).

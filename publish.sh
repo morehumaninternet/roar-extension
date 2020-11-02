@@ -30,13 +30,13 @@ if [ -f "$ARTIFACT_FILE_NAME" ]; then
 fi
 
 # Build the project pointing to https://roar-server.herokuapp.com
-ROAR_SERVER_URL=https://roar-server.herokuapp.com npm run build
+ENV=$TARGET npm run build
 
 # Clear and remake the publish directory
 rm -rf $PUBLISH_DIR && mkdir -p $PUBLISH_DIR
 
 # Copy over the following resources
-for resource in bundled css html img; do
+for resource in bundled html img; do
   cp -R $resource ./$PUBLISH_DIR
 done
 
