@@ -63,11 +63,14 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     }
   },
   SCREENSHOT_CAPTURE_SUCCESS(state, action) {
-    const tab = ensureActiveTab(state)
     const { screenshot } = action.payload
+    const tabId = screenshot.tab.id
+    // Don't use the screenshot if the tab no longer exists
+    if (!state.tabs.has(tabId)) return {}
 
     const nextTabs = new Map(state.tabs)
-    nextTabs.set(tab.id, {
+    const tab = state.tabs.get(tabId)!
+    nextTabs.set(tabId, {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots.concat([screenshot]),
