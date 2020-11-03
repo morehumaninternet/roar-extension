@@ -9,7 +9,7 @@ const emptyState: AppState = {
   justTweeted: null,
   twitterAuth: 'not_authed',
   alert: null,
-  mostRecentAction: { type: 'INITIALIZING' }
+  mostRecentAction: { type: 'INITIALIZING' },
 }
 
 function reducer(state: AppState = emptyState, action: Action): AppState {
@@ -21,11 +21,11 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
   const nextState = {
     ...state,
     ...stateUpdates,
-    mostRecentAction: action
+    mostRecentAction: action,
   }
 
-  if (action.type.startsWith('chrome')) {
-    console.log(action.type, (action as any).payload, nextState.focusedWindowId, nextState.tabs)
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(action.type, (action as any).payload, nextState)
   }
 
   return nextState
