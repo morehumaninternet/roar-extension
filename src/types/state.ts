@@ -14,21 +14,10 @@ type SystemInfo = {
   zoom: number
 }
 
-type DisconnectedPopupState = {
-  connected: false
-  disabledForTab?: undefined
-}
-
-type ConnectedPopupState = {
-  connected: true
-  activeTab: null | browser.tabs.Tab
-  disabledForTab?: boolean
-}
-
-type PopupState = DisconnectedPopupState | ConnectedPopupState
+type PopupState = boolean
 
 type Screenshot = {
-  tab: browser.tabs.Tab
+  tab: TabInfo
   name: string
   uri: string
   blob: Blob
@@ -51,11 +40,19 @@ type ToBeTweeted = {
   feedbackState: FeedbackState
 }
 
+type TabInfo = {
+  id: number
+  windowId: number
+  active: boolean
+  url?: string
+  host?: string
+  feedbackState: FeedbackState
+}
+
 type AppState = {
-  popup: PopupState
-  feedbackByTabId: {
-    [tabId: number]: FeedbackState
-  }
+  popupConnected: PopupState
+  focusedWindowId: number
+  tabs: Map<number, TabInfo>
   toBeTweeted: Maybe<ToBeTweeted>
   justTweeted: Maybe<{
     url: string

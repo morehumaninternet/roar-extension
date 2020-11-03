@@ -2,13 +2,14 @@ import * as redux from 'redux'
 import { responders } from './responders'
 
 const emptyState: AppState = {
-  popup: { connected: false },
-  feedbackByTabId: {},
+  popupConnected: false,
+  focusedWindowId: -1,
+  tabs: new Map(),
   toBeTweeted: null,
   justTweeted: null,
   twitterAuth: 'not_authed',
   alert: null,
-  mostRecentAction: { type: 'INITIALIZING' }
+  mostRecentAction: { type: 'INITIALIZING' },
 }
 
 function reducer(state: AppState = emptyState, action: Action): AppState {
@@ -17,11 +18,17 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
 
   const responder: Responder<typeof action.type> = responders[action.type]
   const stateUpdates: Partial<AppState> = responder(state, action)
-  return {
+  const nextState = {
     ...state,
     ...stateUpdates,
-    mostRecentAction: action
+    mostRecentAction: action,
   }
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(action.type, (action as any).payload, nextState)
+  }
+
+  return nextState
 }
 
 export function createStore(): redux.Store<AppState, Action> {

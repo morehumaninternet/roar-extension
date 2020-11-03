@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
-import { activeFeedback } from '../selectors'
+import { activeTab } from '../selectors'
 import { ActionBar } from './components/action-bar'
 
 type AppProps = {
@@ -10,7 +10,7 @@ type AppProps = {
 }
 
 type AuthenticatedProps = {
-  feedback: FeedbackState
+  feedback?: FeedbackState
   dispatchUserActions: DispatchUserActions
 }
 
@@ -74,7 +74,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeFeedback(state)!} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeTab(state)?.feedbackState} dispatchUserActions={dispatchUserActions} />
     }
   }
 }
