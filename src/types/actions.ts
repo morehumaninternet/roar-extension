@@ -20,6 +20,17 @@ type BackgroundAction =
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
   | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
   | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
+  | { type: 'chrome.windows.getAll'; payload: { windows: chrome.windows.Window[] } }
+  | { type: 'chrome.tabs.query'; payload: { tabs: chrome.tabs.Tab[] } }
+  | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
+  | { type: 'chrome.tabs.onRemoved'; payload: { tabId: number; removeInfo: chrome.tabs.TabRemoveInfo } }
+  | { type: 'chrome.tabs.onUpdated'; payload: { tabId: number; changeInfo: chrome.tabs.TabChangeInfo } }
+  | { type: 'chrome.tabs.onAttached'; payload: { tabId: number; attachInfo: chrome.tabs.TabAttachInfo } }
+  | { type: 'chrome.tabs.onActivated'; payload: { activeInfo: chrome.tabs.TabActiveInfo } }
+  | { type: 'chrome.tabs.onReplaced'; payload: { addedTabId: number; removedTabId: number } }
+  | { type: 'chrome.windows.onCreated'; payload: { win: chrome.windows.Window } }
+  | { type: 'chrome.windows.onRemoved'; payload: { windowId: number } }
+  | { type: 'chrome.windows.onFocusChanged'; payload: { windowId: number } }
 
 type Action = UserAction | BackgroundAction
 

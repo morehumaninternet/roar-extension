@@ -53,6 +53,17 @@ type ToBeTweeted = {
 
 type AppState = {
   popup: PopupState
+  focusedWindowId: number
+  tabs: Map<
+    number,
+    {
+      id: number
+      windowId: number
+      active: boolean
+      url?: string
+      host?: string
+    }
+  >
   feedbackByTabId: {
     [tabId: number]: FeedbackState
   }

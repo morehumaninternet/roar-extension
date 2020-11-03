@@ -3,6 +3,8 @@ import { responders } from './responders'
 
 const emptyState: AppState = {
   popup: { connected: false },
+  focusedWindowId: -1,
+  tabs: new Map(),
   feedbackByTabId: {},
   toBeTweeted: null,
   justTweeted: null,
@@ -17,11 +19,17 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
 
   const responder: Responder<typeof action.type> = responders[action.type]
   const stateUpdates: Partial<AppState> = responder(state, action)
-  return {
+  const nextState = {
     ...state,
     ...stateUpdates,
     mostRecentAction: action
   }
+
+  if (action.type.startsWith('chrome')) {
+    console.log(action.type, (action as any).payload, nextState.focusedWindowId, nextState.tabs)
+  }
+
+  return nextState
 }
 
 export function createStore(): redux.Store<AppState, Action> {

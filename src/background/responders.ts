@@ -130,5 +130,102 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       justTweeted: null,
       alert: 'POST TWEET FAILURE'
     }
+  },
+  'chrome.windows.getAll'(state, action) {
+    return {
+      focusedWindowId: action.payload.windows.find(win => win.focused)!.id
+    }
+  },
+  'chrome.tabs.query'(state, action) {
+    const tabs: AppState['tabs'] = new Map()
+    action.payload.tabs.forEach(tab =>
+      tabs.set(tab.id!, {
+        id: tab.id!,
+        windowId: tab.windowId!,
+        active: tab.active!,
+        url: tab.url!,
+        host: new URL(tab.url!).host
+      })
+    )
+    return { tabs }
+  },
+  'chrome.tabs.onCreated'(state, action) {
+    const { tab } = action.payload
+    const tabs = new Map(state.tabs)
+    tabs.set(tab.id!, {
+      id: tab.id!,
+      windowId: tab.windowId!,
+      active: tab.active,
+      url: tab.url,
+      host: tab.url ? new URL(tab.url).host : undefined
+    })
+    return { tabs }
+  },
+  'chrome.tabs.onRemoved'(state, action) {
+    const tabs = new Map(state.tabs)
+    tabs.delete(action.payload.tabId)
+    return { tabs }
+  },
+  'chrome.tabs.onUpdated'(state, action) {
+    const tabs = new Map(state.tabs)
+    const { tabId, changeInfo } = action.payload
+    if (!changeInfo.url) return {}
+    const tab = { ...tabs.get(tabId)! }
+    tab.url = changeInfo.url
+    tab.host = new URL(changeInfo.url).host
+    tabs.set(tabId, tab)
+    return { tabs }
+  },
+  'chrome.tabs.onAttached'(state, action) {
+    const tabs = new Map(state.tabs)
+    const {
+      tabId,
+      attachInfo: { newWindowId }
+    } = action.payload
+    const tab = { ...tabs.get(tabId)! }
+    tab.windowId = newWindowId
+    tabs.set(tabId, tab)
+    return { tabs }
+  },
+  'chrome.tabs.onActivated'(state, action) {
+    const tabs: AppState['tabs'] = new Map()
+    const {
+      activeInfo: { tabId, windowId }
+    } = action.payload
+    for (const [id, tab] of state.tabs.entries()) {
+      if (tab.windowId !== windowId) {
+        tabs.set(id, tab)
+      } else if (id === tabId) {
+        tabs.set(id, { ...tab, active: true })
+      } else {
+        tabs.set(id, { ...tab, active: false })
+      }
+    }
+    return { tabs }
+  },
+  'chrome.tabs.onReplaced'(state, action) {
+    console.log('chrome.tabs.onReplaced', state, action)
+    return {}
+  },
+  'chrome.windows.onCreated'(state, action) {
+    if (action.payload.win.focused) {
+      return { focusedWindowId: action.payload.win.id }
+    }
+    return {}
+  },
+  'chrome.windows.onRemoved'(state, action) {
+    const { windowId } = action.payload
+    const tabs = new Map(state.tabs)
+    for (const [id, tab] of state.tabs.entries()) {
+      if (tab.windowId === windowId) {
+        tabs.delete(id)
+      }
+    }
+    const focusedWindowId = windowId === state.focusedWindowId ? -1 : state.focusedWindowId
+    return { tabs, focusedWindowId }
+  },
+  'chrome.windows.onFocusChanged'(state, action) {
+    const { windowId } = action.payload
+    return { focusedWindowId: windowId }
   }
 }
