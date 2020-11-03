@@ -17,6 +17,11 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   DISMISS_ALERT() {
     return { alert: null }
   },
+  TOGGLE_PICKING_EMOJI(state) {
+    return {
+      pickingEmoji: !state.pickingEmoji,
+    }
+  },
   EMOJI_PICKED(state, action) {
     const tab = ensureActiveTab(state)
     const { emoji } = action.payload

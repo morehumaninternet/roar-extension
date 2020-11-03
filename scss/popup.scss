@@ -58,19 +58,27 @@ main {
   min-height: 20px;
 }
 
-.actions-bar {
+.action-bar {
   display: flex;
   justify-content: space-between;
   padding: 5px 0;
-}
 
-.actions {
-  display: flex;
-  align-items: flex-start;
-}
+  > .action-buttons {
+    display: flex;
+    align-items: flex-start;
 
-.actions svg {
-  height: 36px;
+    > .emoji-picker {
+      position: relative;
+
+      .emoji-mart {
+        position: absolute;
+      }
+    }
+
+    svg {
+      height: 36px;
+    }
+  }
 }
 
 .svg-btn {

@@ -58,6 +58,7 @@ type AppState = {
     url: string
   }>
   twitterAuth: TwitterAuthState
+  pickingEmoji: boolean
   alert: null | string | { __html: string }
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }

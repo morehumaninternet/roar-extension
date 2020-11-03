@@ -12,6 +12,7 @@ type AppProps = {
 
 type AuthenticatedProps = {
   feedback?: FeedbackState
+  pickingEmoji: boolean
   dispatchUserActions: DispatchUserActions
 }
 
@@ -19,7 +20,7 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
   return <button onClick={signInWithTwitter}>Sign in with twitter</button>
 }
 
-function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
+function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
   if (!feedback) {
     return null
   }
@@ -35,10 +36,10 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
           <Screenshots feedback={feedback} />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
-            emojiPicked={dispatchUserActions.emojiPicked}
+            togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
           />
-          <EmojiPicker emojiPicked={dispatchUserActions.emojiPicked} />
+          {pickingEmoji && <EmojiPicker emojiPicked={dispatchUserActions.emojiPicked} />}
         </div>
       </main>
     </div>
@@ -76,7 +77,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeTab(state)?.feedbackState} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeTab(state)?.feedbackState} pickingEmoji={state.pickingEmoji} dispatchUserActions={dispatchUserActions} />
     }
   }
 }

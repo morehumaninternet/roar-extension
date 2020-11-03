@@ -1,10 +1,8 @@
 import * as React from 'react'
-import { useState } from 'react'
-// import "emoji-mart/css/emoji-mart.css";
 import { Picker } from 'emoji-mart'
 
 export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void }): JSX.Element {
-  const [pickerActive, setPickerActive] = useState(false)
+  const [pickerActive, setPickerActive] = React.useState(false)
 
   const emojiPicker = pickerActive && (
     <Picker
