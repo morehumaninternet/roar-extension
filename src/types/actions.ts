@@ -6,6 +6,7 @@ type UserAction =
   | { type: 'DISMISS_ALERT' }
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
   | { type: 'CLICK_POST' }
+  | { type: 'TOGGLE_PICKING_EMOJI' }
   | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
   | { type: 'CLICK_TAKE_SCREENSHOT' }
 
@@ -36,6 +37,7 @@ type DispatchUserActions = {
   dismissAlert(): void
   updateEditorState(editorState: any): void
   clickPost(): void
+  togglePickingEmoji(): void
   emojiPicked(emoji: string): void
   clickTakeScreenshot(): void
 }

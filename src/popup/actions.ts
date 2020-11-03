@@ -23,11 +23,14 @@ export function actions(dispatch: Dispatch<UserAction>, getState: () => AppState
     clickPost(): UserAction {
       return dispatch({ type: 'CLICK_POST' })
     },
+    togglePickingEmoji(): UserAction {
+      return dispatch({ type: 'TOGGLE_PICKING_EMOJI' })
+    },
     emojiPicked(emoji: string): UserAction {
       return dispatch({ type: 'EMOJI_PICKED', payload: { emoji } })
     },
     clickTakeScreenshot(): UserAction {
       return dispatch({ type: 'CLICK_TAKE_SCREENSHOT' })
-    }
+    },
   }
 }

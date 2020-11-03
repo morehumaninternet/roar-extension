@@ -1,10 +1,8 @@
 import * as React from 'react'
-import { useState } from 'react'
-// import "emoji-mart/css/emoji-mart.css";
 import { Picker } from 'emoji-mart'
 
 export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void }): JSX.Element {
-  const [pickerActive, setPickerActive] = useState(false)
+  const [pickerActive, setPickerActive] = React.useState(false)
 
   const emojiPicker = pickerActive && (
     <Picker
@@ -19,7 +17,6 @@ export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void 
 
   return (
     <div className="measure">
-      {emojiPicker}
       <button className="svg-btn" onClick={() => setPickerActive(!pickerActive)}>
         <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -29,6 +26,7 @@ export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void 
           />
         </svg>
       </button>
+      {emojiPicker}
     </div>
   )
 }

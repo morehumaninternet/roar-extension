@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { Picker } from 'emoji-mart'
 import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
 import { activeTab } from '../selectors'
 import { ActionBar } from './components/action-bar'
+// import { EmojiPicker } from './components/emoji-picker'
 
 type AppProps = {
   state: AppState
@@ -11,6 +13,7 @@ type AppProps = {
 
 type AuthenticatedProps = {
   feedback?: FeedbackState
+  pickingEmoji: boolean
   dispatchUserActions: DispatchUserActions
 }
 
@@ -18,7 +21,7 @@ function NotAuthed({ signInWithTwitter }: { signInWithTwitter(): void }): JSX.El
   return <button onClick={signInWithTwitter}>Sign in with twitter</button>
 }
 
-function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
+function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
   if (!feedback) {
     return null
   }
@@ -27,6 +30,15 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
 
   return (
     <div className="app">
+      <div className={`emoji-picker-container ${pickingEmoji ? 'open' : 'closed'}`}>
+        <Picker
+          style={{ width: '100%', border: 'none', borderRadius: 0 }}
+          title="Pick your emoji…"
+          showPreview={false}
+          showSkintones={false}
+          onSelect={(emoji: any) => dispatchUserActions.emojiPicked(emoji.native)}
+        />
+      </div>
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
@@ -34,7 +46,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
           <Screenshots feedback={feedback} />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
-            emojiPicked={dispatchUserActions.emojiPicked}
+            togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
           />
         </div>
@@ -74,7 +86,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeTab(state)?.feedbackState} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeTab(state)?.feedbackState} pickingEmoji={state.pickingEmoji} dispatchUserActions={dispatchUserActions} />
     }
   }
 }
