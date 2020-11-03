@@ -9,7 +9,7 @@ const emptyState: AppState = {
   justTweeted: null,
   twitterAuth: 'not_authed',
   alert: null,
-  mostRecentAction: { type: 'INITIALIZING' }
+  mostRecentAction: { type: 'INITIALIZING' },
 }
 
 function reducer(state: AppState = emptyState, action: Action): AppState {
@@ -21,7 +21,7 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
   const nextState = {
     ...state,
     ...stateUpdates,
-    mostRecentAction: action
+    mostRecentAction: action,
   }
 
   // We are using rollup to replace process.env.NODE_ENV before TypeScript
