@@ -2,7 +2,7 @@ import { Store } from 'redux'
 import { actions } from './actions'
 import { takeScreenshot } from './screenshot'
 import { postTweet } from './api'
-import { activeTab } from '../selectors'
+import { ensureActiveTab } from '../selectors'
 
 export function subscribe(store: Store<AppState, Action>, browser: typeof window.browser, tabs: typeof browser.tabs): Function {
   const dispatchBackgroundActions: DispatchBackgroundActions = actions(store.dispatch)
@@ -16,7 +16,7 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
 
     // Take a screenshot if no screenshots currently present for the active tab
     if (nextState.popupConnected && !prevState.popupConnected) {
-      const tab = activeTab(nextState)
+      const tab = ensureActiveTab(nextState)
 
       if (!tab.feedbackState.screenshots.length) {
         takeScreenshot(tab, tabs, dispatchBackgroundActions)
@@ -26,7 +26,7 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     // Take a screenshot on request
     if (nextState.mostRecentAction.type === 'CLICK_TAKE_SCREENSHOT') {
       if (!nextState.popupConnected) throw new Error('Popup should be connected')
-      takeScreenshot(activeTab(nextState), tabs, dispatchBackgroundActions)
+      takeScreenshot(ensureActiveTab(nextState), tabs, dispatchBackgroundActions)
     }
 
     if (nextState.toBeTweeted && !prevState.toBeTweeted) {
