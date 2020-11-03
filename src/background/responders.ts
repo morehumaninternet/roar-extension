@@ -6,7 +6,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return { popupConnected: true }
   },
   POPUP_DISCONNECT() {
-    return { popupConnected: false, alert: null } // closing the popup dismisses any alert
+    return { popupConnected: false, pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   SIGN_IN_WITH_TWITTER() {
     return { twitterAuth: 'authenticating' }
@@ -39,7 +39,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       },
     })
 
-    return { tabs: nextTabs }
+    return { tabs: nextTabs, pickingEmoji: false }
   },
   UPDATE_EDITOR_STATE(state, action) {
     const tab = ensureActiveTab(state)
