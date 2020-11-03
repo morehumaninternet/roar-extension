@@ -3,6 +3,7 @@ import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
 import { activeTab } from '../selectors'
 import { ActionBar } from './components/action-bar'
+import { EmojiPicker } from './components/emoji-picker'
 
 type AppProps = {
   state: AppState
@@ -37,6 +38,7 @@ function Authenticated({ feedback, dispatchUserActions }: AuthenticatedProps): J
             emojiPicked={dispatchUserActions.emojiPicked}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
           />
+          <EmojiPicker emojiPicked={dispatchUserActions.emojiPicked} />
         </div>
       </main>
     </div>
