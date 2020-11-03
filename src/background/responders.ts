@@ -1,5 +1,5 @@
 import { EditorState, Modifier } from 'draft-js'
-import { activeTab } from '../selectors'
+import { ensureActiveTab } from '../selectors'
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT() {
@@ -18,7 +18,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return { alert: null }
   },
   EMOJI_PICKED(state, action) {
-    const tab = activeTab(state)
+    const tab = ensureActiveTab(state)
     const { emoji } = action.payload
 
     const editorState: EditorState = tab.feedbackState.editorState
@@ -30,22 +30,22 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: nextEditorState
-      }
+        editorState: nextEditorState,
+      },
     })
 
     return { tabs: nextTabs }
   },
   UPDATE_EDITOR_STATE(state, action) {
-    const tab = activeTab(state)
+    const tab = ensureActiveTab(state)
 
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: action.payload.editorState
-      }
+        editorState: action.payload.editorState,
+      },
     })
 
     return { tabs: nextTabs }
@@ -54,16 +54,16 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return {}
   },
   CLICK_POST(state) {
-    const tab = activeTab(state)
+    const tab = ensureActiveTab(state)
     return {
       toBeTweeted: {
         feedbackState: tab.feedbackState,
-        tabId: tab.id
-      }
+        tabId: tab.id,
+      },
     }
   },
   SCREENSHOT_CAPTURE_SUCCESS(state, action) {
-    const tab = activeTab(state)
+    const tab = ensureActiveTab(state)
     const { screenshot } = action.payload
 
     const nextTabs = new Map(state.tabs)
@@ -71,8 +71,8 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots.concat([screenshot]),
-        editorState: tab.feedbackState.editorState
-      }
+        editorState: tab.feedbackState.editorState,
+      },
     })
 
     return { tabs: nextTabs }
@@ -84,19 +84,19 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const { url } = action.payload.tweetResult
     return {
       toBeTweeted: null,
-      justTweeted: { url }
+      justTweeted: { url },
     }
   },
   POST_TWEET_FAILURE() {
     return {
       toBeTweeted: null,
       justTweeted: null,
-      alert: 'POST TWEET FAILURE'
+      alert: 'POST TWEET FAILURE',
     }
   },
   'chrome.windows.getAll'(state, action) {
     return {
-      focusedWindowId: action.payload.windows.find(win => win.focused)!.id
+      focusedWindowId: action.payload.windows.find(win => win.focused)!.id,
     }
   },
   'chrome.tabs.query'(state, action) {
@@ -110,8 +110,8 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
         host: new URL(tab.url!).host,
         feedbackState: {
           screenshots: [],
-          editorState: EditorState.createEmpty()
-        }
+          editorState: EditorState.createEmpty(),
+        },
       })
     )
     return { tabs }
@@ -127,8 +127,8 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       host: tab.url ? new URL(tab.url).host : undefined,
       feedbackState: {
         screenshots: [],
-        editorState: EditorState.createEmpty()
-      }
+        editorState: EditorState.createEmpty(),
+      },
     })
     return { tabs }
   },
@@ -151,7 +151,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const tabs = new Map(state.tabs)
     const {
       tabId,
-      attachInfo: { newWindowId }
+      attachInfo: { newWindowId },
     } = action.payload
     const tab = { ...tabs.get(tabId)! }
     tab.windowId = newWindowId
@@ -193,5 +193,5 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   'chrome.windows.onFocusChanged'(state, action) {
     const { windowId } = action.payload
     return { focusedWindowId: windowId }
-  }
+  },
 }

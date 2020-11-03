@@ -10,7 +10,7 @@ type AppProps = {
 }
 
 type AuthenticatedProps = {
-  feedback: FeedbackState
+  feedback?: FeedbackState
   dispatchUserActions: DispatchUserActions
 }
 
@@ -74,7 +74,7 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return <Authenticated feedback={activeTab(state).feedbackState} dispatchUserActions={dispatchUserActions} />
+      return <Authenticated feedback={activeTab(state)?.feedbackState} dispatchUserActions={dispatchUserActions} />
     }
   }
 }
