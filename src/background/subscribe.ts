@@ -1,8 +1,8 @@
 import { Store } from 'redux'
 import { actions } from './actions'
-import { checkActiveTab } from './tab'
 import { takeScreenshot } from './screenshot'
 import { postTweet } from './api'
+import { activeTab } from '../selectors'
 
 export function subscribe(store: Store<AppState, Action>, browser: typeof window.browser, tabs: typeof browser.tabs): Function {
   const dispatchBackgroundActions: DispatchBackgroundActions = actions(store.dispatch)
@@ -14,26 +14,19 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     const prevState = previousState
     previousState = nextState
 
-    // Check the active tab if the user just connected
-    if (nextState.popup.connected && !prevState.popup.connected) {
-      checkActiveTab(tabs, dispatchBackgroundActions)
-    }
-
     // Take a screenshot if no screenshots currently present for the active tab
-    if (nextState.mostRecentAction.type === 'ACTIVE_TAB_DETECTED') {
-      if (!nextState.popup.connected) throw new Error('Popup should be connected')
-      const activeTabId = nextState.popup.activeTab!.id!
-      const activeTabFeedback = nextState.feedbackByTabId[activeTabId] || { screenshots: [] }
+    if (nextState.popupConnected && !prevState.popupConnected) {
+      const tab = activeTab(nextState)
 
-      if (!activeTabFeedback.screenshots.length) {
-        takeScreenshot((nextState.popup as ConnectedPopupState).activeTab!, tabs, dispatchBackgroundActions)
+      if (!tab.feedbackState.screenshots.length) {
+        takeScreenshot(tab, tabs, dispatchBackgroundActions)
       }
     }
 
     // Take a screenshot on request
     if (nextState.mostRecentAction.type === 'CLICK_TAKE_SCREENSHOT') {
-      if (!nextState.popup.connected) throw new Error('Popup should be connected')
-      takeScreenshot((nextState.popup as ConnectedPopupState).activeTab!, tabs, dispatchBackgroundActions)
+      if (!nextState.popupConnected) throw new Error('Popup should be connected')
+      takeScreenshot(activeTab(nextState), tabs, dispatchBackgroundActions)
     }
 
     if (nextState.toBeTweeted && !prevState.toBeTweeted) {

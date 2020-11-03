@@ -10,12 +10,6 @@ type UserAction =
   | { type: 'CLICK_TAKE_SCREENSHOT' }
 
 type BackgroundAction =
-  | {
-      type: 'ACTIVE_TAB_DETECTED'
-      payload: { activeTab: browser.tabs.Tab; disabledForTab: boolean }
-    }
-  | { type: 'NO_ACTIVE_TAB_DETECTED' }
-  | { type: 'TAB_CLOSED'; payload: { tabId: number } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
   | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
@@ -47,8 +41,6 @@ type DispatchUserActions = {
 }
 
 type DispatchBackgroundActions = {
-  activeTabDetected(activeTab: browser.tabs.Tab, disabledForTab: boolean): void
-  noActiveTabDetected(): void
   screenshotCaptureSuccess(screenshot: Screenshot): void
   screenshotCaptureFailure(error: any): void
   postTweetSuccess(tweetResult: any): void

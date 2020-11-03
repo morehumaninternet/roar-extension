@@ -1,8 +1,6 @@
-export function activeFeedback(state: AppState): null | FeedbackState {
-  if (!state.popup.connected) return null
-  if (!state.popup.activeTab) return null
-
-  const activeTabId = state.popup.activeTab.id
-  if (!activeTabId) return null
-  return state.feedbackByTabId[activeTabId] || null
+export function activeTab(state: AppState): TabInfo {
+  for (const tab of state.tabs.values()) {
+    if (tab.windowId === state.focusedWindowId && tab.active) return tab
+  }
+  throw new Error('No active tab found')
 }

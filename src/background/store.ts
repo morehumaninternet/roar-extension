@@ -2,10 +2,9 @@ import * as redux from 'redux'
 import { responders } from './responders'
 
 const emptyState: AppState = {
-  popup: { connected: false },
+  popupConnected: false,
   focusedWindowId: -1,
   tabs: new Map(),
-  feedbackByTabId: {},
   toBeTweeted: null,
   justTweeted: null,
   twitterAuth: 'not_authed',
