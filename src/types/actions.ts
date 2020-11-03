@@ -15,8 +15,8 @@ type BackgroundAction =
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
   | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
   | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
-  | { type: 'chrome.windows.getAll'; payload: { windows: chrome.windows.Window[] } }
-  | { type: 'chrome.tabs.query'; payload: { tabs: chrome.tabs.Tab[] } }
+  | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
+  | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
   | { type: 'chrome.tabs.onRemoved'; payload: { tabId: number; removeInfo: chrome.tabs.TabRemoveInfo } }
   | { type: 'chrome.tabs.onUpdated'; payload: { tabId: number; changeInfo: chrome.tabs.TabChangeInfo } }

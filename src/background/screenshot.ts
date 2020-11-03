@@ -4,16 +4,12 @@ function dataURItoBlob(dataURI: string): Blob {
   const byteString = atob(dataURI.split(',')[1])
 
   // separate out the mime component
-  const mimeString = dataURI
-    .split(',')[0]
-    .split(':')[1]
-    .split(';')[0]
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
 
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length)
   const ia = new Uint8Array(ab)
   for (let i = 0; i < byteString.length; i++) {
-    // tslint:disable-line:no-let
     // tslint:disable-line:no-let
     ia[i] = byteString.charCodeAt(i)
   }
@@ -31,7 +27,7 @@ export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, di
       tab,
       name: `${host} - ${new Date().toISOString()}`,
       uri: screenshotUri,
-      blob: screenshotBlob
+      blob: screenshotBlob,
     })
   } catch (error) {
     dispatchBackgroundActions.screenshotCaptureFailure(error)
