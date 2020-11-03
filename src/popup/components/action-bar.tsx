@@ -50,8 +50,8 @@ export const ActionBar = ({ clickPost, emojiPicked, clickTakeScreenshot }: Actio
       <div className="actions">
         <TakeSnapshotButton onClick={clickTakeScreenshot} />
         <AddImageButton />
-        <AddHashtagButton />
         <EmojiPicker emojiPicked={emojiPicked} />
+        <AddHashtagButton />
       </div>
       <button className="post-btn" onClick={clickPost}>
         Post
