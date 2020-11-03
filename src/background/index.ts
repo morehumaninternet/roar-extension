@@ -14,7 +14,7 @@ const store = (window.store = createStore())
 
 subscribe(store, browser, browser.tabs)
 
-chrome.windows.getAll({}, windows => store.dispatch({ type: 'chrome.windows.getAll', payload: { windows } }))
+chrome.windows.getAll(windows => store.dispatch({ type: 'chrome.windows.getAll', payload: { windows } }))
 chrome.tabs.query({}, tabs => store.dispatch({ type: 'chrome.tabs.query', payload: { tabs } }))
 chrome.tabs.onCreated.addListener(tab => store.dispatch({ type: 'chrome.tabs.onCreated', payload: { tab } }))
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => store.dispatch({ type: 'chrome.tabs.onRemoved', payload: { tabId, removeInfo } }))

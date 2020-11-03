@@ -10,7 +10,7 @@ export function EmojiPicker({ emojiPicked }: { emojiPicked(emoji: string): void 
     <Picker
       title="Pick your emoji…"
       emoji="point_up"
-      onSelect={emoji => {
+      onSelect={(emoji: any) => {
         emojiPicked(emoji.native)
         setPickerActive(false)
       }}
