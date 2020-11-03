@@ -145,8 +145,18 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     if (!changeInfo.url) return {}
     const tabs = new Map(state.tabs)
     const tab = { ...tabs.get(tabId)! }
-    tab.url = changeInfo.url
-    tab.host = new URL(changeInfo.url).host
+    const nextURL = changeInfo.url
+    const nextHost = new URL(nextURL).host
+    tab.url = nextURL
+
+    // If the domain has changed, delete the feedback
+    if (tab.host !== nextHost) {
+      tab.host = nextHost
+      tab.feedbackState = {
+        screenshots: [],
+        editorState: EditorState.createEmpty(),
+      }
+    }
     tabs.set(tabId, tab)
     return { tabs }
   },
