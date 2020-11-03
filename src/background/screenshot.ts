@@ -9,8 +9,9 @@ function dataURItoBlob(dataURI: string): Blob {
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length)
   const ia = new Uint8Array(ab)
+
+  // tslint:disable-next-line:no-let
   for (let i = 0; i < byteString.length; i++) {
-    // tslint:disable-line:no-let
     ia[i] = byteString.charCodeAt(i)
   }
 
