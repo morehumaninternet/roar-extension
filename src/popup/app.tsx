@@ -35,6 +35,7 @@ function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: Authenti
           style={{ width: '100%', border: 'none', borderRadius: 0 }}
           title="Pick your emoji…"
           showPreview={false}
+          showSkintones={false}
           onSelect={(emoji: any) => dispatchUserActions.emojiPicked(emoji.native)}
         />
       </div>
