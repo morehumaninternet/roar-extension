@@ -173,8 +173,12 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return { tabs }
   },
   'chrome.tabs.onReplaced'(state, action) {
-    console.log('chrome.tabs.onReplaced', state, action)
-    return {}
+    const { addedTabId, removedTabId } = action.payload
+    const tab = state.tabs.get(removedTabId)!
+    const tabs = new Map(state.tabs)
+    tabs.delete(removedTabId)
+    tabs.set(addedTabId, { ...tab, id: addedTabId })
+    return { tabs }
   },
   'chrome.windows.onCreated'(state, action) {
     if (action.payload.win.focused) {
