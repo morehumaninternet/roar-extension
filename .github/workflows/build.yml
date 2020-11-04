@@ -1,0 +1,37 @@
+name: Build and publish
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set branch name
+      id: vars
+      shell: bash
+      run: |
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+    - uses: actions/checkout@v2
+    - name: Build and publish
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - run: npm install
+    - run: npm run lint
+    # - run: npm test
+    - run: ENV=stage npm run build
+    - run: ./gh-create-zip.sh
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: roar-extension-${{ steps.vars.outputs.branch }}-${{ github.run_number }}
+        path: artifacts/*.zip
+        if-no-files-found: error
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: workflow,job,commit,repo,ref,author,took
+      if: always()
+      env:
+        CI: true
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}
