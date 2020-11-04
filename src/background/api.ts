@@ -1,7 +1,15 @@
 function tweetFormData(toBeTweeted: ToBeTweeted): FormData {
   const tweetData = new FormData()
 
-  const status = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
+  const statusWithoutHandle = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
+  const hostTwitterHandle = toBeTweeted.feedbackState.hostTwitterHandle.handle
+
+  // tslint:disable-next-line: no-let
+  let status = statusWithoutHandle
+  if (hostTwitterHandle) {
+    status = `${hostTwitterHandle} ${status}`
+  }
+
   tweetData.append('status', status)
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
@@ -42,7 +50,6 @@ export const fetchTwitterHandle = async (url: string, dispatchBackgroundActions:
   try {
     const res = await makeHandleRequest(url)
     const { twitter_handle } = await res.json()
-    console.log(twitter_handle)
     return dispatchBackgroundActions.fetchHandleSuccess(twitter_handle)
   } catch (error) {
     return dispatchBackgroundActions.fetchHandleFailure(error)
