@@ -214,6 +214,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   'chrome.windows.onFocusChanged'(state, action): Partial<AppState> {
     const { windowId } = action.payload
+    if (windowId === -1) return {}
     return { focusedWindowId: windowId }
   },
 }
