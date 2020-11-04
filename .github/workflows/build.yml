@@ -26,6 +26,19 @@ jobs:
         name: roar-extension-${{ steps.vars.outputs.branch }}-${{ env.GITHUB_RUN_NUMBER }}
         path: artifacts/*.zip
         if-no-files-found: error
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: workflow,job,commit,repo,ref,author,took
+        custom_payload: |
+          {
+            username: 'extension-publisher',
+            icon_emoji: ':octocat:',
+            attachments: [{
+              color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+              text: `${process.env.AS_WORKFLOW}\n${process.env.AS_JOB} (${process.env.AS_COMMIT}) of ${process.env.AS_REPO}@${process.env.AS_REF} by ${process.env.AS_AUTHOR} succeeded in ${process.env.AS_TOOK}`,
+            }]
+          }
       env:
         CI: true
-        SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}
