@@ -40,7 +40,6 @@ for resource in bundled html img; do
   cp -R $resource ./$PUBLISH_DIR
 done
 
-# Write over the proper conf.js file based on the environment. Ignore the one at the root level.
 if [[ $TARGET == "production" ]]; then
   NAME="Roar"
 else
