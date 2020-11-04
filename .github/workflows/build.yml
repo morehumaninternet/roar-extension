@@ -23,7 +23,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: roar-extension-${{ steps.vars.outputs.branch }}-${{ env.GITHUB_RUN_NUMBER }}
+        name: roar-extension-${{ steps.vars.outputs.branch }}-${{ github.run_number }}
         path: artifacts/*.zip
         if-no-files-found: error
     - uses: 8398a7/action-slack@v3
