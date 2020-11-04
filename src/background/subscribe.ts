@@ -1,7 +1,7 @@
 import { Store } from 'redux'
 import { actions } from './actions'
 import { takeScreenshot } from './screenshot'
-import { postTweet } from './api'
+import { fetchTwitterHandle, postTweet } from './api'
 import { ensureActiveTab } from '../selectors'
 
 export function subscribe(store: Store<AppState, Action>, browser: typeof window.browser, tabs: typeof browser.tabs): Function {
@@ -14,12 +14,18 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     const prevState = previousState
     previousState = nextState
 
-    // Take a screenshot if no screenshots currently present for the active tab
+    // Dispatch actions when the extension was clicked
     if (nextState.popupConnected && !prevState.popupConnected) {
       const tab = ensureActiveTab(nextState)
 
+      // Take a screenshot if no screenshots currently present for the active tab
       if (!tab.feedbackState.screenshots.length) {
         takeScreenshot(tab, tabs, dispatchBackgroundActions)
+      }
+
+      // Fetch the twitter handle if it wasn't fetched before and the tab URL is valid
+      if (tab.url && tab.feedbackState.hostTwitterHandle.status === 'NEW') {
+        fetchTwitterHandle(tab.url, dispatchBackgroundActions)
       }
     }
 

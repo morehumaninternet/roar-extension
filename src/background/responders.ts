@@ -1,5 +1,6 @@
 import { EditorState, Modifier } from 'draft-js'
-import { ensureActiveTab } from '../selectors'
+import { store } from 'emoji-mart'
+import { activeTab, ensureActiveTab } from '../selectors'
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT(): Partial<AppState> {
@@ -36,6 +37,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
         editorState: nextEditorState,
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -50,6 +52,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
         editorState: action.payload.editorState,
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -67,6 +70,47 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       },
     }
   },
+  FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
+    const { handle } = action.payload
+    const tab = activeTab(state)
+
+    // If the tab doesn't exist anymore, don't try to update it
+    if (tab === null) return {}
+    const nextTabs = new Map(state.tabs)
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        screenshots: tab.feedbackState.screenshots,
+        editorState: tab.feedbackState.editorState,
+        hostTwitterHandle: {
+          status: 'DONE',
+          handle,
+        },
+      },
+    })
+
+    return { tabs: nextTabs }
+  },
+  FETCH_HANDLE_FAILURE(state, action): Partial<AppState> {
+    const { error } = action.payload
+    const tab = activeTab(state)
+
+    // If the tab doesn't exist anymore, don't try to update it
+    if (tab === null) return {}
+    const nextTabs = new Map(state.tabs)
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        screenshots: tab.feedbackState.screenshots,
+        editorState: tab.feedbackState.editorState,
+        hostTwitterHandle: {
+          status: 'DONE',
+          handle: null,
+        },
+      },
+    })
+    return { tabs: nextTabs, alert: `Failed to set handle: ${error}` }
+  },
   SCREENSHOT_CAPTURE_SUCCESS(state, action): Partial<AppState> {
     const { screenshot } = action.payload
     const tabId = screenshot.tab.id
@@ -80,6 +124,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       feedbackState: {
         screenshots: tab.feedbackState.screenshots.concat([screenshot]),
         editorState: tab.feedbackState.editorState,
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -119,6 +164,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
         feedbackState: {
           screenshots: [],
           editorState: EditorState.createEmpty(),
+          hostTwitterHandle: {
+            status: 'NEW',
+            handle: null,
+          },
         },
       })
     )
@@ -136,6 +185,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       feedbackState: {
         screenshots: [],
         editorState: EditorState.createEmpty(),
+        hostTwitterHandle: {
+          status: 'NEW',
+          handle: null,
+        },
       },
     })
     return { tabs }
@@ -160,6 +213,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       tab.feedbackState = {
         screenshots: [],
         editorState: EditorState.createEmpty(),
+        hostTwitterHandle: {
+          status: 'NEW',
+          handle: null,
+        },
       }
     }
     tabs.set(tabId, tab)
