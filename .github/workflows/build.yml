@@ -1,4 +1,4 @@
-name: Install, lint, test, and build
+name: Build and publish
 
 on: [push]
 
@@ -6,20 +6,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Declare some variables
+    - name: Set branch name
       id: vars
       shell: bash
       run: |
         echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
     - uses: actions/checkout@v2
-    - name: Install, lint, test, and build
+    - name: Build and publish
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
     - run: npm install
     - run: npm run lint
     # - run: npm test
-    - run: ./gh-publish.sh
+    - run: ENV=stage npm run build
+    - run: ./gh-create-zip.sh
 
     - uses: actions/upload-artifact@v2
       with:
@@ -30,15 +31,7 @@ jobs:
       with:
         status: ${{ job.status }}
         fields: workflow,job,commit,repo,ref,author,took
-        custom_payload: |
-          {
-            username: 'Extension Publisher',
-            icon_emoji: ':octocat:',
-            attachments: [{
-              color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
-              text: `${process.env.AS_WORKFLOW}\n${process.env.AS_JOB} (${process.env.AS_COMMIT}) of ${process.env.AS_REPO}@${process.env.AS_REF} by ${process.env.AS_AUTHOR} succeeded in ${process.env.AS_TOOK}`,
-            }]
-          }
+      if: always()
       env:
         CI: true
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}
