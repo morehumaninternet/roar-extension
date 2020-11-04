@@ -67,8 +67,11 @@ console.log(
   '\n'
 )
 
-// Run the build. If any commands fail, kill the others
-concurrently(commands, { outputStream, killOthers: ['failure'] })
+// Run the build. If any commands fail, kill the others and exit with its exit code
+concurrently(commands, { outputStream, killOthers: ['failure'] }).catch(results => {
+  const { exitCode } = results.find(result => result.exitCode !== 0 && typeof result.exitCode === 'number')
+  process.exit(exitCode)
+})
 
 // On a successful build, let the user know and destroy the passThrough as we no longer have any use for it
 function onSuccessfulBuild() {
