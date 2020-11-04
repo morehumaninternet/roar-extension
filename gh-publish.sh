@@ -3,7 +3,7 @@ set -euo pipefail
 
 git_branch=${GITHUB_REF##*/}
 git_hash=$(git rev-parse --short "$GITHUB_SHA")
-artifact_name="$git_branch - $GITHUB_RUN_NUMBER @$git_hash"
+artifact_name="roar-extension $git_branch - $GITHUB_RUN_NUMBER @$git_hash"
 
 PUBLISH_DIR=publish
 
