@@ -15,5 +15,11 @@ jobs:
     - run: npm run lint
     # - run: npm test
     - run: ./gh-publish.sh
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: extension.zip
+        path: artifacts/*.zip
       env:
         CI: true
+        SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}

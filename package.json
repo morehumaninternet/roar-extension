@@ -39,6 +39,7 @@
     "@rollup/plugin-commonjs": "16.0.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "10.0.0",
+    "@slack/webhook": "^5.0.3",
     "@types/chai": "4.1.7",
     "@types/chrome": "0.0.81",
     "@types/draft-js": "0.10.44",

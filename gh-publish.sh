@@ -28,3 +28,5 @@ ROOT=$(pwd)
 mkdir -p artifacts
 
 cd $PUBLISH_DIR && zip -r -FS "$ROOT/$ARTIFACT_FILE_NAME" * && cd $ROOT
+
+# git_branch=$git_branch git_hash=$git_hash artifact_name=$artifact_name ./slack.js
