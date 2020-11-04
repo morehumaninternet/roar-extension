@@ -6,6 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Declare some variables
+      id: vars
+      shell: bash
+      run: |
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
     - uses: actions/checkout@v2
     - name: Install, lint, test, and build
       uses: actions/setup-node@v1
@@ -18,8 +23,9 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: extension.zip
+        name: roar-extension-${{ steps.vars.outputs.branch }}-${{ env.GITHUB_RUN_NUMBER }}
         path: artifacts/*.zip
+        if-no-files-found: error
       env:
         CI: true
         SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL: ${{ secrets.SLACK_ENGINEERING_CHANNEL_WEBHOOK_URL }}
