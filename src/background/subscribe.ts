@@ -23,8 +23,15 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
         takeScreenshot(tab, tabs, dispatchBackgroundActions)
       }
 
-      // Fetch the twitter handle if it wasn't fetched before and the tab URL is valid
+      // it the handle wasn't fetched before and the tab URL is valid,
+      // start the fetch process
       if (tab.url && tab.feedbackState.hostTwitterHandle.status === 'NEW') {
+        console.log('starting the process')
+        dispatchBackgroundActions.startFetchHandle()
+      }
+
+      if (tab.url && tab.feedbackState.hostTwitterHandle.status === 'IN_PROGRESS') {
+        console.log('fetching the handle')
         fetchTwitterHandle(tab.url, dispatchBackgroundActions)
       }
     }

@@ -11,6 +11,7 @@ type UserAction =
   | { type: 'CLICK_TAKE_SCREENSHOT' }
 
 type BackgroundAction =
+  | { type: 'START_FETCH_HANDLE' }
   | { type: 'FETCH_HANDLE_SUCCESS'; payload: { handle: string } }
   | { type: 'FETCH_HANDLE_FAILURE'; payload: { error: any } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
@@ -45,6 +46,7 @@ type DispatchUserActions = {
 }
 
 type DispatchBackgroundActions = {
+  startFetchHandle(): void
   fetchHandleSuccess(handle: string): void
   fetchHandleFailure(error: any): void
   screenshotCaptureSuccess(screenshot: Screenshot): void

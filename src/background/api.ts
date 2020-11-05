@@ -1,15 +1,7 @@
 function tweetFormData(toBeTweeted: ToBeTweeted): FormData {
   const tweetData = new FormData()
 
-  const statusWithoutHandle = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
-  const hostTwitterHandle = toBeTweeted.feedbackState.hostTwitterHandle.handle
-
-  // tslint:disable-next-line: no-let
-  let status = statusWithoutHandle
-  if (hostTwitterHandle) {
-    status = `${hostTwitterHandle} ${status}`
-  }
-
+  const status = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
@@ -41,7 +33,7 @@ export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActi
 
 function makeHandleRequest(url: string): Promise<Response> {
   const params = { domain: url }
-  const requestURL = new URL(`${window.roarServerUrl}/v1/website`)
+  const requestURL = new URL('v1/website', window.roarServerUrl)
   requestURL.search = new URLSearchParams(params).toString()
   return fetch(requestURL.toString())
 }

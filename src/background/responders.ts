@@ -1,6 +1,18 @@
-import { EditorState, Modifier } from 'draft-js'
+import { EditorState, Modifier, SelectionState } from 'draft-js'
+import { OrderedSet } from 'immutable'
 import { store } from 'emoji-mart'
 import { activeTab, ensureActiveTab } from '../selectors'
+
+const emptyFeedbackState = (): FeedbackState => {
+  return {
+    screenshots: [],
+    editorState: EditorState.createEmpty(),
+    hostTwitterHandle: {
+      status: 'NEW',
+      handle: null,
+    },
+  }
+}
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT(): Partial<AppState> {
@@ -46,6 +58,13 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   UPDATE_EDITOR_STATE(state, action): Partial<AppState> {
     const tab = ensureActiveTab(state)
 
+    const handle = tab.feedbackState.hostTwitterHandle.handle
+    const { editorState } = action.payload
+    const status = editorState.getCurrentContent().getPlainText('\u0001')
+
+    // If the new editor state doesn't start with the handle, don't update the store
+    if (handle && !status.startsWith(`${handle} `)) return {}
+
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
@@ -70,18 +89,46 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       },
     }
   },
-  FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
-    const { handle } = action.payload
-    const tab = activeTab(state)
-
-    // If the tab doesn't exist anymore, don't try to update it
-    if (tab === null) return {}
+  START_FETCH_HANDLE(state): Partial<AppState> {
+    const tab = ensureActiveTab(state)
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
         editorState: tab.feedbackState.editorState,
+        hostTwitterHandle: {
+          status: 'IN_PROGRESS',
+          handle: null,
+        },
+      },
+    })
+    return { tabs: nextTabs }
+  },
+  FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
+    const { handle } = action.payload
+    const tab = activeTab(state)
+
+    // If the tab doesn't exist anymore, don't try to update it
+    if (!tab) return {}
+    const nextTabs = new Map(state.tabs)
+
+    const editorState: EditorState = tab.feedbackState.editorState
+    const currentContent = editorState.getCurrentContent()
+    const currentSelection = editorState.getSelection()
+    const nextSelection = currentSelection.merge({
+      // TODO - color only the handle in pink
+      // anchorOffset: 0,
+      // focusOffset: handle.length
+    })
+    const nextContentState = Modifier.insertText(currentContent, nextSelection, `${handle} `, OrderedSet.of('HUMAN-PINK'))
+    const nextEditorState = EditorState.createWithContent(nextContentState)
+
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        screenshots: tab.feedbackState.screenshots,
+        editorState: nextEditorState,
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -96,7 +143,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const tab = activeTab(state)
 
     // If the tab doesn't exist anymore, don't try to update it
-    if (tab === null) return {}
+    if (!tab) return {}
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
@@ -161,14 +208,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
         active: tab.active!,
         url: tab.url!,
         host: new URL(tab.url!).host,
-        feedbackState: {
-          screenshots: [],
-          editorState: EditorState.createEmpty(),
-          hostTwitterHandle: {
-            status: 'NEW',
-            handle: null,
-          },
-        },
+        feedbackState: emptyFeedbackState(),
       })
     )
     return { tabs }
@@ -182,14 +222,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       active: tab.active,
       url: tab.url,
       host: tab.url ? new URL(tab.url).host : undefined,
-      feedbackState: {
-        screenshots: [],
-        editorState: EditorState.createEmpty(),
-        hostTwitterHandle: {
-          status: 'NEW',
-          handle: null,
-        },
-      },
+      feedbackState: emptyFeedbackState(),
     })
     return { tabs }
   },
@@ -210,14 +243,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     // If the domain has changed, delete the feedback
     if (tab.host !== nextHost) {
       tab.host = nextHost
-      tab.feedbackState = {
-        screenshots: [],
-        editorState: EditorState.createEmpty(),
-        hostTwitterHandle: {
-          status: 'NEW',
-          handle: null,
-        },
-      }
+      tab.feedbackState = emptyFeedbackState()
     }
     tabs.set(tabId, tab)
     return { tabs }

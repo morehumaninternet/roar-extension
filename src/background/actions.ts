@@ -2,6 +2,11 @@ import { Dispatch } from 'redux'
 
 export function actions(dispatch: Dispatch<BackgroundAction>): DispatchBackgroundActions {
   return {
+    startFetchHandle: () =>
+      dispatch({
+        type: 'START_FETCH_HANDLE',
+      }),
+
     fetchHandleSuccess: handle =>
       dispatch({
         type: 'FETCH_HANDLE_SUCCESS',
