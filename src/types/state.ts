@@ -28,9 +28,17 @@ type ScreenshotState = {
   screenshots: ReadonlyArray<Screenshot>
 }
 
+type TwitterHandleStatus = 'NEW' | 'IN_PROGRESS' | 'DONE'
+
+type HostTwitterHandle = {
+  status: TwitterHandleStatus
+  handle: string | null
+}
+
 type FeedbackState = {
   screenshots: ReadonlyArray<Screenshot>
   editorState: any
+  hostTwitterHandle: HostTwitterHandle
 }
 
 type TwitterAuthState = 'not_authed' | 'authenticating' | 'authenticated'
