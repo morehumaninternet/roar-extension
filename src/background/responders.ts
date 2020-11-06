@@ -60,7 +60,8 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const { editorState } = action.payload
     const status = editorState.getCurrentContent().getPlainText('\u0001')
 
-    // If the new editor state doesn't start with the handle, don't update the store
+    // If the new editor state doesn't start with the handle, don't update the store.
+    // This makes the handle static (not editable)
     if (handle && !status.startsWith(`${handle} `)) return {}
 
     const nextTabs = new Map(state.tabs)
@@ -137,9 +138,9 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       focusOffset: handle.length,
       focusKey: firstBlockKey,
     })
-    const coloredContestState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
+    const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
 
-    const nextEditorState = EditorState.createWithContent(coloredContestState)
+    const nextEditorState = EditorState.createWithContent(coloredContentState)
 
     nextTabs.set(tab.id, {
       ...tab,
