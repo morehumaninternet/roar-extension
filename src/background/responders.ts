@@ -1,7 +1,5 @@
-import { EditorState, Modifier, SelectionState } from 'draft-js'
-import { OrderedSet } from 'immutable'
-import { store } from 'emoji-mart'
-import { activeTab, ensureActiveTab } from '../selectors'
+import { EditorState, Modifier } from 'draft-js'
+import { ensureActiveTab } from '../selectors'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
@@ -121,14 +119,27 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     const editorState: EditorState = tab.feedbackState.editorState
     const currentContent = editorState.getCurrentContent()
+
+    // Select position 0 (anchor) of the first line (block)
+    const firstBlockKey = currentContent.getFirstBlock().getKey()
     const currentSelection = editorState.getSelection()
-    const nextSelection = currentSelection.merge({
-      // TODO - color only the handle in pink
-      // anchorOffset: 0,
-      // focusOffset: handle.length
+    const startSelection = currentSelection.merge({
+      anchorOffset: 0,
+      anchorKey: firstBlockKey,
     })
-    const nextContentState = Modifier.insertText(currentContent, nextSelection, `${handle} `, OrderedSet.of('HUMAN-PINK'))
-    const nextEditorState = EditorState.createWithContent(nextContentState)
+
+    // Insert the handle to the Tweet
+    const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
+
+    // Select the handle and color it
+    // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
+    const handleSelection = startSelection.merge({
+      focusOffset: handle.length,
+      focusKey: firstBlockKey,
+    })
+    const coloredContestState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
+
+    const nextEditorState = EditorState.createWithContent(coloredContestState)
 
     nextTabs.set(tab.id, {
       ...tab,
