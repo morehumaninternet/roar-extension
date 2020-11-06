@@ -8,15 +8,15 @@ function render(dispatchUserActions: DispatchUserActions, state: AppState, appCo
   return ReactDOM.render(<App state={state} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
-export function mount(chrome: any, window: Window) {
-  const appContainer = window.document.getElementById('app-container')!
+export function mount(chrome: typeof global.chrome, popupWindow: Window) {
+  const appContainer = popupWindow.document.getElementById('app-container')!
 
   let dispatchUserActions: DispatchUserActions
   let unsubscribe: () => void
 
-  chrome.runtime.getBackgroundPage(function(background: any) {
-    Object.assign(window, { background })
-    const store: Store<AppState> = background.store
+  chrome.runtime.getBackgroundPage(function (backgroundWindow: Window) {
+    Object.assign(popupWindow, { backgroundWindow })
+    const store: Store<AppState> = backgroundWindow.store
     dispatchUserActions = actions(store.dispatch, store.getState)
 
     const onStateChange = () => render(dispatchUserActions, store.getState(), appContainer)
@@ -27,7 +27,7 @@ export function mount(chrome: any, window: Window) {
     dispatchUserActions.popupConnect()
   })
 
-  window.addEventListener('unload', () => {
+  popupWindow.addEventListener('unload', () => {
     if (unsubscribe) {
       unsubscribe()
       dispatchUserActions.popupDisconnect()

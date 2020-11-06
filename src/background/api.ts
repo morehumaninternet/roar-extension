@@ -25,6 +25,9 @@ export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActi
       return dispatchBackgroundActions.postTweetFailure(await res.text())
     }
     const tweetResult = await res.json()
+    if (!tweetResult.url) {
+      return dispatchBackgroundActions.postTweetFailure({ message: 'Response must include a url' })
+    }
     return dispatchBackgroundActions.postTweetSuccess(tweetResult)
   } catch (error) {
     return dispatchBackgroundActions.postTweetFailure(error)

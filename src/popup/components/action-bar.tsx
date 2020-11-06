@@ -1,5 +1,4 @@
 import * as React from 'react'
-// import { EmojiPicker } from './emoji-picker'
 import { ActionButton } from './action-button'
 
 type ActionBarProps = {
