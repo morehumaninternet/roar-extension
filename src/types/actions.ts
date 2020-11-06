@@ -11,9 +11,9 @@ type UserAction =
   | { type: 'CLICK_TAKE_SCREENSHOT' }
 
 type BackgroundAction =
-  | { type: 'START_FETCH_HANDLE' }
-  | { type: 'FETCH_HANDLE_SUCCESS'; payload: { handle: string } }
-  | { type: 'FETCH_HANDLE_FAILURE'; payload: { error: any } }
+  | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
+  | { type: 'FETCH_HANDLE_SUCCESS'; payload: { tabId: number; host: string; handle: string } }
+  | { type: 'FETCH_HANDLE_FAILURE'; payload: { tabId: number; host: string; error: any } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
   | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
@@ -46,9 +46,9 @@ type DispatchUserActions = {
 }
 
 type DispatchBackgroundActions = {
-  startFetchHandle(): void
-  fetchHandleSuccess(handle: string): void
-  fetchHandleFailure(error: any): void
+  fetchHandleStart(tabId: number): void
+  fetchHandleSuccess(payload: { tabId: number; host: string; handle: string }): void
+  fetchHandleFailure(payload: { tabId: number; host: string; error: any }): void
   screenshotCaptureSuccess(screenshot: Screenshot): void
   screenshotCaptureFailure(error: any): void
   postTweetSuccess(tweetResult: any): void

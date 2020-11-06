@@ -89,8 +89,12 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       },
     }
   },
-  START_FETCH_HANDLE(state): Partial<AppState> {
-    const tab = ensureActiveTab(state)
+  FETCH_HANDLE_START(state, action): Partial<AppState> {
+    const { tabId } = action.payload
+    const tab = state.tabs.get(tabId)
+    // If the tab doesn't exist anymore, don't try to update it
+    if (!tab) return {}
+
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
@@ -103,14 +107,16 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
         },
       },
     })
+
     return { tabs: nextTabs }
   },
   FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
-    const { handle } = action.payload
-    const tab = activeTab(state)
-
-    // If the tab doesn't exist anymore, don't try to update it
+    const { tabId, host, handle } = action.payload
+    const tab = state.tabs.get(tabId)
+    // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
     if (!tab) return {}
+    if (tab.host !== host) return {}
+
     const nextTabs = new Map(state.tabs)
 
     const editorState: EditorState = tab.feedbackState.editorState
@@ -139,11 +145,12 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return { tabs: nextTabs }
   },
   FETCH_HANDLE_FAILURE(state, action): Partial<AppState> {
-    const { error } = action.payload
-    const tab = activeTab(state)
-
-    // If the tab doesn't exist anymore, don't try to update it
+    const { tabId, host, error } = action.payload
+    const tab = state.tabs.get(tabId)
+    // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
     if (!tab) return {}
+    if (tab.host !== host) return {}
+
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,

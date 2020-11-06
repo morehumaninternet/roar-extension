@@ -2,21 +2,22 @@ import { Dispatch } from 'redux'
 
 export function actions(dispatch: Dispatch<BackgroundAction>): DispatchBackgroundActions {
   return {
-    startFetchHandle: () =>
+    fetchHandleStart: tabId =>
       dispatch({
-        type: 'START_FETCH_HANDLE',
+        type: 'FETCH_HANDLE_START',
+        payload: { tabId },
       }),
 
-    fetchHandleSuccess: handle =>
+    fetchHandleSuccess: payload =>
       dispatch({
         type: 'FETCH_HANDLE_SUCCESS',
-        payload: { handle },
+        payload,
       }),
 
-    fetchHandleFailure: error =>
+    fetchHandleFailure: payload =>
       dispatch({
         type: 'FETCH_HANDLE_FAILURE',
-        payload: { error },
+        payload,
       }),
 
     screenshotCaptureSuccess: screenshot =>

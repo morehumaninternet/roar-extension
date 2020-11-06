@@ -31,19 +31,20 @@ export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActi
   }
 }
 
-function makeHandleRequest(url: string): Promise<Response> {
-  const params = { domain: url }
+function makeHandleRequest(host: string): Promise<Response> {
+  const params = { domain: host }
   const requestURL = new URL('v1/website', window.roarServerUrl)
   requestURL.search = new URLSearchParams(params).toString()
   return fetch(requestURL.toString())
 }
 
-export const fetchTwitterHandle = async (url: string, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
-    const res = await makeHandleRequest(url)
+    dispatchBackgroundActions.fetchHandleStart(tabId)
+    const res = await makeHandleRequest(host)
     const { twitter_handle } = await res.json()
-    return dispatchBackgroundActions.fetchHandleSuccess(twitter_handle)
+    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, host, handle: twitter_handle })
   } catch (error) {
-    return dispatchBackgroundActions.fetchHandleFailure(error)
+    return dispatchBackgroundActions.fetchHandleFailure({ tabId, host, error })
   }
 }
