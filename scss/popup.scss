@@ -4,14 +4,12 @@
 $human-blue: #164176;
 $human-pink: #fa759e;
 $window-height: 320px;
-$window-width: 500px;
-$window-padding: 10px;
+$main-padding: 10px;
 
 html,
 body {
   padding: 0;
   margin: 0;
-  min-width: $window-width;
   font-family: 'Roboto', sans-serif;
   // Set max height and width imposed on all chrome extensions to prevent overflow
   // https://stackoverflow.com/questions/47568794/how-can-i-set-height-of-chrome-extension-to-browser-window-height#:~:text=I%20found%20out%20that%20Chrome,and%20maximum%20width%20of%20800px.
@@ -27,7 +25,8 @@ iframe {
 
 .app {
   background-color: $human-blue;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 476px;
 }
 
 header {
@@ -37,7 +36,7 @@ header {
 }
 
 main {
-  padding: $window-padding;
+  padding: $main-padding;
   display: flex;
 }
 
@@ -55,7 +54,7 @@ main {
 
 .DraftEditor-root {
   color: white;
-  width: 430px;
+  width: 100%;
   font-size: 18px;
   margin-top: 7px;
   min-height: 20px;

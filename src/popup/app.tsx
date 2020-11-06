@@ -32,7 +32,7 @@ function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: Authenti
     <div className="app">
       <div className={`emoji-picker-container ${pickingEmoji ? 'open' : 'closed'}`}>
         <Picker
-          style={{ width: '100%', border: 'none', borderRadius: 0 }}
+          style={{ width: '100%', /* height: '100%', */ border: 'none', borderRadius: 0 }}
           title="Pick your emoji…"
           onSelect={(emoji: any) => dispatchUserActions.emojiPicked(emoji.native)}
         />
