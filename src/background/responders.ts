@@ -1,5 +1,6 @@
 import { EditorState, Modifier } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
+import { appendEntity } from '../draft-js-utils'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
@@ -37,9 +38,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const tab = ensureActiveTab(state)
     const { emoji } = action.payload
 
-    const editorState: EditorState = tab.feedbackState.editorState
-    const nextContentState = Modifier.insertText(editorState.getCurrentContent(), editorState.getSelection(), emoji)
-    const nextEditorState = EditorState.createWithContent(nextContentState)
+    const nextEditorState = appendEntity(tab.feedbackState.editorState, emoji, 'emoji')
 
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
@@ -129,18 +128,22 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       anchorKey: firstBlockKey,
     })
 
+    // Add a space at the end
+    const handleText = `${handle} `
+
     // Insert the handle to the Tweet
-    const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
+    const handleContentState = Modifier.insertText(currentContent, startSelection, handleText)
 
     // Select the handle and color it
     // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
     const handleSelection = startSelection.merge({
-      focusOffset: handle.length,
+      focusOffset: handleText.length,
       focusKey: firstBlockKey,
     })
+
     const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
 
-    const nextEditorState = EditorState.createWithContent(coloredContentState)
+    const nextEditorState = EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
 
     nextTabs.set(tab.id, {
       ...tab,

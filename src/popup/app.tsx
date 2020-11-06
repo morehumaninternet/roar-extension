@@ -56,7 +56,7 @@ function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: Authenti
 function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter(): void }): JSX.Element {
   React.useEffect(() => {
     function listener(event: any): any {
-      if (event.origin !== 'https://localhost:5004' && event.origin !== 'https://roar-server.herokuapp.com') {
+      if (event.origin !== window.roarServerUrl) {
         return
       }
       if (event.data.type === 'twitter-auth-success') {
@@ -68,8 +68,8 @@ function Authenticating({ authenticatedViaTwitter }: { authenticatedViaTwitter()
       throw new Error(`Unexpected message: ${event.data}`)
     }
 
-    addEventListener('message', listener)
-    return () => removeEventListener('message', listener)
+    window.addEventListener('message', listener)
+    return () => window.removeEventListener('message', listener)
   }, [])
 
   return <iframe src={`${window.roarServerUrl}/v1/auth/twitter`} allow="*" />

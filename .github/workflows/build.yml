@@ -18,7 +18,7 @@ jobs:
         node-version: 14.x
     - run: npm install
     - run: npm run lint
-    # - run: npm test
+    - run: npm test
     - run: ENV=stage npm run build
     - run: ./gh-create-zip.sh
 

@@ -28,7 +28,7 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
   // We are using rollup to replace process.env.NODE_ENV before TypeScript
   // runs, so it fail to compile - "This condition will always return 'true'"
   // @ts-ignore
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'development') {
     console.log(action.type, (action as any).payload, nextState)
   }
 
