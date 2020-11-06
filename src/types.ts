@@ -39,7 +39,7 @@ type HostTwitterHandle = {
 
 type FeedbackState = {
   screenshots: ReadonlyArray<Screenshot>
-  editorState: any
+  editorState: Draft.EditorState
   hostTwitterHandle: HostTwitterHandle
 }
 

@@ -8,16 +8,27 @@ import { whenState } from './util'
 import { run } from '../background/run'
 import { mount } from '../popup/mount'
 import { activeTab, ensureActiveTab } from '../selectors'
+import { appendEntity } from '../draft-js-utils'
 
 describe('happy path', () => {
   const mocks = createMocks()
+  let unsubscribe: () => void
   after(() => mocks.teardown())
+  after(() => unsubscribe())
 
   describe('background:run', () => {
-    before(() => run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any))
+    before(() => {
+      run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any)
+      // Throw an error if ever a FAILURE event is dispatched
+      unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
+        const { mostRecentAction } = mocks.backgroundWindow.store.getState()
+        if (mostRecentAction.type.endsWith('FAILURE')) {
+          throw (mostRecentAction as any).payload.error
+        }
+      })
+    })
 
     it('loads window.store, which starts with an empty state', () => {
-      expect(mocks.backgroundWindow).to.have.property('store')
       expect(mocks.backgroundWindow.store.getState()).to.eql({
         popupConnected: false,
         focusedWindowId: -1,
@@ -71,7 +82,13 @@ describe('happy path', () => {
   let main: HTMLElement
 
   describe('popup:mount', () => {
+    before(() => {
+      fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle: '@zing' } })
+    })
     before(() => mount(mocks.chrome as any, mocks.popupWindow as any))
+    after(() => {
+      fetchMock.restore()
+    })
 
     it('mounts the app with a button to sign in with twitter', () => {
       const appContainer = mocks.popupWindow.document.getElementById('app-container')!
@@ -79,13 +96,18 @@ describe('happy path', () => {
       expect(signInWithTwitter).to.have.property('innerHTML', 'Sign in with twitter')
     })
 
-    it('dispatches POPUP_CONNECT, resulting in a screenshot of the active tab getting added to the state', () => {
+    it('dispatches POPUP_CONNECT, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
       const state = mocks.backgroundWindow.store.getState()
       const activeTab = ensureActiveTab(state)
       expect(activeTab.feedbackState.screenshots).to.have.length(1)
+
       const [screenshot] = activeTab.feedbackState.screenshots
       expect(screenshot.tab.url).to.equal(activeTab.url)
       expect(screenshot.blob).to.be.an.instanceof(Blob)
+
+      expect(activeTab.feedbackState.hostTwitterHandle.handle).to.equal('@zing')
+
+      expect(activeTab.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')).to.equal('@zing ')
     })
   })
 
@@ -144,17 +166,19 @@ describe('happy path', () => {
     // https://github.com/facebook/draft-js/issues/325
     // https://github.com/jsdom/jsdom/issues/1670
     it('can edit the feedback', () => {
-      const activeTab = ensureActiveTab(mocks.backgroundWindow.store.getState())
+      const tab = ensureActiveTab(mocks.backgroundWindow.store.getState())
 
-      const editorState: EditorState = activeTab.feedbackState.editorState
-      const nextContentState = Modifier.insertText(editorState.getCurrentContent(), editorState.getSelection(), 'This is some feedback')
-      const nextEditorState = EditorState.createWithContent(nextContentState)
+      mocks.backgroundWindow.store.dispatch({
+        type: 'UPDATE_EDITOR_STATE',
+        payload: {
+          editorState: appendEntity(tab.feedbackState.editorState, 'This is some feedback'),
+        },
+      })
 
-      mocks.backgroundWindow.store.dispatch({ type: 'UPDATE_EDITOR_STATE', payload: { editorState: nextEditorState } })
-
-      const span = main.querySelector('.twitter-interface > .DraftEditor-root span[data-text="true"]')! as HTMLDivElement
-
-      expect(span).to.have.property('innerHTML', 'This is some feedback')
+      const spans = main.querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(spans).to.have.length(2)
+      expect(spans[0]).to.have.property('innerHTML', '@zing ')
+      expect(spans[1]).to.have.property('innerHTML', 'This is some feedback')
     })
   })
 
@@ -179,7 +203,7 @@ describe('happy path', () => {
       expect(opts).to.have.property('credentials', 'include')
 
       const body: FormData = opts!.body! as any
-      expect(body.get('status')).to.equal('This is some feedback')
+      expect(body.get('status')).to.equal('@zing This is some feedback')
       const screenshot: any = body.get('screenshots') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
 
