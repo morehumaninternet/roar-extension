@@ -35,7 +35,7 @@ describe('happy path', () => {
         tabs: new Map(),
         toBeTweeted: null,
         justTweeted: null,
-        twitterAuth: 'not_authed',
+        auth: { state: 'not_authed' },
         pickingEmoji: false,
         alert: null,
         mostRecentAction: { type: 'INITIALIZING' },
@@ -123,23 +123,23 @@ describe('happy path', () => {
       removeEventListener.restore()
     })
 
-    it('transitions to a { twitterAuth: "authenticating" } state and adds an iframe when the sign in with twitter button is clicked', () => {
+    it('transitions to an "authenticating" state and adds an iframe when the sign in with twitter button is clicked', () => {
       const signInButton = mocks.popupWindow.document.querySelector('#app-container > button')! as HTMLButtonElement
       signInButton.click()
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('twitterAuth', 'authenticating')
+      expect(mocks.backgroundWindow.store.getState().auth).to.have.property('state', 'authenticating')
       const iframe = mocks.popupWindow.document.querySelector('#app-container > iframe')! as HTMLIFrameElement
       expect(iframe).to.have.property('src', 'https://test-roar-server.com/v1/auth/twitter')
     })
 
-    it('listens for a twitter-auth-success message from the iframe and transitions to a { twitterAuth: "authenticated" } state when received', () => {
+    it('listens for a twitter-auth-success message from the iframe and transitions to an "authenticated" state when received', () => {
       expect(addEventListener).to.have.callCount(1)
       const [eventName, callback] = addEventListener.firstCall.args
       expect(eventName).to.equal('message')
       callback({
         origin: 'https://test-roar-server.com',
-        data: { type: 'twitter-auth-success' },
+        data: { type: 'twitter-auth-success', photoUrl: 'https://some-image-url.com/123' },
       })
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('twitterAuth', 'authenticated')
+      expect(mocks.backgroundWindow.store.getState().auth).to.have.property('state', 'authenticated')
     })
 
     it('removes the event listener', () => {
@@ -153,6 +153,11 @@ describe('happy path', () => {
       expect(app.childNodes).to.have.length(2)
       emojiPickerContainer = app.childNodes[0] as any
       main = app.childNodes[1] as any
+    })
+
+    it('renders the profile image', () => {
+      const profileImage = mocks.popupWindow.document.querySelector('img.profile-img')!
+      expect(profileImage).to.have.property('src', 'https://some-image-url.com/123')
     })
 
     it('renders the screenshot', () => {

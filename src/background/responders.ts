@@ -21,10 +21,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     return { popupConnected: false, pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   SIGN_IN_WITH_TWITTER(): Partial<AppState> {
-    return { twitterAuth: 'authenticating' }
+    return { auth: { state: 'authenticating' } }
   },
-  AUTHENTICATED_VIA_TWITTER(): Partial<AppState> {
-    return { twitterAuth: 'authenticated' }
+  AUTHENTICATED_VIA_TWITTER(state, action): Partial<AppState> {
+    return { auth: { state: 'authenticated', user: { photoUrl: action.payload.photoUrl } } }
   },
   DISMISS_ALERT(): Partial<AppState> {
     return { alert: null }
