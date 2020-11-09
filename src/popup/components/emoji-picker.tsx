@@ -6,15 +6,27 @@ type EmojiPickerProps = {
   dispatchUserActions: DispatchUserActions
 }
 
+function getPixels(el: Element, prop: 'height' | 'width'): number {
+  return Number(getComputedStyle(el)[prop].match(/^(\d+)px$/)![1])
+}
+
 export function EmojiPicker({ pickingEmoji, dispatchUserActions }: EmojiPickerProps) {
   const ref = React.useRef<HTMLDivElement>()
 
   React.useEffect(() => {
+    // On resize, calculate the distance to the bottom for .emoji-mart-scroll and
+    // explicitly increase its height that distance
     function listener() {
-      const bodyHeight = getComputedStyle(window.document.body).height
-      const bodyHeightPx = Number(bodyHeight.match(/^(\d+)px$/)![1])
       const emojiMartScroll = ref.current!.querySelector('.emoji-mart-scroll')! as HTMLDivElement
-      emojiMartScroll.style.height = `${bodyHeightPx - 84}px`
+
+      const bodyBottom = window.document.body.getBoundingClientRect().bottom
+      const emojiMartScrollBottom = emojiMartScroll.getBoundingClientRect().bottom
+      const emojiMartScrollDistanceFromBottom = bodyBottom - emojiMartScrollBottom
+
+      const emojiMartScrollCurrentHeight = getPixels(emojiMartScroll, 'height')
+      const emojiMartScrollNextHeight = emojiMartScrollCurrentHeight + emojiMartScrollDistanceFromBottom
+
+      emojiMartScroll.style.height = `${emojiMartScrollNextHeight}px`
     }
 
     window.addEventListener('resize', listener)
@@ -24,7 +36,7 @@ export function EmojiPicker({ pickingEmoji, dispatchUserActions }: EmojiPickerPr
   return (
     <div ref={ref as any} className={`emoji-picker-container ${pickingEmoji ? 'open' : 'closed'}`}>
       <Picker
-        style={{ width: '100%', height: '100%', border: 'none', borderRadius: 0 }}
+        style={{ width: '100%', border: 'none', borderRadius: 0 }}
         title="Pick your emoji…"
         onSelect={(emoji: any) => dispatchUserActions.emojiPicked(emoji.native)}
       />
