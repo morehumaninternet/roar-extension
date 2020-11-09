@@ -43,7 +43,9 @@ type FeedbackState = {
   hostTwitterHandle: HostTwitterHandle
 }
 
-type TwitterAuthState = 'not_authed' | 'authenticating' | 'authenticated'
+type User = { photoUrl?: string }
+
+type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
 type ToBeTweeted = {
   tabId: number
@@ -67,7 +69,7 @@ type AppState = {
   justTweeted: Maybe<{
     url: string
   }>
-  twitterAuth: TwitterAuthState
+  auth: Auth
   pickingEmoji: boolean
   alert: null | string | { __html: string }
   mostRecentAction: Action | { type: 'INITIALIZING' }
@@ -82,7 +84,7 @@ type UserAction =
   | { type: 'POPUP_CONNECT' }
   | { type: 'POPUP_DISCONNECT' }
   | { type: 'SIGN_IN_WITH_TWITTER' }
-  | { type: 'AUTHENTICATED_VIA_TWITTER' }
+  | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { photoUrl?: string } }
   | { type: 'DISMISS_ALERT' }
   | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
   | { type: 'CLICK_POST' }
@@ -116,7 +118,7 @@ type DispatchUserActions = {
   popupConnect(): void
   popupDisconnect(): void
   signInWithTwitter(): void
-  authenticatedViaTwitter(): void
+  authenticatedViaTwitter(photoUrl?: string): void
   dismissAlert(): void
   updateEditorState(editorState: any): void
   clickPost(): void

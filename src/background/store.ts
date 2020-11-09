@@ -7,7 +7,7 @@ const emptyState: AppState = {
   tabs: new Map(),
   toBeTweeted: null,
   justTweeted: null,
-  twitterAuth: 'not_authed',
+  auth: { state: 'not_authed' },
   pickingEmoji: false,
   alert: null,
   mostRecentAction: { type: 'INITIALIZING' },
