@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { Picker } from 'emoji-mart'
 import { FeedbackEditor } from './components/feedback-editor'
 import { Screenshots } from './components/screenshots'
 import { activeTab } from '../selectors'
 import { ActionBar } from './components/action-bar'
-// import { EmojiPicker } from './components/emoji-picker'
+import { EmojiPicker } from './components/emoji-picker'
 
 type AppProps = {
   state: AppState
@@ -30,13 +29,7 @@ function Authenticated({ feedback, pickingEmoji, dispatchUserActions }: Authenti
 
   return (
     <div className="app">
-      <div className={`emoji-picker-container ${pickingEmoji ? 'open' : 'closed'}`}>
-        <Picker
-          style={{ width: '100%', border: 'none', borderRadius: 0 }}
-          title="Pick your emoji…"
-          onSelect={(emoji: any) => dispatchUserActions.emojiPicked(emoji.native)}
-        />
-      </div>
+      <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
       <main>
         <img className="profile-img" src="/img/avatar.png" />
         <div className="twitter-interface">
