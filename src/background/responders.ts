@@ -128,16 +128,13 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       anchorKey: firstBlockKey,
     })
 
-    // Add a space at the end
-    const handleText = `${handle} `
-
     // Insert the handle to the Tweet
-    const handleContentState = Modifier.insertText(currentContent, startSelection, handleText)
+    const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
 
     // Select the handle and color it
     // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
     const handleSelection = startSelection.merge({
-      focusOffset: handleText.length,
+      focusOffset: handle.length,
       focusKey: firstBlockKey,
     })
 

@@ -177,8 +177,8 @@ describe('happy path', () => {
 
       const spans = main.querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
       expect(spans).to.have.length(2)
-      expect(spans[0]).to.have.property('innerHTML', '@zing ')
-      expect(spans[1]).to.have.property('innerHTML', 'This is some feedback')
+      expect(spans[0]).to.have.property('innerHTML', '@zing')
+      expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
     })
   })
 
