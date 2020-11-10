@@ -164,6 +164,32 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     if (tab.host !== host) return {}
 
     const nextTabs = new Map(state.tabs)
+
+    const editorState: EditorState = tab.feedbackState.editorState
+    const currentContent = editorState.getCurrentContent()
+
+    // Select position 0 (anchor) of the first line (block)
+    const firstBlockKey = currentContent.getFirstBlock().getKey()
+    const currentSelection = editorState.getSelection()
+    const startSelection = currentSelection.merge({
+      anchorOffset: 0,
+      anchorKey: firstBlockKey,
+    })
+
+    // Insert the host name to the Tweet
+    const handleContentState = Modifier.insertText(currentContent, startSelection, `${host} `)
+
+    // Select the host name (instead of handle name) and color it
+    // Host name might pass the limit 15 chars so we can not safely assume that the handle is still in the first block
+    const handleSelection = startSelection.merge({
+      focusOffset: host.length,
+      focusKey: firstBlockKey,
+    })
+
+    const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
+
+    const nextEditorState = EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
+
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
