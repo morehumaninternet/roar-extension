@@ -13,6 +13,16 @@ const emptyFeedbackState = (): FeedbackState => {
   }
 }
 
+const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
+  id: tab.id!,
+  windowId: tab.windowId!,
+  active: tab.active,
+  isTweeting: false,
+  url: tab.url,
+  host: tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined,
+  feedbackState: emptyFeedbackState(),
+})
+
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT(): Partial<AppState> {
     return { popupConnected: true }
@@ -216,31 +226,13 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   'chrome.tabs.query'(state, action): Partial<AppState> {
     const tabs: AppState['tabs'] = new Map()
-    action.payload.tabs.forEach(tab =>
-      tabs.set(tab.id!, {
-        id: tab.id!,
-        windowId: tab.windowId!,
-        active: tab.active!,
-        isTweeting: false,
-        url: tab.url!,
-        host: new URL(tab.url!).host,
-        feedbackState: emptyFeedbackState(),
-      })
-    )
+    action.payload.tabs.forEach(tab => tabs.set(tab.id!, newTabInfo(tab)))
     return { tabs }
   },
   'chrome.tabs.onCreated'(state, action): Partial<AppState> {
     const { tab } = action.payload
     const tabs = new Map(state.tabs)
-    tabs.set(tab.id!, {
-      id: tab.id!,
-      windowId: tab.windowId!,
-      active: tab.active,
-      isTweeting: false,
-      url: tab.url,
-      host: tab.url ? new URL(tab.url).host : undefined,
-      feedbackState: emptyFeedbackState(),
-    })
+    tabs.set(tab.id!, newTabInfo(tab))
     return { tabs }
   },
   'chrome.tabs.onRemoved'(state, action): Partial<AppState> {

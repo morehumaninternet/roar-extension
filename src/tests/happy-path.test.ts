@@ -63,9 +63,11 @@ describe('happy path', () => {
         { id: 14, windowId: 2, active: true, url: 'https://zing.com/abc' },
         { id: 15, windowId: 2, active: false, url: 'https://slam.com/abc' },
         { id: 16, windowId: 3, active: true, url: 'https://mop.com/abc' },
+        { id: 17, windowId: 3, active: true, url: 'chrome://extensions' },
       ])
       const state = mocks.backgroundWindow.store.getState()
-      expect(state.tabs.size).to.equal(6)
+      expect(state.tabs.size).to.equal(7)
+
       const activeTab = ensureActiveTab(state)
       expect(activeTab).to.have.property('id', 14)
       expect(activeTab).to.have.property('windowId', 2)
@@ -75,6 +77,8 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('host', 'zing.com')
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
       expect(activeTab.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')).to.eql('')
+
+      expect(state.tabs.get(17)).to.have.property('host', undefined)
     })
   })
 
