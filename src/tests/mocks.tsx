@@ -1,3 +1,5 @@
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
@@ -48,6 +50,8 @@ export function createMocks(): Mocks {
   Object.assign(global, popupWindowGlobals)
 
   const teardown = () => {
+    // Render a blank div into the app-container before removing globals to trigger any cleanup from the React components themselves
+    ReactDOM.render(<div />, popupWindow.document.getElementById('app-container'))
     for (const key in popupWindowGlobals) {
       delete (global as any)[key]
     }

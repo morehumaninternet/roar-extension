@@ -15,7 +15,7 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
     reject = rej
   })
 
-  const unsubscribe = store.subscribe(() => {
+  const callback = () => {
     const state = store.getState()
     if (predicate(state)) {
       clearTimeout(timeout)
@@ -27,7 +27,9 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
 
       resolve(state)
     }
-  })
+  }
+
+  const unsubscribe = store.subscribe(callback)
 
   timeout = setTimeout(() => {
     if (!unsubscribed) {
@@ -37,6 +39,8 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
 
     reject('timeout')
   }, timeoutMillis)
+
+  callback()
 
   return promise
 }

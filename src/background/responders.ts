@@ -1,6 +1,6 @@
-import { EditorState, Modifier } from 'draft-js'
+import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity } from '../draft-js-utils'
+import { appendEntity, appendHandle } from '../draft-js-utils'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
@@ -12,6 +12,16 @@ const emptyFeedbackState = (): FeedbackState => {
     },
   }
 }
+
+const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
+  id: tab.id!,
+  windowId: tab.windowId!,
+  active: tab.active,
+  isTweeting: false,
+  url: tab.url,
+  host: tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined,
+  feedbackState: emptyFeedbackState(),
+})
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
   POPUP_CONNECT(): Partial<AppState> {
@@ -80,12 +90,9 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   CLICK_POST(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
-    return {
-      toBeTweeted: {
-        feedbackState: tab.feedbackState,
-        tabId: tab.id,
-      },
-    }
+    const nextTabs = new Map(state.tabs)
+    nextTabs.set(tab.id, { ...tab, isTweeting: true })
+    return { tabs: nextTabs }
   },
   FETCH_HANDLE_START(state, action): Partial<AppState> {
     const { tabId } = action.payload
@@ -117,36 +124,11 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     const nextTabs = new Map(state.tabs)
 
-    const editorState: EditorState = tab.feedbackState.editorState
-    const currentContent = editorState.getCurrentContent()
-
-    // Select position 0 (anchor) of the first line (block)
-    const firstBlockKey = currentContent.getFirstBlock().getKey()
-    const currentSelection = editorState.getSelection()
-    const startSelection = currentSelection.merge({
-      anchorOffset: 0,
-      anchorKey: firstBlockKey,
-    })
-
-    // Insert the handle to the Tweet
-    const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
-
-    // Select the handle and color it
-    // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
-    const handleSelection = startSelection.merge({
-      focusOffset: handle.length,
-      focusKey: firstBlockKey,
-    })
-
-    const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
-
-    const nextEditorState = EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
-
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: nextEditorState,
+        editorState: appendHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -199,18 +181,42 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   SCREENSHOT_CAPTURE_FAILURE(): Partial<AppState> {
     return { alert: 'SCREENSHOT FAILURE' }
   },
-  POST_TWEET_SUCCESS(_state, action): Partial<AppState> {
-    const { url } = action.payload.tweetResult
+  POST_TWEET_SUCCESS(state, action): Partial<AppState> {
+    const tab = state.tabs.get(action.payload.tabId)
+    if (!tab) return {}
+
+    const nextTabs = new Map(state.tabs)
+    const { handle } = tab.feedbackState.hostTwitterHandle
+
+    // Clear the existing feedback state for the tab once the tweet is clicked
+    nextTabs.set(tab.id, {
+      ...tab,
+      isTweeting: false,
+      feedbackState: {
+        screenshots: [],
+        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
+      },
+    })
+
     return {
-      toBeTweeted: null,
-      justTweeted: { url },
+      tabs: nextTabs,
     }
   },
-  POST_TWEET_FAILURE(): Partial<AppState> {
+  POST_TWEET_FAILURE(state, action): Partial<AppState> {
+    const tab = state.tabs.get(action.payload.tabId)
+    if (!tab) return {}
+
+    const nextTabs = new Map(state.tabs)
+
+    nextTabs.set(tab.id, {
+      ...tab,
+      isTweeting: false,
+    })
+
     return {
-      toBeTweeted: null,
-      justTweeted: null,
-      alert: 'POST TWEET FAILURE',
+      tabs: nextTabs,
+      alert: action.payload.error.message,
     }
   },
   'chrome.windows.getAll'(state, action): Partial<AppState> {
@@ -220,29 +226,13 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   'chrome.tabs.query'(state, action): Partial<AppState> {
     const tabs: AppState['tabs'] = new Map()
-    action.payload.tabs.forEach(tab =>
-      tabs.set(tab.id!, {
-        id: tab.id!,
-        windowId: tab.windowId!,
-        active: tab.active!,
-        url: tab.url!,
-        host: new URL(tab.url!).host,
-        feedbackState: emptyFeedbackState(),
-      })
-    )
+    action.payload.tabs.forEach(tab => tabs.set(tab.id!, newTabInfo(tab)))
     return { tabs }
   },
   'chrome.tabs.onCreated'(state, action): Partial<AppState> {
     const { tab } = action.payload
     const tabs = new Map(state.tabs)
-    tabs.set(tab.id!, {
-      id: tab.id!,
-      windowId: tab.windowId!,
-      active: tab.active,
-      url: tab.url,
-      host: tab.url ? new URL(tab.url).host : undefined,
-      feedbackState: emptyFeedbackState(),
-    })
+    tabs.set(tab.id!, newTabInfo(tab))
     return { tabs }
   },
   'chrome.tabs.onRemoved'(state, action): Partial<AppState> {

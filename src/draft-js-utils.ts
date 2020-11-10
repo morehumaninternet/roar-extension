@@ -31,3 +31,33 @@ export function appendEntity(editorState: EditorState, text: string, type: 'text
 
   return EditorState.forceSelection(newEditorState, addedContent.getSelectionAfter())
 }
+
+export function appendHandle(editorState: EditorState, handle: string): EditorState {
+  if (!handle.startsWith('@')) {
+    throw new Error('handle must start with @')
+  }
+
+  const currentContent = editorState.getCurrentContent()
+
+  // Select position 0 (anchor) of the first line (block)
+  const firstBlockKey = currentContent.getFirstBlock().getKey()
+  const currentSelection = editorState.getSelection()
+  const startSelection = currentSelection.merge({
+    anchorOffset: 0,
+    anchorKey: firstBlockKey,
+  })
+
+  // Insert the handle to the Tweet
+  const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
+
+  // Select the handle and color it
+  // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
+  const handleSelection = startSelection.merge({
+    focusOffset: handle.length,
+    focusKey: firstBlockKey,
+  })
+
+  const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
+
+  return EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
+}

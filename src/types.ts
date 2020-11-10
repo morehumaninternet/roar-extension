@@ -47,15 +47,11 @@ type User = { photoUrl?: string }
 
 type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
-type ToBeTweeted = {
-  tabId: number
-  feedbackState: FeedbackState
-}
-
 type TabInfo = {
   id: number
   windowId: number
   active: boolean
+  isTweeting: boolean
   url?: string
   host?: string
   feedbackState: FeedbackState
@@ -65,10 +61,6 @@ type AppState = {
   popupConnected: PopupState
   focusedWindowId: number
   tabs: Map<number, TabInfo>
-  toBeTweeted: Maybe<ToBeTweeted>
-  justTweeted: Maybe<{
-    url: string
-  }>
   auth: Auth
   pickingEmoji: boolean
   alert: null | string | { __html: string }
@@ -98,8 +90,8 @@ type BackgroundAction =
   | { type: 'FETCH_HANDLE_FAILURE'; payload: { tabId: number; host: string; error: any } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
-  | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
-  | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
+  | { type: 'POST_TWEET_SUCCESS'; payload: { tabId: number } }
+  | { type: 'POST_TWEET_FAILURE'; payload: { tabId: number; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
@@ -133,6 +125,6 @@ type DispatchBackgroundActions = {
   fetchHandleFailure(payload: { tabId: number; host: string; error: any }): void
   screenshotCaptureSuccess(screenshot: Screenshot): void
   screenshotCaptureFailure(error: any): void
-  postTweetSuccess(tweetResult: any): void
-  postTweetFailure(error: any): void
+  postTweetSuccess(payload: { tabId: number }): void
+  postTweetFailure(payload: { tabId: number; error: any }): void
 }

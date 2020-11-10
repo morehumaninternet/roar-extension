@@ -9,7 +9,7 @@ type AppProps = {
   dispatchUserActions: DispatchUserActions
 }
 
-export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
+export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {
   switch (state.auth.state) {
     case 'not_authed': {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
@@ -18,14 +18,23 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
-      return (
-        <Authenticated
-          feedback={activeTab(state)?.feedbackState}
-          user={state.auth.user}
-          pickingEmoji={state.pickingEmoji}
-          dispatchUserActions={dispatchUserActions}
-        />
-      )
+      const tab = activeTab(state)
+      if (!tab) return null
+      if (tab.host) {
+        return (
+          <div className="app">
+            <Authenticated
+              feedback={tab.feedbackState}
+              host={tab.host}
+              isTweeting={tab.isTweeting}
+              user={state.auth.user}
+              pickingEmoji={state.pickingEmoji}
+              dispatchUserActions={dispatchUserActions}
+            />
+          </div>
+        )
+      }
+      return <p>Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.</p>
     }
   }
 }
