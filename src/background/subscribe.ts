@@ -37,9 +37,10 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     }
 
     if (nextState.toBeTweeted && !prevState.toBeTweeted) {
+      const tab = ensureActiveTab(nextState)
       // The user clicked on the "post" button
       // send tweet to the server
-      postTweet(nextState.toBeTweeted, dispatchBackgroundActions)
+      postTweet(nextState.toBeTweeted, tab.host!, dispatchBackgroundActions)
     }
   })
 }

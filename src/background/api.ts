@@ -1,8 +1,10 @@
-function tweetFormData(toBeTweeted: ToBeTweeted): FormData {
+function tweetFormData(toBeTweeted: ToBeTweeted, host: string): FormData {
   const tweetData = new FormData()
 
   const status = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
+
+  tweetData.append('host', host)
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
   toBeTweeted.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
@@ -18,9 +20,9 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
   })
 }
 
-export const postTweet = async (toBeTweeted: ToBeTweeted, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const postTweet = async (toBeTweeted: ToBeTweeted, host: string, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
-    const res = await makeTweetRequest(tweetFormData(toBeTweeted))
+    const res = await makeTweetRequest(tweetFormData(toBeTweeted, host))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure(await res.text())
     }

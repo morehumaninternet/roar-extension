@@ -209,8 +209,10 @@ describe('happy path', () => {
 
       const body: FormData = opts!.body! as any
       expect(body.get('status')).to.equal('@zing This is some feedback')
+      expect(body.get('host')).to.equal('zing.com')
       const screenshot: any = body.get('screenshots') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
+      expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const state = await whenState(mocks.backgroundWindow.store, state => !state.toBeTweeted)
       expect(state.justTweeted).to.eql({ url: 'https://t.co/sometweethash' })
