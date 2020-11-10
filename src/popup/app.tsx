@@ -19,12 +19,13 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
     }
     case 'authenticated': {
       const tab = activeTab(state)
-      return (
-        tab && (
+      if (!tab) return null
+      if (tab.host) {
+        return (
           <div className="app">
             <Authenticated
               feedback={tab.feedbackState}
-              host={tab.host!}
+              host={tab.host}
               isTweeting={tab.isTweeting}
               user={state.auth.user}
               pickingEmoji={state.pickingEmoji}
@@ -32,7 +33,8 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
             />
           </div>
         )
-      )
+      }
+      return <p>Roar does not work on this tab because roar is not a webpage.</p>
     }
   }
 }
