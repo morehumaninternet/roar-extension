@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export function Authenticating({ authenticatedViaTwitter }: Pick<Dispatch<UserAction>, 'authenticatedViaTwitter'>): JSX.Element {
+export function Authenticating({ authenticatedViaTwitter }: Pick<Dispatchers<UserAction>, 'authenticatedViaTwitter'>): JSX.Element {
   React.useEffect(() => {
     function listener(event: any): any {
       if (event.origin !== window.roarServerUrl) {

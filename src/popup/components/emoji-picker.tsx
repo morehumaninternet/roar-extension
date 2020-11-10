@@ -3,7 +3,7 @@ import { Picker } from 'emoji-mart'
 
 type EmojiPickerProps = {
   pickingEmoji: boolean
-  dispatchUserActions: Dispatch<UserAction>
+  dispatchUserActions: Dispatchers<UserAction>
 }
 
 function getPixels(el: Element, prop: 'height' | 'width'): number {

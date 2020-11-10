@@ -3,7 +3,7 @@ import { Editor, EditorState } from 'draft-js'
 
 type FeedbackEditorProps = {
   editorState: EditorState
-  updateEditorState: Dispatch<UserAction>['updateEditorState']
+  updateEditorState: Dispatchers<UserAction>['updateEditorState']
 }
 
 const styleMap = {

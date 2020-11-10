@@ -1,4 +1,4 @@
-export function monitorTabs(dispatch: Dispatch<BackgroundAction>, chrome: typeof global.chrome): void {
+export function monitorTabs(dispatch: Dispatchers<BackgroundAction>, chrome: typeof global.chrome): void {
   chrome.windows.getAll(windows => dispatch['chrome.windows.getAll']({ windows }))
   chrome.tabs.query({}, tabs => dispatch['chrome.tabs.query']({ tabs }))
   chrome.tabs.onCreated.addListener(tab => dispatch['chrome.tabs.onCreated']({ tab }))

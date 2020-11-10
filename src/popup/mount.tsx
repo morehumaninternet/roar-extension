@@ -3,14 +3,14 @@ import * as ReactDOM from 'react-dom'
 import { AppStore } from '../background/store'
 import { App } from './app'
 
-function render(dispatchUserActions: Dispatch<UserAction>, state: AppState, appContainer: HTMLElement) {
+function render(dispatchUserActions: Dispatchers<UserAction>, state: AppState, appContainer: HTMLElement) {
   return ReactDOM.render(<App state={state} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
 export function mount(chrome: typeof global.chrome, popupWindow: Window) {
   const appContainer = popupWindow.document.getElementById('app-container')!
 
-  let dispatchUserActions: Dispatch<UserAction>
+  let dispatchUserActions: Dispatchers<UserAction>
   let unsubscribe: () => void
 
   chrome.runtime.getBackgroundPage(function (backgroundWindow: Window) {

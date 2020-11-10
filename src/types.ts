@@ -16,8 +16,6 @@ type SystemInfo = {
   zoom: number
 }
 
-type PopupState = boolean
-
 type Screenshot = {
   tab: TabInfo
   name: string
@@ -58,7 +56,6 @@ type TabInfo = {
 }
 
 type AppState = {
-  popupConnected: PopupState
   focusedWindowId: number
   tabs: Map<number, TabInfo>
   auth: Auth
@@ -67,10 +64,16 @@ type AppState = {
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
 
-// A Responder is a function that takes the current state of the application and an action of the corresponding type
-// and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
+// A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
+// type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
 // object of responders, each of which only need return those parts of the state that we are updating
-type Responder<T extends Action['type']> = (state: AppState, action: Action & { type: T }) => Partial<AppState>
+type Responder<A extends Action, T extends A['type']> = A extends { type: T; payload: any }
+  ? (state: AppState, payload: A['payload']) => Partial<AppState>
+  : (state: AppState) => Partial<AppState>
+
+type Responders<A extends Action> = {
+  [T in A['type']]: Responder<A, T>
+}
 
 type UserAction =
   | { type: 'popupConnect' }
@@ -106,8 +109,10 @@ type BackgroundAction =
 
 type Action = UserAction | BackgroundAction
 
+// If the action has a payload, a dispatcher for that function takes the payload as its first argument
+// otherwise, the dispatcher is a function called with no arguments
 type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; payload: any } ? (payload: A['payload']) => void : () => void
 
-type Dispatch<A extends Action> = {
+type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
 }
