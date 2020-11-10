@@ -99,7 +99,7 @@ main {
 }
 
 .screenshots {
-  height: 210px;
+  height: 250px;
   flex: 1 1 auto;
   display: flex;
   margin: 15px 0;
@@ -113,6 +113,7 @@ main {
 }
 
 .emoji-picker-container {
+  display: inherit;
   transition: width 0.2s;
   // width: $emoji-container-width;
 
@@ -127,5 +128,9 @@ main {
 }
 
 .emoji-mart-preview {
+  display: none;
+}
+
+.emoji-mart-bar:last-child {
   display: none;
 }
