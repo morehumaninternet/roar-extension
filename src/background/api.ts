@@ -22,19 +22,24 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
 
 export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
-    dispatchBackgroundActions.postTweetStart()
     const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.host!))
     if (res.status !== 201) {
-      return dispatchBackgroundActions.postTweetFailure(await res.text())
+      return dispatchBackgroundActions.postTweetFailure({
+        tabId: tab.id,
+        error: { message: await res.text() },
+      })
     }
     const tweetResult = await res.json()
     if (!tweetResult.url) {
-      return dispatchBackgroundActions.postTweetFailure({ message: 'Response must include a url' })
+      return dispatchBackgroundActions.postTweetFailure({
+        tabId: tab.id,
+        error: { message: 'Response must include a url' },
+      })
     }
     chrome.tabs.create({ url: tweetResult.url, active: true })
-    return dispatchBackgroundActions.postTweetSuccess({ tweetUrl: tweetResult.url })
+    return dispatchBackgroundActions.postTweetSuccess({ tabId: tab.id })
   } catch (error) {
-    return dispatchBackgroundActions.postTweetFailure(error)
+    return dispatchBackgroundActions.postTweetFailure({ tabId: tab.id, error })
   }
 }
 

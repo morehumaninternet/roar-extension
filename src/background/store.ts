@@ -5,7 +5,6 @@ const emptyState: AppState = {
   popupConnected: false,
   focusedWindowId: -1,
   tabs: new Map(),
-  tweeting: null,
   auth: { state: 'not_authed' },
   pickingEmoji: false,
   alert: null,

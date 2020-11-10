@@ -80,9 +80,9 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   },
   CLICK_POST(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
-    return {
-      tweeting: { state: 'NEW', tab },
-    }
+    const nextTabs = new Map(state.tabs)
+    nextTabs.set(tab.id, { ...tab, isTweeting: true })
+    return { tabs: nextTabs }
   },
   FETCH_HANDLE_START(state, action): Partial<AppState> {
     const { tabId } = action.payload
@@ -171,23 +171,9 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   SCREENSHOT_CAPTURE_FAILURE(): Partial<AppState> {
     return { alert: 'SCREENSHOT FAILURE' }
   },
-  POST_TWEET_START(state): Partial<AppState> {
-    if (state.tweeting?.state !== 'NEW') {
-      throw new Error('Can only start posting a new tweet')
-    }
-    return {
-      tweeting: {
-        state: 'IN_PROGRESS',
-        tab: state.tweeting.tab,
-      },
-    }
-  },
   POST_TWEET_SUCCESS(state, action): Partial<AppState> {
-    if (state.tweeting?.state !== 'IN_PROGRESS') {
-      throw new Error('Cannot have a successful tweet before the tweet is in progress')
-    }
-
-    const { tab } = state.tweeting
+    const tab = state.tabs.get(action.payload.tabId)
+    if (!tab) return {}
 
     const nextTabs = new Map(state.tabs)
     const { handle } = tab.feedbackState.hostTwitterHandle
@@ -195,6 +181,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     // Clear the existing feedback state for the tab once the tweet is clicked
     nextTabs.set(tab.id, {
       ...tab,
+      isTweeting: false,
       feedbackState: {
         screenshots: [],
         editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
@@ -203,17 +190,23 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     })
 
     return {
-      tweeting: null,
       tabs: nextTabs,
     }
   },
-  POST_TWEET_FAILURE(state): Partial<AppState> {
-    if (state.tweeting?.state !== 'IN_PROGRESS') {
-      throw new Error('Cannot have a successful tweet before the tweet is in progress')
-    }
+  POST_TWEET_FAILURE(state, action): Partial<AppState> {
+    const tab = state.tabs.get(action.payload.tabId)
+    if (!tab) return {}
+
+    const nextTabs = new Map(state.tabs)
+
+    nextTabs.set(tab.id, {
+      ...tab,
+      isTweeting: false,
+    })
+
     return {
-      tweeting: null,
-      alert: 'POST TWEET FAILURE',
+      tabs: nextTabs,
+      alert: action.payload.error.message,
     }
   },
   'chrome.windows.getAll'(state, action): Partial<AppState> {
@@ -228,6 +221,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
         id: tab.id!,
         windowId: tab.windowId!,
         active: tab.active!,
+        isTweeting: false,
         url: tab.url!,
         host: new URL(tab.url!).host,
         feedbackState: emptyFeedbackState(),
@@ -242,6 +236,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       id: tab.id!,
       windowId: tab.windowId!,
       active: tab.active,
+      isTweeting: false,
       url: tab.url,
       host: tab.url ? new URL(tab.url).host : undefined,
       feedbackState: emptyFeedbackState(),

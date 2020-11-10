@@ -40,8 +40,9 @@ export function subscribe(store: Store<AppState, Action>, chrome: typeof global.
 
     // The user clicked on the "post" button
     // send tweet to the server
-    if (nextState.tweeting?.state === 'NEW') {
-      postTweet(nextState.tweeting.tab, chrome, dispatchBackgroundActions)
+    if (nextState.mostRecentAction.type === 'CLICK_POST') {
+      const tab = ensureActiveTab(nextState)
+      postTweet(tab, chrome, dispatchBackgroundActions)
     }
   })
 }

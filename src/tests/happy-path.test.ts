@@ -34,7 +34,6 @@ describe('happy path', () => {
         popupConnected: false,
         focusedWindowId: -1,
         tabs: new Map(),
-        tweeting: null,
         auth: { state: 'not_authed' },
         pickingEmoji: false,
         alert: null,
@@ -71,6 +70,7 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('id', 14)
       expect(activeTab).to.have.property('windowId', 2)
       expect(activeTab).to.have.property('active', true)
+      expect(activeTab).to.have.property('isTweeting', false)
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
       expect(activeTab).to.have.property('host', 'zing.com')
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
@@ -193,9 +193,7 @@ describe('happy path', () => {
 
     it('posts feedback upon clicking the post button', () => {
       const postButton = app().querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('tweeting', null)
       postButton.click()
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('tweeting').that.is.an('object')
 
       const [url, opts] = fetchMock.lastCall()!
       expect(url).to.equal('https://test-roar-server.com/v1/feedback')
@@ -215,7 +213,7 @@ describe('happy path', () => {
     })
 
     it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-      await whenState(mocks.backgroundWindow.store, state => !state.tweeting)
+      await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).isTweeting)
       expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
         url: 'https://t.co/sometweethash',
         active: true,
