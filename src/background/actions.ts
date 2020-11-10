@@ -32,10 +32,15 @@ export function actions(dispatch: Dispatch<BackgroundAction>): DispatchBackgroun
         payload: { error },
       }),
 
+    postTweetStart: () =>
+      dispatch({
+        type: 'POST_TWEET_START',
+      }),
+
     postTweetSuccess: tweetResult =>
       dispatch({
         type: 'POST_TWEET_SUCCESS',
-        payload: { tweetResult },
+        payload: tweetResult,
       }),
 
     postTweetFailure: error =>

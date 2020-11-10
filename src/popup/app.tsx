@@ -19,12 +19,15 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
     }
     case 'authenticated': {
       return (
-        <Authenticated
-          feedback={activeTab(state)?.feedbackState}
-          user={state.auth.user}
-          pickingEmoji={state.pickingEmoji}
-          dispatchUserActions={dispatchUserActions}
-        />
+        <div className="app">
+          <Authenticated
+            feedback={activeTab(state)?.feedbackState}
+            tweeting={state.tweeting}
+            user={state.auth.user}
+            pickingEmoji={state.pickingEmoji}
+            dispatchUserActions={dispatchUserActions}
+          />
+        </div>
       )
     }
   }

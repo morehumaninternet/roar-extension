@@ -1,6 +1,6 @@
-import { EditorState, Modifier } from 'draft-js'
+import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity } from '../draft-js-utils'
+import { appendEntity, appendHandle } from '../draft-js-utils'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
@@ -78,13 +78,35 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   CLICK_TAKE_SCREENSHOT(): Partial<AppState> {
     return {}
   },
+  CLICK_TWEET(state): Partial<AppState> {
+    if (state.tweeting?.state !== 'DONE') {
+      throw new Error('Should only be able to click a tweet that is done')
+    }
+
+    const { tab } = state.tweeting
+
+    const nextTabs = new Map(state.tabs)
+    const { handle } = tab.feedbackState.hostTwitterHandle
+
+    // Clear the existing feedback state for the tab once the tweet is clicked
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        screenshots: [],
+        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
+      },
+    })
+
+    return {
+      tweeting: null,
+      tabs: nextTabs,
+    }
+  },
   CLICK_POST(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
     return {
-      toBeTweeted: {
-        feedbackState: tab.feedbackState,
-        tabId: tab.id,
-      },
+      tweeting: { state: 'NEW', tab },
     }
   },
   FETCH_HANDLE_START(state, action): Partial<AppState> {
@@ -117,36 +139,11 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     const nextTabs = new Map(state.tabs)
 
-    const editorState: EditorState = tab.feedbackState.editorState
-    const currentContent = editorState.getCurrentContent()
-
-    // Select position 0 (anchor) of the first line (block)
-    const firstBlockKey = currentContent.getFirstBlock().getKey()
-    const currentSelection = editorState.getSelection()
-    const startSelection = currentSelection.merge({
-      anchorOffset: 0,
-      anchorKey: firstBlockKey,
-    })
-
-    // Insert the handle to the Tweet
-    const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
-
-    // Select the handle and color it
-    // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
-    const handleSelection = startSelection.merge({
-      focusOffset: handle.length,
-      focusKey: firstBlockKey,
-    })
-
-    const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
-
-    const nextEditorState = EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
-
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: nextEditorState,
+        editorState: appendHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -199,17 +196,35 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   SCREENSHOT_CAPTURE_FAILURE(): Partial<AppState> {
     return { alert: 'SCREENSHOT FAILURE' }
   },
-  POST_TWEET_SUCCESS(_state, action): Partial<AppState> {
-    const { url } = action.payload.tweetResult
+  POST_TWEET_START(state): Partial<AppState> {
+    if (state.tweeting?.state !== 'NEW') {
+      throw new Error('Can only start posting a new tweet')
+    }
     return {
-      toBeTweeted: null,
-      justTweeted: { url },
+      tweeting: {
+        state: 'IN_PROGRESS',
+        tab: state.tweeting.tab,
+      },
     }
   },
-  POST_TWEET_FAILURE(): Partial<AppState> {
+  POST_TWEET_SUCCESS(state, action): Partial<AppState> {
+    if (state.tweeting?.state !== 'IN_PROGRESS') {
+      throw new Error('Cannot have a successful tweet before the tweet is in progress')
+    }
     return {
-      toBeTweeted: null,
-      justTweeted: null,
+      tweeting: {
+        state: 'DONE',
+        tab: state.tweeting.tab,
+        tweetUrl: action.payload.tweetUrl,
+      },
+    }
+  },
+  POST_TWEET_FAILURE(state): Partial<AppState> {
+    if (state.tweeting?.state !== 'IN_PROGRESS') {
+      throw new Error('Cannot have a successful tweet before the tweet is in progress')
+    }
+    return {
+      tweeting: null,
       alert: 'POST TWEET FAILURE',
     }
   },

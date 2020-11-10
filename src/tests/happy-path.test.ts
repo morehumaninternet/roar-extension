@@ -2,7 +2,6 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as fetchMock from 'fetch-mock'
-import { EditorState, Modifier } from 'draft-js'
 import { createMocks } from './mocks'
 import { whenState } from './util'
 import { run } from '../background/run'
@@ -12,6 +11,8 @@ import { appendEntity } from '../draft-js-utils'
 
 describe('happy path', () => {
   const mocks = createMocks()
+  const app = () => mocks.popupWindow.document.querySelector('#app-container > .app')!
+
   let unsubscribe: () => void
   after(() => mocks.teardown())
   after(() => unsubscribe())
@@ -33,8 +34,7 @@ describe('happy path', () => {
         popupConnected: false,
         focusedWindowId: -1,
         tabs: new Map(),
-        toBeTweeted: null,
-        justTweeted: null,
+        tweeting: null,
         auth: { state: 'not_authed' },
         pickingEmoji: false,
         alert: null,
@@ -77,9 +77,6 @@ describe('happy path', () => {
       expect(activeTab.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')).to.eql('')
     })
   })
-
-  let emojiPickerContainer: HTMLDivElement
-  let main: HTMLElement
 
   describe('popup:mount', () => {
     before(() => {
@@ -149,19 +146,18 @@ describe('happy path', () => {
 
   describe('once authenticated', () => {
     it('renders the app with an emoji picker container and the main element', () => {
-      const app = mocks.popupWindow.document.querySelector('#app-container > .app')!
-      expect(app.childNodes).to.have.length(2)
-      emojiPickerContainer = app.childNodes[0] as any
-      main = app.childNodes[1] as any
+      expect(app().childNodes).to.have.length(2)
+      expect(app().childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
+      expect(app().childNodes[1]).to.have.property('tagName', 'MAIN')
     })
 
     it('renders the profile image', () => {
-      const profileImage = mocks.popupWindow.document.querySelector('img.profile-img')!
+      const profileImage = app().querySelector('img.profile-img')!
       expect(profileImage).to.have.property('src', 'https://some-image-url.com/123')
     })
 
     it('renders the screenshot', () => {
-      const screenshotThumbnail = main.querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
+      const screenshotThumbnail = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
       const screenshotUri = activeTab(mocks.backgroundWindow.store.getState())?.feedbackState.screenshots[0].uri
       expect(screenshotThumbnail).to.have.property('src', screenshotUri)
     })
@@ -180,7 +176,7 @@ describe('happy path', () => {
         },
       })
 
-      const spans = main.querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
       expect(spans).to.have.length(2)
       expect(spans[0]).to.have.property('innerHTML', '@zing')
       expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
@@ -195,11 +191,11 @@ describe('happy path', () => {
       fetchMock.restore()
     })
 
-    it('posts feedback upon clicking the post button', async () => {
-      const postButton = main.querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('toBeTweeted', null)
+    it('posts feedback upon clicking the post button', () => {
+      const postButton = app().querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
+      expect(mocks.backgroundWindow.store.getState()).to.have.property('tweeting', null)
       postButton.click()
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('toBeTweeted').that.is.an('object')
+      expect(mocks.backgroundWindow.store.getState()).to.have.property('tweeting').that.is.an('object')
 
       const [url, opts] = fetchMock.lastCall()!
       expect(url).to.equal('https://test-roar-server.com/v1/feedback')
@@ -214,8 +210,23 @@ describe('happy path', () => {
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
-      const state = await whenState(mocks.backgroundWindow.store, state => !state.toBeTweeted)
-      expect(state.justTweeted).to.eql({ url: 'https://t.co/sometweethash' })
+      const tweetInProgress = app().querySelector('.tweet-in-progress')!
+      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting...')
+    })
+
+    it('renders a link to the tweet which, when clicked, clears the link and opens a new feedback box', async () => {
+      await whenState(mocks.backgroundWindow.store, state => state.tweeting?.state === 'DONE')
+      const link = app().querySelector('a.your-tweet')! as HTMLAnchorElement
+      expect(link).to.have.property('href', 'https://t.co/sometweethash')
+
+      link.click()
+
+      expect(app().querySelector('a.your-tweet')).to.equal(null)
+
+      const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(spans).to.have.length(2)
+      expect(spans[0]).to.have.property('innerHTML', '@zing')
+      expect(spans[1]).to.have.property('innerHTML', ' ')
     })
   })
 })

@@ -15,7 +15,7 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
     previousState = nextState
 
     // Dispatch actions when the extension was clicked
-    if (nextState.popupConnected && !prevState.popupConnected) {
+    if (nextState.popupConnected && !prevState.popupConnected && !nextState.tweeting) {
       const tab = ensureActiveTab(nextState)
 
       // Take a screenshot if no screenshots currently present for the active tab
@@ -36,11 +36,10 @@ export function subscribe(store: Store<AppState, Action>, browser: typeof window
       takeScreenshot(ensureActiveTab(nextState), tabs, dispatchBackgroundActions)
     }
 
-    if (nextState.toBeTweeted && !prevState.toBeTweeted) {
-      const tab = ensureActiveTab(nextState)
-      // The user clicked on the "post" button
-      // send tweet to the server
-      postTweet(nextState.toBeTweeted, tab.host!, dispatchBackgroundActions)
+    // The user clicked on the "post" button
+    // send tweet to the server
+    if (nextState.tweeting?.state === 'NEW') {
+      postTweet(nextState.tweeting.tab, dispatchBackgroundActions)
     }
   })
 }

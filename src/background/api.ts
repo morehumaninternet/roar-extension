@@ -1,13 +1,13 @@
-function tweetFormData(toBeTweeted: ToBeTweeted, host: string): FormData {
+function tweetFormData(feedbackState: FeedbackState, host: string): FormData {
   const tweetData = new FormData()
 
-  const status = toBeTweeted.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
+  const status = feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
 
   tweetData.append('host', host)
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
-  toBeTweeted.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
+  feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
 
   return tweetData
 }
@@ -20,9 +20,10 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
   })
 }
 
-export const postTweet = async (toBeTweeted: ToBeTweeted, host: string, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const postTweet = async (tab: TabInfo, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
-    const res = await makeTweetRequest(tweetFormData(toBeTweeted, host))
+    dispatchBackgroundActions.postTweetStart()
+    const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.host!))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure(await res.text())
     }
@@ -30,7 +31,7 @@ export const postTweet = async (toBeTweeted: ToBeTweeted, host: string, dispatch
     if (!tweetResult.url) {
       return dispatchBackgroundActions.postTweetFailure({ message: 'Response must include a url' })
     }
-    return dispatchBackgroundActions.postTweetSuccess(tweetResult)
+    return dispatchBackgroundActions.postTweetSuccess({ tweetUrl: tweetResult.url })
   } catch (error) {
     return dispatchBackgroundActions.postTweetFailure(error)
   }

@@ -47,11 +47,6 @@ type User = { photoUrl?: string }
 
 type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
-type ToBeTweeted = {
-  tabId: number
-  feedbackState: FeedbackState
-}
-
 type TabInfo = {
   id: number
   windowId: number
@@ -61,14 +56,13 @@ type TabInfo = {
   feedbackState: FeedbackState
 }
 
+type Tweeting = { state: 'NEW'; tab: TabInfo } | { state: 'IN_PROGRESS'; tab: TabInfo } | { state: 'DONE'; tab: TabInfo; tweetUrl: string }
+
 type AppState = {
   popupConnected: PopupState
   focusedWindowId: number
   tabs: Map<number, TabInfo>
-  toBeTweeted: Maybe<ToBeTweeted>
-  justTweeted: Maybe<{
-    url: string
-  }>
+  tweeting: null | Tweeting
   auth: Auth
   pickingEmoji: boolean
   alert: null | string | { __html: string }
@@ -91,6 +85,7 @@ type UserAction =
   | { type: 'TOGGLE_PICKING_EMOJI' }
   | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
   | { type: 'CLICK_TAKE_SCREENSHOT' }
+  | { type: 'CLICK_TWEET' }
 
 type BackgroundAction =
   | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
@@ -98,7 +93,8 @@ type BackgroundAction =
   | { type: 'FETCH_HANDLE_FAILURE'; payload: { tabId: number; host: string; error: any } }
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
-  | { type: 'POST_TWEET_SUCCESS'; payload: { tweetResult: any } }
+  | { type: 'POST_TWEET_START' }
+  | { type: 'POST_TWEET_SUCCESS'; payload: { tweetUrl: string } }
   | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
@@ -125,6 +121,7 @@ type DispatchUserActions = {
   togglePickingEmoji(): void
   emojiPicked(emoji: string): void
   clickTakeScreenshot(): void
+  clickTweet(): void
 }
 
 type DispatchBackgroundActions = {
@@ -133,6 +130,7 @@ type DispatchBackgroundActions = {
   fetchHandleFailure(payload: { tabId: number; host: string; error: any }): void
   screenshotCaptureSuccess(screenshot: Screenshot): void
   screenshotCaptureFailure(error: any): void
-  postTweetSuccess(tweetResult: any): void
+  postTweetStart(): void
+  postTweetSuccess(tweetResult: { tweetUrl: string }): void
   postTweetFailure(error: any): void
 }
