@@ -34,7 +34,7 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
           </div>
         )
       }
-      return <p>Roar does not work on this tab because roar is not a webpage.</p>
+      return <p>Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.</p>
     }
   }
 }
