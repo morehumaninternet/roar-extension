@@ -20,7 +20,7 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
   })
 }
 
-export const postTweet = async (tab: TabInfo, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: DispatchBackgroundActions) => {
   try {
     dispatchBackgroundActions.postTweetStart()
     const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.host!))
@@ -31,6 +31,7 @@ export const postTweet = async (tab: TabInfo, dispatchBackgroundActions: Dispatc
     if (!tweetResult.url) {
       return dispatchBackgroundActions.postTweetFailure({ message: 'Response must include a url' })
     }
+    chrome.tabs.create({ url: tweetResult.url, active: true })
     return dispatchBackgroundActions.postTweetSuccess({ tweetUrl: tweetResult.url })
   } catch (error) {
     return dispatchBackgroundActions.postTweetFailure(error)

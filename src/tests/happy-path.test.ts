@@ -214,14 +214,12 @@ describe('happy path', () => {
       expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting...')
     })
 
-    it('renders a link to the tweet which, when clicked, clears the link and opens a new feedback box', async () => {
-      await whenState(mocks.backgroundWindow.store, state => state.tweeting?.state === 'DONE')
-      const link = app().querySelector('a.your-tweet')! as HTMLAnchorElement
-      expect(link).to.have.property('href', 'https://t.co/sometweethash')
-
-      link.click()
-
-      expect(app().querySelector('a.your-tweet')).to.equal(null)
+    it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
+      await whenState(mocks.backgroundWindow.store, state => !state.tweeting)
+      expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
+        url: 'https://t.co/sometweethash',
+        active: true,
+      })
 
       const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
       expect(spans).to.have.length(2)

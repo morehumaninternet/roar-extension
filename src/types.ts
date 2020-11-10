@@ -56,7 +56,10 @@ type TabInfo = {
   feedbackState: FeedbackState
 }
 
-type Tweeting = { state: 'NEW'; tab: TabInfo } | { state: 'IN_PROGRESS'; tab: TabInfo } | { state: 'DONE'; tab: TabInfo; tweetUrl: string }
+type Tweeting = {
+  state: 'NEW' | 'IN_PROGRESS'
+  tab: TabInfo
+}
 
 type AppState = {
   popupConnected: PopupState
@@ -85,7 +88,6 @@ type UserAction =
   | { type: 'TOGGLE_PICKING_EMOJI' }
   | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
   | { type: 'CLICK_TAKE_SCREENSHOT' }
-  | { type: 'FOLLOW_TWEET_LINK' }
 
 type BackgroundAction =
   | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
@@ -94,7 +96,7 @@ type BackgroundAction =
   | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
   | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
   | { type: 'POST_TWEET_START' }
-  | { type: 'POST_TWEET_SUCCESS'; payload: { tweetUrl: string } }
+  | { type: 'POST_TWEET_SUCCESS' }
   | { type: 'POST_TWEET_FAILURE'; payload: { error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
@@ -121,7 +123,6 @@ type DispatchUserActions = {
   togglePickingEmoji(): void
   emojiPicked(emoji: string): void
   clickTakeScreenshot(): void
-  followTweetLink(): void
 }
 
 type DispatchBackgroundActions = {

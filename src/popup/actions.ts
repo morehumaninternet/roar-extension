@@ -32,8 +32,5 @@ export function actions(dispatch: Dispatch<UserAction>, getState: () => AppState
     clickTakeScreenshot(): UserAction {
       return dispatch({ type: 'CLICK_TAKE_SCREENSHOT' })
     },
-    followTweetLink(): UserAction {
-      return dispatch({ type: 'FOLLOW_TWEET_LINK' })
-    },
   }
 }

@@ -78,31 +78,6 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   CLICK_TAKE_SCREENSHOT(): Partial<AppState> {
     return {}
   },
-  FOLLOW_TWEET_LINK(state): Partial<AppState> {
-    if (state.tweeting?.state !== 'DONE') {
-      throw new Error('Should only be able to click a tweet that is done')
-    }
-
-    const { tab } = state.tweeting
-
-    const nextTabs = new Map(state.tabs)
-    const { handle } = tab.feedbackState.hostTwitterHandle
-
-    // Clear the existing feedback state for the tab once the tweet is clicked
-    nextTabs.set(tab.id, {
-      ...tab,
-      feedbackState: {
-        screenshots: [],
-        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
-        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
-      },
-    })
-
-    return {
-      tweeting: null,
-      tabs: nextTabs,
-    }
-  },
   CLICK_POST(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
     return {
@@ -211,12 +186,25 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     if (state.tweeting?.state !== 'IN_PROGRESS') {
       throw new Error('Cannot have a successful tweet before the tweet is in progress')
     }
-    return {
-      tweeting: {
-        state: 'DONE',
-        tab: state.tweeting.tab,
-        tweetUrl: action.payload.tweetUrl,
+
+    const { tab } = state.tweeting
+
+    const nextTabs = new Map(state.tabs)
+    const { handle } = tab.feedbackState.hostTwitterHandle
+
+    // Clear the existing feedback state for the tab once the tweet is clicked
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        screenshots: [],
+        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
+        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
+    })
+
+    return {
+      tweeting: null,
+      tabs: nextTabs,
     }
   },
   POST_TWEET_FAILURE(state): Partial<AppState> {

@@ -14,6 +14,6 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   // Attach the store to the window so the popup can access it
   // see src/popup/mount.tsx
   const store = (backgroundWindow.store = createStore())
-  subscribe(store, browser, browser.tabs)
+  subscribe(store, chrome, browser)
   monitorTabs(store, chrome)
 }
