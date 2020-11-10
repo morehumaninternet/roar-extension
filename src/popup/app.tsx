@@ -9,7 +9,7 @@ type AppProps = {
   dispatchUserActions: DispatchUserActions
 }
 
-export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
+export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {
   switch (state.auth.state) {
     case 'not_authed': {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
@@ -18,16 +18,20 @@ export function App({ state, dispatchUserActions }: AppProps): JSX.Element {
       return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
     }
     case 'authenticated': {
+      const tab = activeTab(state)
       return (
-        <div className="app">
-          <Authenticated
-            feedback={activeTab(state)?.feedbackState}
-            tweeting={state.tweeting}
-            user={state.auth.user}
-            pickingEmoji={state.pickingEmoji}
-            dispatchUserActions={dispatchUserActions}
-          />
-        </div>
+        tab && (
+          <div className="app">
+            <Authenticated
+              feedback={tab.feedbackState}
+              host={tab.host!}
+              isTweeting={tab.isTweeting}
+              user={state.auth.user}
+              pickingEmoji={state.pickingEmoji}
+              dispatchUserActions={dispatchUserActions}
+            />
+          </div>
+        )
       )
     }
   }

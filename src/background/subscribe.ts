@@ -15,18 +15,20 @@ export function subscribe(store: Store<AppState, Action>, chrome: typeof global.
     previousState = nextState
 
     // Dispatch actions when the extension was clicked
-    if (nextState.popupConnected && !prevState.popupConnected && !nextState.tweeting) {
+    if (nextState.popupConnected && !prevState.popupConnected) {
       const tab = ensureActiveTab(nextState)
 
-      // Take a screenshot if no screenshots currently present for the active tab
-      if (!tab.feedbackState.screenshots.length) {
-        takeScreenshot(tab, browser.tabs, dispatchBackgroundActions)
-      }
+      if (!tab.isTweeting) {
+        // Take a screenshot if no screenshots currently present for the active tab
+        if (!tab.feedbackState.screenshots.length) {
+          takeScreenshot(tab, browser.tabs, dispatchBackgroundActions)
+        }
 
-      // it the handle wasn't fetched before and the tab URL is valid,
-      // start the fetch process
-      if (tab.host && tab.feedbackState.hostTwitterHandle.status === 'NEW') {
-        fetchTwitterHandle(tab.id, tab.host, dispatchBackgroundActions)
+        // it the handle wasn't fetched before and the tab URL is valid,
+        // start the fetch process
+        if (tab.host && tab.feedbackState.hostTwitterHandle.status === 'NEW') {
+          fetchTwitterHandle(tab.id, tab.host, dispatchBackgroundActions)
+        }
       }
     }
 

@@ -211,7 +211,7 @@ describe('happy path', () => {
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const tweetInProgress = app().querySelector('.tweet-in-progress')!
-      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting...')
+      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback for zing.com')
     })
 
     it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {

@@ -6,20 +6,17 @@ import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
 
 type AuthenticatedProps = {
-  feedback?: FeedbackState
+  feedback: FeedbackState
+  host: string
   user: User
-  tweeting: AppState['tweeting']
+  isTweeting: boolean
   pickingEmoji: boolean
   dispatchUserActions: DispatchUserActions
 }
 
-export function Authenticated({ feedback, tweeting, user, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
-  if (tweeting) {
-    return <Tweeting tweeting={tweeting} />
-  }
-
-  if (!feedback) {
-    return null
+export function Authenticated({ feedback, host, isTweeting, user, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
+  if (isTweeting) {
+    return <Tweeting host={host} />
   }
 
   return (
