@@ -78,7 +78,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
   CLICK_TAKE_SCREENSHOT(): Partial<AppState> {
     return {}
   },
-  CLICK_TWEET(state): Partial<AppState> {
+  FOLLOW_TWEET_LINK(state): Partial<AppState> {
     if (state.tweeting?.state !== 'DONE') {
       throw new Error('Should only be able to click a tweet that is done')
     }

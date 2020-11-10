@@ -15,7 +15,7 @@ type AuthenticatedProps = {
 
 export function Authenticated({ feedback, tweeting, user, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
   if (tweeting) {
-    return <Tweeting tweeting={tweeting} clickTweet={dispatchUserActions.clickTweet} />
+    return <Tweeting tweeting={tweeting} followTweetLink={dispatchUserActions.followTweetLink} />
   }
 
   if (!feedback) {

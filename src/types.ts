@@ -85,7 +85,7 @@ type UserAction =
   | { type: 'TOGGLE_PICKING_EMOJI' }
   | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
   | { type: 'CLICK_TAKE_SCREENSHOT' }
-  | { type: 'CLICK_TWEET' }
+  | { type: 'FOLLOW_TWEET_LINK' }
 
 type BackgroundAction =
   | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
@@ -121,7 +121,7 @@ type DispatchUserActions = {
   togglePickingEmoji(): void
   emojiPicked(emoji: string): void
   clickTakeScreenshot(): void
-  clickTweet(): void
+  followTweetLink(): void
 }
 
 type DispatchBackgroundActions = {
