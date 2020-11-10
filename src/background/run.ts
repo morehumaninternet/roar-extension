@@ -1,12 +1,11 @@
-import { Store } from 'redux'
 import { monitorTabs } from './monitorTabs'
-import { createStore } from './store'
+import { AppStore, createStore } from './store'
 import { subscribe } from './subscribe'
 
 declare global {
   interface Window {
     roarServerUrl: string
-    store: Store<AppState, Action>
+    store: AppStore
   }
 }
 
@@ -15,5 +14,5 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   // see src/popup/mount.tsx
   const store = (backgroundWindow.store = createStore())
   subscribe(store, chrome, browser)
-  monitorTabs(store, chrome)
+  monitorTabs(store.dispatchers, chrome)
 }

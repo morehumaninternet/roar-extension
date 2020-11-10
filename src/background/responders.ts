@@ -24,27 +24,27 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
 })
 
 export const responders: { [T in Action['type']]: Responder<T> } = {
-  POPUP_CONNECT(): Partial<AppState> {
+  popupConnect(): Partial<AppState> {
     return { popupConnected: true }
   },
-  POPUP_DISCONNECT(): Partial<AppState> {
+  popupDisconnect(): Partial<AppState> {
     return { popupConnected: false, pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
-  SIGN_IN_WITH_TWITTER(): Partial<AppState> {
+  signInWithTwitter(): Partial<AppState> {
     return { auth: { state: 'authenticating' } }
   },
-  AUTHENTICATED_VIA_TWITTER(state, action): Partial<AppState> {
+  authenticatedViaTwitter(state, action): Partial<AppState> {
     return { auth: { state: 'authenticated', user: { photoUrl: action.payload.photoUrl } } }
   },
-  DISMISS_ALERT(): Partial<AppState> {
+  dismissAlert(): Partial<AppState> {
     return { alert: null }
   },
-  TOGGLE_PICKING_EMOJI(state): Partial<AppState> {
+  togglePickingEmoji(state): Partial<AppState> {
     return {
       pickingEmoji: !state.pickingEmoji,
     }
   },
-  EMOJI_PICKED(state, action): Partial<AppState> {
+  emojiPicked(state, action): Partial<AppState> {
     const tab = ensureActiveTab(state)
     const { emoji } = action.payload
 
@@ -62,7 +62,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs, pickingEmoji: false }
   },
-  UPDATE_EDITOR_STATE(state, action): Partial<AppState> {
+  updateEditorState(state, action): Partial<AppState> {
     const tab = ensureActiveTab(state)
 
     const handle = tab.feedbackState.hostTwitterHandle.handle
@@ -85,16 +85,16 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  CLICK_TAKE_SCREENSHOT(): Partial<AppState> {
+  clickTakeScreenshot(): Partial<AppState> {
     return {}
   },
-  CLICK_POST(state): Partial<AppState> {
+  clickPost(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, { ...tab, isTweeting: true })
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_START(state, action): Partial<AppState> {
+  fetchHandleStart(state, action): Partial<AppState> {
     const { tabId } = action.payload
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, don't try to update it
@@ -115,7 +115,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
+  fetchHandleSuccess(state, action): Partial<AppState> {
     const { tabId, host, handle } = action.payload
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
@@ -138,7 +138,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_FAILURE(state, action): Partial<AppState> {
+  fetchHandleFailure(state, action): Partial<AppState> {
     const { tabId, host, error } = action.payload
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
@@ -159,7 +159,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     })
     return { tabs: nextTabs, alert: `Failed to set handle: ${error}` }
   },
-  SCREENSHOT_CAPTURE_SUCCESS(state, action): Partial<AppState> {
+  screenshotCaptureSuccess(state, action): Partial<AppState> {
     const { screenshot } = action.payload
     const tabId = screenshot.tab.id
     // Don't use the screenshot if the tab no longer exists
@@ -178,10 +178,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  SCREENSHOT_CAPTURE_FAILURE(): Partial<AppState> {
+  screenshotCaptureFailure(): Partial<AppState> {
     return { alert: 'SCREENSHOT FAILURE' }
   },
-  POST_TWEET_SUCCESS(state, action): Partial<AppState> {
+  postTweetSuccess(state, action): Partial<AppState> {
     const tab = state.tabs.get(action.payload.tabId)
     if (!tab) return {}
 
@@ -203,7 +203,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       tabs: nextTabs,
     }
   },
-  POST_TWEET_FAILURE(state, action): Partial<AppState> {
+  postTweetFailure(state, action): Partial<AppState> {
     const tab = state.tabs.get(action.payload.tabId)
     if (!tab) return {}
 

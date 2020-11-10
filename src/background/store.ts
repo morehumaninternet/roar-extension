@@ -1,6 +1,10 @@
 import * as redux from 'redux'
 import { responders } from './responders'
 
+export type AppStore = redux.Store<AppState, Action> & {
+  dispatchers: Dispatch<Action>
+}
+
 const emptyState: AppState = {
   popupConnected: false,
   focusedWindowId: -1,
@@ -33,6 +37,21 @@ function reducer(state: AppState = emptyState, action: Action): AppState {
   return nextState
 }
 
-export function createStore(): redux.Store<AppState, Action> {
-  return redux.createStore(reducer)
+export function createStore(): AppStore {
+  const store: AppStore = redux.createStore(reducer)
+
+  store.dispatchers = Object.keys(responders).reduce(
+    (dis, type) => ({
+      ...dis,
+      [type]: (payload?: any) => {
+        if (payload) {
+          return store.dispatch({ type, payload } as any)
+        }
+        return store.dispatch({ type } as any)
+      },
+    }),
+    {} as any
+  )
+
+  return store
 }

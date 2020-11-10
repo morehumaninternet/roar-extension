@@ -73,25 +73,25 @@ type AppState = {
 type Responder<T extends Action['type']> = (state: AppState, action: Action & { type: T }) => Partial<AppState>
 
 type UserAction =
-  | { type: 'POPUP_CONNECT' }
-  | { type: 'POPUP_DISCONNECT' }
-  | { type: 'SIGN_IN_WITH_TWITTER' }
-  | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { photoUrl?: string } }
-  | { type: 'DISMISS_ALERT' }
-  | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
-  | { type: 'CLICK_POST' }
-  | { type: 'TOGGLE_PICKING_EMOJI' }
-  | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
-  | { type: 'CLICK_TAKE_SCREENSHOT' }
+  | { type: 'popupConnect' }
+  | { type: 'popupDisconnect' }
+  | { type: 'signInWithTwitter' }
+  | { type: 'authenticatedViaTwitter'; payload: { photoUrl?: string } }
+  | { type: 'dismissAlert' }
+  | { type: 'updateEditorState'; payload: { editorState: any } }
+  | { type: 'clickPost' }
+  | { type: 'togglePickingEmoji' }
+  | { type: 'emojiPicked'; payload: { emoji: string } }
+  | { type: 'clickTakeScreenshot' }
 
 type BackgroundAction =
-  | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
-  | { type: 'FETCH_HANDLE_SUCCESS'; payload: { tabId: number; host: string; handle: string } }
-  | { type: 'FETCH_HANDLE_FAILURE'; payload: { tabId: number; host: string; error: any } }
-  | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
-  | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
-  | { type: 'POST_TWEET_SUCCESS'; payload: { tabId: number } }
-  | { type: 'POST_TWEET_FAILURE'; payload: { tabId: number; error: any } }
+  | { type: 'fetchHandleStart'; payload: { tabId: number } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; host: string; handle: string } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; host: string; error: any } }
+  | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
+  | { type: 'screenshotCaptureFailure'; payload: { error: any } }
+  | { type: 'postTweetSuccess'; payload: { tabId: number } }
+  | { type: 'postTweetFailure'; payload: { tabId: number; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
@@ -106,25 +106,8 @@ type BackgroundAction =
 
 type Action = UserAction | BackgroundAction
 
-type DispatchUserActions = {
-  popupConnect(): void
-  popupDisconnect(): void
-  signInWithTwitter(): void
-  authenticatedViaTwitter(photoUrl?: string): void
-  dismissAlert(): void
-  updateEditorState(editorState: any): void
-  clickPost(): void
-  togglePickingEmoji(): void
-  emojiPicked(emoji: string): void
-  clickTakeScreenshot(): void
-}
+type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; payload: any } ? (payload: A['payload']) => void : () => void
 
-type DispatchBackgroundActions = {
-  fetchHandleStart(tabId: number): void
-  fetchHandleSuccess(payload: { tabId: number; host: string; handle: string }): void
-  fetchHandleFailure(payload: { tabId: number; host: string; error: any }): void
-  screenshotCaptureSuccess(screenshot: Screenshot): void
-  screenshotCaptureFailure(error: any): void
-  postTweetSuccess(payload: { tabId: number }): void
-  postTweetFailure(payload: { tabId: number; error: any }): void
+type Dispatch<A extends Action> = {
+  [T in A['type']]: Dispatcher<A, T>
 }
