@@ -23,7 +23,7 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     isTweeting: false,
     url: tab.url,
     host: hostName,
-    feedbackState: emptyFeedbackState(`@${hostName}`),
+    feedbackState: emptyFeedbackState(`@${hostName?.match(/[\d\w/]+.com/)}`),
   }
 }
 
