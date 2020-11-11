@@ -35,7 +35,14 @@ type HostTwitterHandle = {
   handle: string | null
 }
 
+type EditingScreenshotState = {
+  index: number
+  color: string
+  blob: Blob
+}
+
 type FeedbackState = {
+  editingScreenshot: null | EditingScreenshotState
   screenshots: ReadonlyArray<Screenshot>
   editorState: Draft.EditorState
   hostTwitterHandle: HostTwitterHandle
@@ -86,6 +93,7 @@ type UserAction =
   | { type: 'togglePickingEmoji' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
+  | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }

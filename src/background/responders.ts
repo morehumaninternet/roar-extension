@@ -4,6 +4,7 @@ import { appendEntity, appendHandle } from '../draft-js-utils'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
+    editingScreenshot: null,
     screenshots: [],
     editorState: EditorState.createEmpty(),
     hostTwitterHandle: {
@@ -53,9 +54,8 @@ export const responders: Responders<Action> = {
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
-        screenshots: tab.feedbackState.screenshots,
+        ...tab.feedbackState,
         editorState: nextEditorState,
-        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -75,9 +75,8 @@ export const responders: Responders<Action> = {
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
-        screenshots: tab.feedbackState.screenshots,
+        ...tab.feedbackState,
         editorState,
-        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -101,8 +100,7 @@ export const responders: Responders<Action> = {
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
-        screenshots: tab.feedbackState.screenshots,
-        editorState: tab.feedbackState.editorState,
+        ...tab.feedbackState,
         hostTwitterHandle: {
           status: 'IN_PROGRESS',
           handle: null,
@@ -123,6 +121,7 @@ export const responders: Responders<Action> = {
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
+        editingScreenshot: tab.feedbackState.editingScreenshot,
         screenshots: tab.feedbackState.screenshots,
         editorState: appendHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
@@ -144,8 +143,7 @@ export const responders: Responders<Action> = {
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
-        screenshots: tab.feedbackState.screenshots,
-        editorState: tab.feedbackState.editorState,
+        ...tab.feedbackState,
         hostTwitterHandle: {
           status: 'DONE',
           handle: null,
@@ -164,9 +162,8 @@ export const responders: Responders<Action> = {
     nextTabs.set(tabId, {
       ...tab,
       feedbackState: {
+        ...tab.feedbackState,
         screenshots: tab.feedbackState.screenshots.concat([screenshot]),
-        editorState: tab.feedbackState.editorState,
-        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
@@ -187,6 +184,7 @@ export const responders: Responders<Action> = {
       ...tab,
       isTweeting: false,
       feedbackState: {
+        editingScreenshot: null,
         screenshots: [],
         editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
         hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
@@ -212,6 +210,26 @@ export const responders: Responders<Action> = {
       tabs: nextTabs,
       alert: error.message,
     }
+  },
+  startEditingScreenshot(state, { screenshotIndex }): Partial<AppState> {
+    const tab = ensureActiveTab(state)
+
+    const nextTabs = new Map(state.tabs)
+
+    // Clear the existing feedback state for the tab once the tweet is clicked
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        ...tab.feedbackState,
+        editingScreenshot: {
+          index: screenshotIndex,
+          color: '#fa759e',
+          blob: tab.feedbackState.screenshots[screenshotIndex].blob,
+        },
+      },
+    })
+
+    return { tabs: nextTabs }
   },
   'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
     return {
