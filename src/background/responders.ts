@@ -2,10 +2,10 @@ import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle } from '../draft-js-utils'
 
-const emptyFeedbackState = (): FeedbackState => {
+const emptyFeedbackState = (hostName: string): FeedbackState => {
   return {
     screenshots: [],
-    editorState: EditorState.createEmpty(),
+    editorState: prependHandle(EditorState.createEmpty(), hostName),
     hostTwitterHandle: {
       status: 'NEW',
       handle: null,
@@ -13,15 +13,19 @@ const emptyFeedbackState = (): FeedbackState => {
   }
 }
 
-const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
-  id: tab.id!,
-  windowId: tab.windowId!,
-  active: tab.active,
-  isTweeting: false,
-  url: tab.url,
-  host: tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined,
-  feedbackState: emptyFeedbackState(),
-})
+const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
+  const hostName = tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined
+
+  return {
+    id: tab.id!,
+    windowId: tab.windowId!,
+    active: tab.active,
+    isTweeting: false,
+    url: tab.url,
+    host: hostName,
+    feedbackState: emptyFeedbackState(`@${hostName}`),
+  }
+}
 
 export const responders: Responders<Action> = {
   popupConnect(): Partial<AppState> {
@@ -249,7 +253,7 @@ export const responders: Responders<Action> = {
     // If the domain has changed, delete the feedback
     if (tab.host !== nextHost) {
       tab.host = nextHost
-      tab.feedbackState = emptyFeedbackState()
+      tab.feedbackState = emptyFeedbackState('@some name')
     }
     tabs.set(tabId, tab)
     return { tabs }
