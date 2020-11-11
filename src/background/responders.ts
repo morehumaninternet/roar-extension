@@ -253,7 +253,7 @@ export const responders: Responders<Action> = {
     // If the domain has changed, delete the feedback
     if (tab.host !== nextHost) {
       tab.host = nextHost
-      tab.feedbackState = emptyFeedbackState('@some name')
+      tab.feedbackState = emptyFeedbackState(`${tab.host}`) //has to pass in an argument to get TypeScript pass, work in progress
     }
     tabs.set(tabId, tab)
     return { tabs }
