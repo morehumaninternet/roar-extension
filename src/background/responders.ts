@@ -94,12 +94,9 @@ export const responders: Responders<Action> = {
   },
   fetchHandleStart(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
-    // display host name test before successfully fetch twitter
-    // const currentURL = (window.location.host).match(/[\d\w/]+.com/) || ['no host data'];
-    // const hostName = `@${currentURL[0]}`
 
-    const tabHost = tab?.host
-    const hostName = `@${tabHost}`
+    // const tabHost = tab?.host
+    // const hostName = `@${tabHost}`
 
     // If the tab doesn't exist anymore, don't try to update it
     if (!tab) return {}
@@ -109,7 +106,7 @@ export const responders: Responders<Action> = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: prependHandle(tab.feedbackState.editorState, hostName),
+        editorState: tab.feedbackState.editorState,
         hostTwitterHandle: {
           status: 'IN_PROGRESS',
           handle: null,
