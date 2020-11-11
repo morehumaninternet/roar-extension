@@ -23,7 +23,7 @@ describe('happy path', () => {
       // Throw an error if ever a FAILURE event is dispatched
       unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
         const { mostRecentAction } = mocks.backgroundWindow.store.getState()
-        if (mostRecentAction.type.endsWith('FAILURE')) {
+        if (mostRecentAction.type.endsWith('Failure')) {
           throw (mostRecentAction as any).payload.error
         }
       })
@@ -31,7 +31,6 @@ describe('happy path', () => {
 
     it('loads window.store, which starts with an empty state', () => {
       expect(mocks.backgroundWindow.store.getState()).to.eql({
-        popupConnected: false,
         focusedWindowId: -1,
         tabs: new Map(),
         auth: { state: 'not_authed' },
@@ -97,7 +96,7 @@ describe('happy path', () => {
       expect(signInWithTwitter).to.have.property('innerHTML', 'Sign in with twitter')
     })
 
-    it('dispatches POPUP_CONNECT, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
+    it('dispatches popupConnect, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
       const state = mocks.backgroundWindow.store.getState()
       const activeTab = ensureActiveTab(state)
       expect(activeTab.feedbackState.screenshots).to.have.length(1)
@@ -174,7 +173,7 @@ describe('happy path', () => {
       const tab = ensureActiveTab(mocks.backgroundWindow.store.getState())
 
       mocks.backgroundWindow.store.dispatch({
-        type: 'UPDATE_EDITOR_STATE',
+        type: 'updateEditorState',
         payload: {
           editorState: appendEntity(tab.feedbackState.editorState, 'This is some feedback'),
         },

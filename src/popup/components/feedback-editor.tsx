@@ -3,7 +3,7 @@ import { Editor, EditorState } from 'draft-js'
 
 type FeedbackEditorProps = {
   editorState: EditorState
-  updateEditorState: DispatchUserActions['updateEditorState']
+  updateEditorState: Dispatchers<UserAction>['updateEditorState']
 }
 
 const styleMap = {
@@ -17,7 +17,7 @@ export function FeedbackEditor({ editorState, updateEditorState }: FeedbackEdito
     <Editor
       placeholder="What's your feedback?"
       editorState={editorState}
-      onChange={nextEditorState => updateEditorState(nextEditorState)}
+      onChange={editorState => updateEditorState({ editorState })}
       customStyleMap={styleMap}
     />
   )

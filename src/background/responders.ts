@@ -23,30 +23,29 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
   feedbackState: emptyFeedbackState(),
 })
 
-export const responders: { [T in Action['type']]: Responder<T> } = {
-  POPUP_CONNECT(): Partial<AppState> {
-    return { popupConnected: true }
+export const responders: Responders<Action> = {
+  popupConnect(): Partial<AppState> {
+    return {}
   },
-  POPUP_DISCONNECT(): Partial<AppState> {
-    return { popupConnected: false, pickingEmoji: false, alert: null } // closing the popup dismisses any alert
+  popupDisconnect(): Partial<AppState> {
+    return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
-  SIGN_IN_WITH_TWITTER(): Partial<AppState> {
+  signInWithTwitter(): Partial<AppState> {
     return { auth: { state: 'authenticating' } }
   },
-  AUTHENTICATED_VIA_TWITTER(state, action): Partial<AppState> {
-    return { auth: { state: 'authenticated', user: { photoUrl: action.payload.photoUrl } } }
+  authenticatedViaTwitter(state, { photoUrl }): Partial<AppState> {
+    return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
-  DISMISS_ALERT(): Partial<AppState> {
+  dismissAlert(): Partial<AppState> {
     return { alert: null }
   },
-  TOGGLE_PICKING_EMOJI(state): Partial<AppState> {
+  togglePickingEmoji(state): Partial<AppState> {
     return {
       pickingEmoji: !state.pickingEmoji,
     }
   },
-  EMOJI_PICKED(state, action): Partial<AppState> {
+  emojiPicked(state, { emoji }): Partial<AppState> {
     const tab = ensureActiveTab(state)
-    const { emoji } = action.payload
 
     const nextEditorState = appendEntity(tab.feedbackState.editorState, emoji, 'emoji')
 
@@ -62,11 +61,10 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs, pickingEmoji: false }
   },
-  UPDATE_EDITOR_STATE(state, action): Partial<AppState> {
+  updateEditorState(state, { editorState }): Partial<AppState> {
     const tab = ensureActiveTab(state)
 
     const handle = tab.feedbackState.hostTwitterHandle.handle
-    const { editorState } = action.payload
     const status = editorState.getCurrentContent().getPlainText('\u0001')
 
     // If the new editor state doesn't start with the handle, don't update the store.
@@ -78,24 +76,23 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: action.payload.editorState,
+        editorState,
         hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
 
     return { tabs: nextTabs }
   },
-  CLICK_TAKE_SCREENSHOT(): Partial<AppState> {
+  clickTakeScreenshot(): Partial<AppState> {
     return {}
   },
-  CLICK_POST(state): Partial<AppState> {
+  clickPost(state): Partial<AppState> {
     const tab = ensureActiveTab(state)
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, { ...tab, isTweeting: true })
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_START(state, action): Partial<AppState> {
-    const { tabId } = action.payload
+  fetchHandleStart(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, don't try to update it
     if (!tab) return {}
@@ -115,8 +112,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_SUCCESS(state, action): Partial<AppState> {
-    const { tabId, host, handle } = action.payload
+  fetchHandleSuccess(state, { tabId, host, handle }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
     if (!tab) return {}
@@ -138,8 +134,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  FETCH_HANDLE_FAILURE(state, action): Partial<AppState> {
-    const { tabId, host, error } = action.payload
+  fetchHandleFailure(state, { tabId, host, error }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
     if (!tab) return {}
@@ -159,8 +154,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     })
     return { tabs: nextTabs, alert: `Failed to set handle: ${error}` }
   },
-  SCREENSHOT_CAPTURE_SUCCESS(state, action): Partial<AppState> {
-    const { screenshot } = action.payload
+  screenshotCaptureSuccess(state, { screenshot }): Partial<AppState> {
     const tabId = screenshot.tab.id
     // Don't use the screenshot if the tab no longer exists
     if (!state.tabs.has(tabId)) return {}
@@ -178,11 +172,11 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs: nextTabs }
   },
-  SCREENSHOT_CAPTURE_FAILURE(): Partial<AppState> {
+  screenshotCaptureFailure(): Partial<AppState> {
     return { alert: 'SCREENSHOT FAILURE' }
   },
-  POST_TWEET_SUCCESS(state, action): Partial<AppState> {
-    const tab = state.tabs.get(action.payload.tabId)
+  postTweetSuccess(state, { tabId }): Partial<AppState> {
+    const tab = state.tabs.get(tabId)
     if (!tab) return {}
 
     const nextTabs = new Map(state.tabs)
@@ -203,8 +197,8 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
       tabs: nextTabs,
     }
   },
-  POST_TWEET_FAILURE(state, action): Partial<AppState> {
-    const tab = state.tabs.get(action.payload.tabId)
+  postTweetFailure(state, { tabId, error }): Partial<AppState> {
+    const tab = state.tabs.get(tabId)
     if (!tab) return {}
 
     const nextTabs = new Map(state.tabs)
@@ -216,32 +210,31 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return {
       tabs: nextTabs,
-      alert: action.payload.error.message,
+      alert: error.message,
     }
   },
-  'chrome.windows.getAll'(state, action): Partial<AppState> {
+  'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
     return {
-      focusedWindowId: action.payload.windows.find(win => win.focused)!.id,
+      focusedWindowId: windows.find(win => win.focused)!.id,
     }
   },
-  'chrome.tabs.query'(state, action): Partial<AppState> {
+  'chrome.tabs.query'(state, payload): Partial<AppState> {
     const tabs: AppState['tabs'] = new Map()
-    action.payload.tabs.forEach(tab => tabs.set(tab.id!, newTabInfo(tab)))
+    payload.tabs.forEach(tab => tabs.set(tab.id!, newTabInfo(tab)))
     return { tabs }
   },
-  'chrome.tabs.onCreated'(state, action): Partial<AppState> {
-    const { tab } = action.payload
+  'chrome.tabs.onCreated'(state, payload): Partial<AppState> {
+    const { tab } = payload
     const tabs = new Map(state.tabs)
     tabs.set(tab.id!, newTabInfo(tab))
     return { tabs }
   },
-  'chrome.tabs.onRemoved'(state, action): Partial<AppState> {
+  'chrome.tabs.onRemoved'(state, { tabId }): Partial<AppState> {
     const tabs = new Map(state.tabs)
-    tabs.delete(action.payload.tabId)
+    tabs.delete(tabId)
     return { tabs }
   },
-  'chrome.tabs.onUpdated'(state, action): Partial<AppState> {
-    const { tabId, changeInfo } = action.payload
+  'chrome.tabs.onUpdated'(state, { tabId, changeInfo }): Partial<AppState> {
     if (!changeInfo.url) return {}
     const tabs = new Map(state.tabs)
     const tab = { ...tabs.get(tabId)! }
@@ -257,20 +250,16 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     tabs.set(tabId, tab)
     return { tabs }
   },
-  'chrome.tabs.onAttached'(state, action): Partial<AppState> {
+  'chrome.tabs.onAttached'(state, { tabId, attachInfo }): Partial<AppState> {
     const tabs = new Map(state.tabs)
-    const {
-      tabId,
-      attachInfo: { newWindowId },
-    } = action.payload
     const tab = { ...tabs.get(tabId)! }
-    tab.windowId = newWindowId
+    tab.windowId = attachInfo.newWindowId
     tabs.set(tabId, tab)
     return { tabs }
   },
-  'chrome.tabs.onActivated'(state, action): Partial<AppState> {
+  'chrome.tabs.onActivated'(state, payload): Partial<AppState> {
     const tabs: AppState['tabs'] = new Map()
-    const { tabId, windowId } = action.payload.activeInfo
+    const { tabId, windowId } = payload.activeInfo
 
     for (const [id, tab] of state.tabs.entries()) {
       const nextTab = tab.windowId === windowId ? { ...tab, active: id === tabId } : tab
@@ -279,22 +268,20 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
 
     return { tabs }
   },
-  'chrome.tabs.onReplaced'(state, action): Partial<AppState> {
-    const { addedTabId, removedTabId } = action.payload
+  'chrome.tabs.onReplaced'(state, { addedTabId, removedTabId }): Partial<AppState> {
     const tab = state.tabs.get(removedTabId)!
     const tabs = new Map(state.tabs)
     tabs.delete(removedTabId)
     tabs.set(addedTabId, { ...tab, id: addedTabId })
     return { tabs }
   },
-  'chrome.windows.onCreated'(state, action): Partial<AppState> {
-    if (action.payload.win.focused) {
-      return { focusedWindowId: action.payload.win.id }
+  'chrome.windows.onCreated'(state, payload): Partial<AppState> {
+    if (payload.win.focused) {
+      return { focusedWindowId: payload.win.id }
     }
     return {}
   },
-  'chrome.windows.onRemoved'(state, action): Partial<AppState> {
-    const { windowId } = action.payload
+  'chrome.windows.onRemoved'(state, { windowId }): Partial<AppState> {
     const tabs = new Map(state.tabs)
     for (const [id, tab] of state.tabs.entries()) {
       if (tab.windowId === windowId) {
@@ -304,8 +291,7 @@ export const responders: { [T in Action['type']]: Responder<T> } = {
     const focusedWindowId = windowId === state.focusedWindowId ? -1 : state.focusedWindowId
     return { tabs, focusedWindowId }
   },
-  'chrome.windows.onFocusChanged'(state, action): Partial<AppState> {
-    const { windowId } = action.payload
+  'chrome.windows.onFocusChanged'(state, { windowId }): Partial<AppState> {
     if (windowId === -1) return {}
     return { focusedWindowId: windowId }
   },

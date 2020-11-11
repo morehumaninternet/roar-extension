@@ -20,7 +20,7 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
   })
 }
 
-export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
   try {
     const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.host!))
     if (res.status !== 201) {
@@ -50,9 +50,9 @@ function makeHandleRequest(host: string): Promise<Response> {
   return fetch(requestURL.toString())
 }
 
-export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBackgroundActions: DispatchBackgroundActions) => {
+export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
   try {
-    dispatchBackgroundActions.fetchHandleStart(tabId)
+    dispatchBackgroundActions.fetchHandleStart({ tabId })
     const res = await makeHandleRequest(host)
     const { twitter_handle } = await res.json()
     return dispatchBackgroundActions.fetchHandleSuccess({ tabId, host, handle: twitter_handle })

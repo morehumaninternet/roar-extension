@@ -1,13 +1,13 @@
 import * as React from 'react'
 
-export function Authenticating({ authenticatedViaTwitter }: Pick<DispatchUserActions, 'authenticatedViaTwitter'>): JSX.Element {
+export function Authenticating({ authenticatedViaTwitter }: Pick<Dispatchers<UserAction>, 'authenticatedViaTwitter'>): JSX.Element {
   React.useEffect(() => {
     function listener(event: any): any {
       if (event.origin !== window.roarServerUrl) {
         return
       }
       if (event.data.type === 'twitter-auth-success') {
-        return authenticatedViaTwitter(event.data.photoUrl)
+        return authenticatedViaTwitter({ photoUrl: event.data.photoUrl })
       }
       if (event.data.type === 'twitter-auth-failure') {
         throw new Error('TODO: handle this')

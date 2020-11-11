@@ -11,7 +11,7 @@ type AuthenticatedProps = {
   user: User
   isTweeting: boolean
   pickingEmoji: boolean
-  dispatchUserActions: DispatchUserActions
+  dispatchUserActions: Dispatchers<UserAction>
 }
 
 export function Authenticated({ feedback, host, isTweeting, user, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {

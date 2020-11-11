@@ -6,7 +6,7 @@ import { activeTab } from '../selectors'
 
 type AppProps = {
   state: AppState
-  dispatchUserActions: DispatchUserActions
+  dispatchUserActions: Dispatchers<UserAction>
 }
 
 export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {

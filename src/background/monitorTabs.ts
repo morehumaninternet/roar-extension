@@ -1,15 +1,13 @@
-import { Store } from 'redux'
-
-export function monitorTabs(store: Store<AppState, Action>, chrome: typeof global.chrome): void {
-  chrome.windows.getAll(windows => store.dispatch({ type: 'chrome.windows.getAll', payload: { windows } }))
-  chrome.tabs.query({}, tabs => store.dispatch({ type: 'chrome.tabs.query', payload: { tabs } }))
-  chrome.tabs.onCreated.addListener(tab => store.dispatch({ type: 'chrome.tabs.onCreated', payload: { tab } }))
-  chrome.tabs.onRemoved.addListener((tabId, removeInfo) => store.dispatch({ type: 'chrome.tabs.onRemoved', payload: { tabId, removeInfo } }))
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => store.dispatch({ type: 'chrome.tabs.onUpdated', payload: { tabId, changeInfo } }))
-  chrome.tabs.onAttached.addListener((tabId, attachInfo) => store.dispatch({ type: 'chrome.tabs.onAttached', payload: { tabId, attachInfo } }))
-  chrome.tabs.onActivated.addListener(activeInfo => store.dispatch({ type: 'chrome.tabs.onActivated', payload: { activeInfo } }))
-  chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => store.dispatch({ type: 'chrome.tabs.onReplaced', payload: { addedTabId, removedTabId } }))
-  chrome.windows.onCreated.addListener(win => store.dispatch({ type: 'chrome.windows.onCreated', payload: { win } }))
-  chrome.windows.onRemoved.addListener(windowId => store.dispatch({ type: 'chrome.windows.onRemoved', payload: { windowId } }))
-  chrome.windows.onFocusChanged.addListener(windowId => store.dispatch({ type: 'chrome.windows.onFocusChanged', payload: { windowId } }))
+export function monitorTabs(dispatch: Dispatchers<BackgroundAction>, chrome: typeof global.chrome): void {
+  chrome.windows.getAll(windows => dispatch['chrome.windows.getAll']({ windows }))
+  chrome.tabs.query({}, tabs => dispatch['chrome.tabs.query']({ tabs }))
+  chrome.tabs.onCreated.addListener(tab => dispatch['chrome.tabs.onCreated']({ tab }))
+  chrome.tabs.onRemoved.addListener((tabId, removeInfo) => dispatch['chrome.tabs.onRemoved']({ tabId, removeInfo }))
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => dispatch['chrome.tabs.onUpdated']({ tabId, changeInfo }))
+  chrome.tabs.onAttached.addListener((tabId, attachInfo) => dispatch['chrome.tabs.onAttached']({ tabId, attachInfo }))
+  chrome.tabs.onActivated.addListener(activeInfo => dispatch['chrome.tabs.onActivated']({ activeInfo }))
+  chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => dispatch['chrome.tabs.onReplaced']({ addedTabId, removedTabId }))
+  chrome.windows.onCreated.addListener(win => dispatch['chrome.windows.onCreated']({ win }))
+  chrome.windows.onRemoved.addListener(windowId => dispatch['chrome.windows.onRemoved']({ windowId }))
+  chrome.windows.onFocusChanged.addListener(windowId => dispatch['chrome.windows.onFocusChanged']({ windowId }))
 }

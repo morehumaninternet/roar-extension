@@ -19,16 +19,18 @@ function dataURItoBlob(dataURI: string): Blob {
   return new Blob([ab], { type: mimeString })
 }
 
-export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: DispatchBackgroundActions): Promise<void> {
+export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
   try {
     const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const { host } = new URL(tab.url!)
     dispatchBackgroundActions.screenshotCaptureSuccess({
-      tab,
-      name: `${host} - ${new Date().toISOString()}.png`,
-      uri: screenshotUri,
-      blob: screenshotBlob,
+      screenshot: {
+        tab,
+        name: `${host} - ${new Date().toISOString()}.png`,
+        uri: screenshotUri,
+        blob: screenshotBlob,
+      },
     })
   } catch (error) {
     dispatchBackgroundActions.screenshotCaptureFailure(error)

@@ -2,9 +2,9 @@ import * as React from 'react'
 import { ActionButton } from './action-button'
 
 type ActionBarProps = {
-  clickPost: DispatchUserActions['clickPost']
-  togglePickingEmoji: DispatchUserActions['togglePickingEmoji']
-  clickTakeScreenshot: DispatchUserActions['clickTakeScreenshot']
+  clickPost: Dispatchers<UserAction>['clickPost']
+  togglePickingEmoji: Dispatchers<UserAction>['togglePickingEmoji']
+  clickTakeScreenshot: Dispatchers<UserAction>['clickTakeScreenshot']
 }
 
 export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot }: ActionBarProps) => {

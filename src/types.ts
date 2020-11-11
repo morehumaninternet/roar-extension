@@ -16,8 +16,6 @@ type SystemInfo = {
   zoom: number
 }
 
-type PopupState = boolean
-
 type Screenshot = {
   tab: TabInfo
   name: string
@@ -58,7 +56,6 @@ type TabInfo = {
 }
 
 type AppState = {
-  popupConnected: PopupState
   focusedWindowId: number
   tabs: Map<number, TabInfo>
   auth: Auth
@@ -67,31 +64,37 @@ type AppState = {
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
 
-// A Responder is a function that takes the current state of the application and an action of the corresponding type
-// and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
+// A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
+// type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
 // object of responders, each of which only need return those parts of the state that we are updating
-type Responder<T extends Action['type']> = (state: AppState, action: Action & { type: T }) => Partial<AppState>
+type Responder<A extends Action, T extends A['type']> = A extends { type: T; payload: any }
+  ? (state: AppState, payload: A['payload']) => Partial<AppState>
+  : (state: AppState) => Partial<AppState>
+
+type Responders<A extends Action> = {
+  [T in A['type']]: Responder<A, T>
+}
 
 type UserAction =
-  | { type: 'POPUP_CONNECT' }
-  | { type: 'POPUP_DISCONNECT' }
-  | { type: 'SIGN_IN_WITH_TWITTER' }
-  | { type: 'AUTHENTICATED_VIA_TWITTER'; payload: { photoUrl?: string } }
-  | { type: 'DISMISS_ALERT' }
-  | { type: 'UPDATE_EDITOR_STATE'; payload: { editorState: any } }
-  | { type: 'CLICK_POST' }
-  | { type: 'TOGGLE_PICKING_EMOJI' }
-  | { type: 'EMOJI_PICKED'; payload: { emoji: string } }
-  | { type: 'CLICK_TAKE_SCREENSHOT' }
+  | { type: 'popupConnect' }
+  | { type: 'popupDisconnect' }
+  | { type: 'signInWithTwitter' }
+  | { type: 'authenticatedViaTwitter'; payload: { photoUrl?: string } }
+  | { type: 'dismissAlert' }
+  | { type: 'updateEditorState'; payload: { editorState: any } }
+  | { type: 'clickPost' }
+  | { type: 'togglePickingEmoji' }
+  | { type: 'emojiPicked'; payload: { emoji: string } }
+  | { type: 'clickTakeScreenshot' }
 
 type BackgroundAction =
-  | { type: 'FETCH_HANDLE_START'; payload: { tabId: number } }
-  | { type: 'FETCH_HANDLE_SUCCESS'; payload: { tabId: number; host: string; handle: string } }
-  | { type: 'FETCH_HANDLE_FAILURE'; payload: { tabId: number; host: string; error: any } }
-  | { type: 'SCREENSHOT_CAPTURE_SUCCESS'; payload: { screenshot: Screenshot } }
-  | { type: 'SCREENSHOT_CAPTURE_FAILURE'; payload: { error: any } }
-  | { type: 'POST_TWEET_SUCCESS'; payload: { tabId: number } }
-  | { type: 'POST_TWEET_FAILURE'; payload: { tabId: number; error: any } }
+  | { type: 'fetchHandleStart'; payload: { tabId: number } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; host: string; handle: string } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; host: string; error: any } }
+  | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
+  | { type: 'screenshotCaptureFailure'; payload: { error: any } }
+  | { type: 'postTweetSuccess'; payload: { tabId: number } }
+  | { type: 'postTweetFailure'; payload: { tabId: number; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
@@ -106,25 +109,10 @@ type BackgroundAction =
 
 type Action = UserAction | BackgroundAction
 
-type DispatchUserActions = {
-  popupConnect(): void
-  popupDisconnect(): void
-  signInWithTwitter(): void
-  authenticatedViaTwitter(photoUrl?: string): void
-  dismissAlert(): void
-  updateEditorState(editorState: any): void
-  clickPost(): void
-  togglePickingEmoji(): void
-  emojiPicked(emoji: string): void
-  clickTakeScreenshot(): void
-}
+// If the action has a payload, a dispatcher for that function takes the payload as its first argument
+// otherwise, the dispatcher is a function called with no arguments
+type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; payload: any } ? (payload: A['payload']) => void : () => void
 
-type DispatchBackgroundActions = {
-  fetchHandleStart(tabId: number): void
-  fetchHandleSuccess(payload: { tabId: number; host: string; handle: string }): void
-  fetchHandleFailure(payload: { tabId: number; host: string; error: any }): void
-  screenshotCaptureSuccess(screenshot: Screenshot): void
-  screenshotCaptureFailure(error: any): void
-  postTweetSuccess(payload: { tabId: number }): void
-  postTweetFailure(payload: { tabId: number; error: any }): void
+type Dispatchers<A extends Action> = {
+  [T in A['type']]: Dispatcher<A, T>
 }
