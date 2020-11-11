@@ -36,7 +36,7 @@ export function appendEntity(editorState: EditorState, text: string, type: 'text
   return EditorState.forceSelection(newEditorState, addedContent.getSelectionAfter())
 }
 
-export function appendHandle(editorState: EditorState, handle: string): EditorState {
+export function prependHandle(editorState: EditorState, handle: string): EditorState {
   if (!handle.startsWith('@')) {
     throw new Error('handle must start with @')
   }

@@ -1,6 +1,6 @@
 import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity, appendHandle } from '../draft-js-utils'
+import { appendEntity, prependHandle } from '../draft-js-utils'
 
 const emptyFeedbackState = (): FeedbackState => {
   return {
@@ -94,6 +94,13 @@ export const responders: Responders<Action> = {
   },
   fetchHandleStart(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
+    // display host name test before successfully fetch twitter
+    // const currentURL = (window.location.host).match(/[\d\w/]+.com/) || ['no host data'];
+    // const hostName = `@${currentURL[0]}`
+
+    const tabHost = tab?.host
+    const hostName = `@${tabHost}`
+
     // If the tab doesn't exist anymore, don't try to update it
     if (!tab) return {}
 
@@ -102,7 +109,7 @@ export const responders: Responders<Action> = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: tab.feedbackState.editorState,
+        editorState: prependHandle(tab.feedbackState.editorState, hostName),
         hostTwitterHandle: {
           status: 'IN_PROGRESS',
           handle: null,
@@ -124,7 +131,7 @@ export const responders: Responders<Action> = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: appendHandle(tab.feedbackState.editorState, handle),
+        editorState: prependHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -188,7 +195,7 @@ export const responders: Responders<Action> = {
       isTweeting: false,
       feedbackState: {
         screenshots: [],
-        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
+        editorState: handle ? prependHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
         hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
