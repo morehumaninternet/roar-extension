@@ -19,8 +19,8 @@ describe('responders', () => {
       })
 
       const stateUpdates = responders['chrome.tabs.onUpdated'](appState, {
-        type: 'chrome.tabs.onUpdated',
-        payload: { tabId: 17, changeInfo: { url: 'https://updated.com/abc' } },
+        tabId: 17,
+        changeInfo: { url: 'https://updated.com/abc' },
       })
 
       expect(stateUpdates).to.have.all.keys('tabs')

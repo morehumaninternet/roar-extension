@@ -34,7 +34,6 @@ describe('happy path', () => {
 
     it('loads window.store, which starts with an empty state', () => {
       expect(getState()).to.eql({
-        popupConnected: false,
         focusedWindowId: -1,
         tabs: new Map(),
         auth: { state: 'not_authed' },
