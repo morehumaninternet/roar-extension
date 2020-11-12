@@ -21,7 +21,7 @@ export function Authenticated({ feedback, host, isTweeting, user, pickingEmoji, 
   }
 
   if (feedback.editingScreenshot) {
-    return <EditingScreenshot color={feedback.editingScreenshot.color} blob={feedback.editingScreenshot.blob} />
+    return <EditingScreenshot color={feedback.editingScreenshot.color} screenshot={feedback.editingScreenshot.screenshot} />
   }
 
   return (

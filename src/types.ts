@@ -17,7 +17,12 @@ type SystemInfo = {
 }
 
 type Screenshot = {
-  tab: TabInfo
+  tab: {
+    id: number
+    url: string
+    width: number
+    height: number
+  }
   name: string
   uri: string
   blob: Blob
@@ -36,9 +41,8 @@ type HostTwitterHandle = {
 }
 
 type EditingScreenshotState = {
-  index: number
   color: string
-  blob: Blob
+  screenshot: Screenshot
 }
 
 type FeedbackState = {

@@ -222,9 +222,8 @@ export const responders: Responders<Action> = {
       feedbackState: {
         ...tab.feedbackState,
         editingScreenshot: {
-          index: screenshotIndex,
+          screenshot: tab.feedbackState.screenshots[screenshotIndex],
           color: '#fa759e',
-          blob: tab.feedbackState.screenshots[screenshotIndex].blob,
         },
       },
     })
@@ -265,6 +264,7 @@ export const responders: Responders<Action> = {
       tab.host = nextHost
       tab.feedbackState = emptyFeedbackState()
     }
+
     tabs.set(tabId, tab)
     return { tabs }
   },
