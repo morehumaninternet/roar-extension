@@ -216,7 +216,6 @@ export const responders: Responders<Action> = {
 
     const nextTabs = new Map(state.tabs)
 
-    // Clear the existing feedback state for the tab once the tweet is clicked
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
