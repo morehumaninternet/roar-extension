@@ -1,0 +1,52 @@
+.screenshots {
+  height: 250px;
+  flex: 1 1 auto;
+  display: flex;
+  margin: 15px 0;
+
+  .screenshot-thumbnail {
+    position: relative;
+    margin: 2px;
+
+    > .screenshot-image {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    > .close-button {
+      display: none;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: none;
+      opacity: 0.7;
+      border: none;
+      cursor: pointer;
+    }
+
+    > .edit-button {
+      display: none;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: black;
+      color: white;
+      opacity: 0.7;
+      padding: 6px 18px;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    // On image hovering, display the edit button
+    .screenshot-image:hover ~ .edit-button,
+    .screenshot-image:hover ~ .close-button,
+    .edit-button:hover,
+    .close-button:hover {
+      display: inline-block;
+    }
+  }
+}
