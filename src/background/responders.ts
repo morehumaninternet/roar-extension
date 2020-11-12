@@ -1,20 +1,24 @@
 import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity, getPlainText, prependHandle } from '../draft-js-utils'
+import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
-const emptyFeedbackState = (hostName: string): FeedbackState => {
+export const emptyFeedbackState = (): FeedbackState => ({
+  screenshots: [],
+  editorState: EditorState.createEmpty(),
+  hostTwitterHandle: { status: 'NEW', handle: null },
+})
+
+export const newFeedbackState = ({ host }: { host?: string }): FeedbackState => {
+  const empty = emptyFeedbackState()
+  if (!host) return empty
   return {
-    screenshots: [],
-    editorState: prependHandle(EditorState.createEmpty(), hostName),
-    hostTwitterHandle: {
-      status: 'NEW',
-      handle: null,
-    },
+    ...empty,
+    editorState: prependHandle(empty.editorState, `@${host}`),
   }
 }
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
-  const hostName = tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined
+  const host = tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined
 
   return {
     id: tab.id!,
@@ -22,8 +26,8 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     active: tab.active,
     isTweeting: false,
     url: tab.url,
-    host: hostName,
-    feedbackState: emptyFeedbackState(`@${hostName?.match(/[\d\w/]+.com/)}`),
+    host,
+    feedbackState: newFeedbackState({ host }),
   }
 }
 
@@ -132,7 +136,7 @@ export const responders: Responders<Action> = {
       ...tab,
       feedbackState: {
         screenshots: tab.feedbackState.screenshots,
-        editorState: prependHandle(tab.feedbackState.editorState, handle),
+        editorState: replaceHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -253,7 +257,7 @@ export const responders: Responders<Action> = {
     // If the domain has changed, delete the feedback
     if (tab.host !== nextHost) {
       tab.host = nextHost
-      tab.feedbackState = emptyFeedbackState(`${tab.host}`) //has to pass in an argument to get TypeScript pass, work in progress
+      tab.feedbackState = newFeedbackState({ host: nextHost })
     }
     tabs.set(tabId, tab)
     return { tabs }

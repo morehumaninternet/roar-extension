@@ -71,5 +71,13 @@ export function prependHandle(editorState: EditorState, handle: string): EditorS
 }
 
 export function replaceHandle(editorState: EditorState, handle: string): EditorState {
-  throw new Error('TODO: Implement!')
+  const text: string = getPlainText(editorState)
+
+  if (!text.startsWith('@')) {
+    throw new Error('editorState text must start with @')
+  }
+
+  const restOfTheText: string = text.split(' ').slice(1).join(' ')
+
+  return prependHandle(fromText(restOfTheText), handle)
 }

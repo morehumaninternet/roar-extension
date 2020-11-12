@@ -1,10 +1,8 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
-import * as sinon from 'sinon'
-import { EditorState, ContentState } from 'draft-js'
-import { fromText, getPlainText, appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
+import { fromText, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
-describe.only('draft-js-utils', () => {
+describe('draft-js-utils', () => {
   describe('getPlainText', () => {
     it('returns the plain text of a given editor state', () => {
       const editorState = fromText('Hello world')
@@ -26,8 +24,10 @@ describe.only('draft-js-utils', () => {
   })
 
   describe('replaceHandle', () => {
-    it("replaces the current handle and the beginning of the editor's content with one provided", () => {
+    it("replaces the current handle at the beginning of the editor's content with one provided", () => {
       const editorStateWithHostHandle = prependHandle(fromText('Hello world'), '@cool.com')
+      expect(getPlainText(editorStateWithHostHandle)).to.equal('@cool.com Hello world')
+
       const editorStateWithActualHandle = replaceHandle(editorStateWithHostHandle, '@cool')
       expect(getPlainText(editorStateWithActualHandle)).to.equal('@cool Hello world')
     })
@@ -35,6 +35,11 @@ describe.only('draft-js-utils', () => {
     it('throws an error if the provided handle does not start with @', () => {
       const editorStateWithHostHandle = prependHandle(fromText('Hello world'), '@cool.com')
       expect(() => replaceHandle(editorStateWithHostHandle, 'cool')).to.throw('handle must start with @')
+    })
+
+    it('throws an error if the provided editorState does not already have a handle starting with @', () => {
+      const editorStateWithNoHandle = fromText('Hello world')
+      expect(() => replaceHandle(editorStateWithNoHandle, '@cool')).to.throw('editorState text must start with @')
     })
   })
 })

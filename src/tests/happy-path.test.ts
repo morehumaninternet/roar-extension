@@ -16,12 +16,12 @@ describe('happy path', () => {
 
   let unsubscribe: () => void
   after(() => mocks.teardown())
-  // after(() => unsubscribe())
+  after(() => unsubscribe())
 
   describe('background:run', () => {
     before(() => {
       run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any)
-      // Throw an error if ever a FAILURE event is dispatched
+      // Throw an error if ever a Failure event is dispatched
       unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
         const { mostRecentAction } = getState()
 
