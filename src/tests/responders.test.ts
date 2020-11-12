@@ -4,6 +4,21 @@ import { responders, newFeedbackState } from '../background/responders'
 import { getPlainText } from '../draft-js-utils'
 
 describe('responders', () => {
+  describe('chrome.windows.getAll', () => {
+    it('sets the focusedWindowId to be that of the focused window', () => {
+      const stateUpdates = responders['chrome.windows.getAll'](emptyState, {
+        windows: [{ id: 1, focused: false } as any, { id: 2, focused: true } as any],
+      })
+      expect(stateUpdates).to.eql({ focusedWindowId: 2 })
+    })
+
+    it('returns no updates if no window is focused', () => {
+      const stateUpdates = responders['chrome.windows.getAll'](emptyState, {
+        windows: [{ id: 1, focused: false } as any, { id: 2, focused: false } as any],
+      })
+      expect(stateUpdates).to.eql({})
+    })
+  })
   describe('chrome.tabs.onUpdated', () => {
     it('makes a new empty feedback with the updated host, if the url changes', () => {
       const appState: AppState = { ...emptyState }
