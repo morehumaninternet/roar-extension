@@ -7,11 +7,12 @@ import { whenState } from './util'
 import { run } from '../background/run'
 import { mount } from '../popup/mount'
 import { activeTab, ensureActiveTab } from '../selectors'
-import { appendEntity } from '../draft-js-utils'
+import { getPlainText, appendEntity } from '../draft-js-utils'
 
 describe('happy path', () => {
   const mocks = createMocks()
   const app = () => mocks.popupWindow.document.querySelector('#app-container > .app')!
+  const getState = () => mocks.backgroundWindow.store.getState()
 
   let unsubscribe: () => void
   after(() => mocks.teardown())
@@ -30,7 +31,8 @@ describe('happy path', () => {
     })
 
     it('loads window.store, which starts with an empty state', () => {
-      expect(mocks.backgroundWindow.store.getState()).to.eql({
+      expect(getState()).to.eql({
+        popupConnected: false,
         focusedWindowId: -1,
         tabs: new Map(),
         auth: { state: 'not_authed' },
@@ -48,7 +50,7 @@ describe('happy path', () => {
         { id: 2, focused: true },
         { id: 3, focused: false },
       ])
-      expect(mocks.backgroundWindow.store.getState()).to.have.property('focusedWindowId', 2)
+      expect(getState()).to.have.property('focusedWindowId', 2)
     })
 
     it('sets the tabs when chrome.tabs.query calls back', () => {
@@ -64,7 +66,7 @@ describe('happy path', () => {
         { id: 16, windowId: 3, active: true, url: 'https://mop.com/abc' },
         { id: 17, windowId: 3, active: true, url: 'chrome://extensions' },
       ])
-      const state = mocks.backgroundWindow.store.getState()
+      const state = getState()
       expect(state.tabs.size).to.equal(7)
 
       const activeTab = ensureActiveTab(state)
@@ -75,9 +77,14 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
       expect(activeTab).to.have.property('host', 'zing.com')
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
-      expect(activeTab.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')).to.eql('')
 
       expect(state.tabs.get(17)).to.have.property('host', undefined)
+    })
+
+    it("uses the tab's host as the handle as a placeholder prior to fetching the actual twitter handle", () => {
+      const state = getState()
+      const activeTab = ensureActiveTab(state)
+      expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing.com ')
     })
   })
 
@@ -107,7 +114,7 @@ describe('happy path', () => {
 
       expect(activeTab.feedbackState.hostTwitterHandle.handle).to.equal('@zing')
 
-      expect(activeTab.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')).to.equal('@zing ')
+      expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
     })
   })
 
@@ -126,7 +133,7 @@ describe('happy path', () => {
     it('transitions to an "authenticating" state and adds an iframe when the sign in with twitter button is clicked', () => {
       const signInButton = mocks.popupWindow.document.querySelector('#app-container > button')! as HTMLButtonElement
       signInButton.click()
-      expect(mocks.backgroundWindow.store.getState().auth).to.have.property('state', 'authenticating')
+      expect(getState().auth).to.have.property('state', 'authenticating')
       const iframe = mocks.popupWindow.document.querySelector('#app-container > iframe')! as HTMLIFrameElement
       expect(iframe).to.have.property('src', 'https://test-roar-server.com/v1/auth/twitter')
     })
@@ -139,7 +146,7 @@ describe('happy path', () => {
         origin: 'https://test-roar-server.com',
         data: { type: 'twitter-auth-success', photoUrl: 'https://some-image-url.com/123' },
       })
-      expect(mocks.backgroundWindow.store.getState().auth).to.have.property('state', 'authenticated')
+      expect(getState().auth).to.have.property('state', 'authenticated')
     })
 
     it('removes the event listener', () => {
@@ -161,7 +168,7 @@ describe('happy path', () => {
 
     it('renders the screenshot', () => {
       const screenshotThumbnail = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
-      const screenshotUri = activeTab(mocks.backgroundWindow.store.getState())?.feedbackState.screenshots[0].uri
+      const screenshotUri = activeTab(getState())?.feedbackState.screenshots[0].uri
       expect(screenshotThumbnail).to.have.property('src', screenshotUri)
     })
 
@@ -170,7 +177,7 @@ describe('happy path', () => {
     // https://github.com/facebook/draft-js/issues/325
     // https://github.com/jsdom/jsdom/issues/1670
     it('can edit the feedback', () => {
-      const tab = ensureActiveTab(mocks.backgroundWindow.store.getState())
+      const tab = ensureActiveTab(getState())
 
       mocks.backgroundWindow.store.dispatch({
         type: 'updateEditorState',

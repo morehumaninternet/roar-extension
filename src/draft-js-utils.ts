@@ -1,6 +1,10 @@
 // Adapted from https://github.com/davidsemakula/draft-js-emoji-plugin/blob/master/src/modifiers/addEmoji.js
 import { Modifier, ContentState, EditorState } from 'draft-js'
 
+export function getPlainText(editorState: EditorState): string {
+  return editorState.getCurrentContent().getPlainText('\u0001')
+}
+
 export function appendEntity(editorState: EditorState, text: string, type: 'text' | 'emoji' = 'text'): EditorState {
   const contentState = editorState.getCurrentContent()
 
