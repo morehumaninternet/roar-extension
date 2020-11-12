@@ -21,12 +21,20 @@ function dataURItoBlob(dataURI: string): Blob {
 
 export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
   try {
+    const gettingTab = tabs.get(tab.id)
     const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)
+    const moreTabInfo = await gettingTab
+
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const { host } = new URL(tab.url!)
     dispatchBackgroundActions.screenshotCaptureSuccess({
       screenshot: {
-        tab,
+        tab: {
+          id: tab.id,
+          url: tab.url!,
+          width: moreTabInfo.width!,
+          height: moreTabInfo.height!,
+        },
         name: `${host} - ${new Date().toISOString()}.png`,
         uri: screenshotUri,
         blob: screenshotBlob,

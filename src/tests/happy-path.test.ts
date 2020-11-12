@@ -93,6 +93,7 @@ describe('happy path', () => {
     before(() => {
       fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle: '@zing' } })
     })
+    before(() => mocks.browser.tabs.get.withArgs(14).resolves({ width: 1200, height: 900 }))
     before(() => mount(mocks.chrome as any, mocks.popupWindow as any))
     after(() => {
       fetchMock.restore()
@@ -110,7 +111,10 @@ describe('happy path', () => {
       expect(activeTab.feedbackState.screenshots).to.have.length(1)
 
       const [screenshot] = activeTab.feedbackState.screenshots
+      expect(screenshot.tab.id).to.equal(activeTab.id)
       expect(screenshot.tab.url).to.equal(activeTab.url)
+      expect(screenshot.tab.width).to.equal(1200)
+      expect(screenshot.tab.height).to.equal(900)
       expect(screenshot.blob).to.be.an.instanceof(Blob)
 
       expect(activeTab.feedbackState.hostTwitterHandle.handle).to.equal('@zing')

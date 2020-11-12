@@ -17,7 +17,12 @@ type SystemInfo = {
 }
 
 type Screenshot = {
-  tab: TabInfo
+  tab: {
+    id: number
+    url: string
+    width: number
+    height: number
+  }
   name: string
   uri: string
   blob: Blob
@@ -35,7 +40,13 @@ type HostTwitterHandle = {
   handle: string | null
 }
 
+type EditingScreenshotState = {
+  color: string
+  screenshot: Screenshot
+}
+
 type FeedbackState = {
+  editingScreenshot: null | EditingScreenshotState
   screenshots: ReadonlyArray<Screenshot>
   editorState: Draft.EditorState
   hostTwitterHandle: HostTwitterHandle
@@ -86,6 +97,7 @@ type UserAction =
   | { type: 'togglePickingEmoji' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
+  | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }

@@ -8,6 +8,7 @@ import { JSDOM, DOMWindow } from 'jsdom'
 type MockBrowser = typeof global.browser & {
   tabs: {
     captureVisibleTab: sinon.SinonStub
+    get: sinon.SinonStub
   }
 }
 
@@ -33,6 +34,7 @@ export function createMocks(): Mocks {
   const browser: MockBrowser = {
     tabs: {
       captureVisibleTab: sinon.stub().withArgs({ format: 'png' }).resolves(screenshotUri),
+      get: sinon.stub().throws(),
     },
   } as any
 
