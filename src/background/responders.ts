@@ -3,6 +3,7 @@ import { ensureActiveTab } from '../selectors'
 import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
 export const emptyFeedbackState = (): FeedbackState => ({
+  editingScreenshot: null,
   screenshots: [],
   editorState: EditorState.createEmpty(),
   hostTwitterHandle: { status: 'NEW', handle: null },
