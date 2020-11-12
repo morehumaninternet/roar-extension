@@ -5,6 +5,10 @@ export function getPlainText(editorState: EditorState): string {
   return editorState.getCurrentContent().getPlainText('\u0001')
 }
 
+export function fromText(text: string): EditorState {
+  return EditorState.createWithContent(ContentState.createFromText(text))
+}
+
 export function appendEntity(editorState: EditorState, text: string, type: 'text' | 'emoji' = 'text'): EditorState {
   const contentState = editorState.getCurrentContent()
 
@@ -64,4 +68,8 @@ export function prependHandle(editorState: EditorState, handle: string): EditorS
   const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
 
   return EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
+}
+
+export function replaceHandle(editorState: EditorState, handle: string): EditorState {
+  throw new Error('TODO: Implement!')
 }

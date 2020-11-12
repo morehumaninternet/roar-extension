@@ -1,6 +1,6 @@
 import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity, prependHandle } from '../draft-js-utils'
+import { appendEntity, getPlainText, prependHandle } from '../draft-js-utils'
 
 const emptyFeedbackState = (hostName: string): FeedbackState => {
   return {
@@ -69,7 +69,7 @@ export const responders: Responders<Action> = {
     const tab = ensureActiveTab(state)
 
     const handle = tab.feedbackState.hostTwitterHandle.handle
-    const status = editorState.getCurrentContent().getPlainText('\u0001')
+    const status = getPlainText(editorState)
 
     // If the new editor state doesn't start with the handle, don't update the store.
     // This makes the handle static (not editable)
