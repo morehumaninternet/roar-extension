@@ -1,28 +1,36 @@
 import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity, appendHandle } from '../draft-js-utils'
+import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
-const emptyFeedbackState = (): FeedbackState => {
+export const emptyFeedbackState = (): FeedbackState => ({
+  editingScreenshot: null,
+  screenshots: [],
+  editorState: EditorState.createEmpty(),
+  hostTwitterHandle: { status: 'NEW', handle: null },
+})
+
+export const newFeedbackState = ({ host }: { host?: string }): FeedbackState => {
+  const empty = emptyFeedbackState()
+  if (!host) return empty
   return {
-    editingScreenshot: null,
-    screenshots: [],
-    editorState: EditorState.createEmpty(),
-    hostTwitterHandle: {
-      status: 'NEW',
-      handle: null,
-    },
+    ...empty,
+    editorState: prependHandle(empty.editorState, `@${host}`),
   }
 }
 
-const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
-  id: tab.id!,
-  windowId: tab.windowId!,
-  active: tab.active,
-  isTweeting: false,
-  url: tab.url,
-  host: tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined,
-  feedbackState: emptyFeedbackState(),
-})
+const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
+  const host = tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined
+
+  return {
+    id: tab.id!,
+    windowId: tab.windowId!,
+    active: tab.active,
+    isTweeting: false,
+    url: tab.url,
+    host,
+    feedbackState: newFeedbackState({ host }),
+  }
+}
 
 export const responders: Responders<Action> = {
   popupConnect(): Partial<AppState> {
@@ -65,7 +73,7 @@ export const responders: Responders<Action> = {
     const tab = ensureActiveTab(state)
 
     const handle = tab.feedbackState.hostTwitterHandle.handle
-    const status = editorState.getCurrentContent().getPlainText('\u0001')
+    const status = getPlainText(editorState)
 
     // If the new editor state doesn't start with the handle, don't update the store.
     // This makes the handle static (not editable)
@@ -93,6 +101,10 @@ export const responders: Responders<Action> = {
   },
   fetchHandleStart(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
+
+    // const tabHost = tab?.host
+    // const hostName = `@${tabHost}`
+
     // If the tab doesn't exist anymore, don't try to update it
     if (!tab) return {}
 
@@ -123,7 +135,7 @@ export const responders: Responders<Action> = {
       feedbackState: {
         editingScreenshot: tab.feedbackState.editingScreenshot,
         screenshots: tab.feedbackState.screenshots,
-        editorState: appendHandle(tab.feedbackState.editorState, handle),
+        editorState: replaceHandle(tab.feedbackState.editorState, handle),
         hostTwitterHandle: {
           status: 'DONE',
           handle,
@@ -186,7 +198,7 @@ export const responders: Responders<Action> = {
       feedbackState: {
         editingScreenshot: null,
         screenshots: [],
-        editorState: handle ? appendHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
+        editorState: handle ? prependHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
         hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
       },
     })
@@ -261,7 +273,7 @@ export const responders: Responders<Action> = {
     // If the domain has changed, delete the feedback
     if (tab.host !== nextHost) {
       tab.host = nextHost
-      tab.feedbackState = emptyFeedbackState()
+      tab.feedbackState = newFeedbackState({ host: nextHost })
     }
 
     tabs.set(tabId, tab)

@@ -6,7 +6,7 @@ export type AppStore = Store<AppState, Action> & {
   on<T extends Action['type']>(type: T, callback: (nextState: AppState & { mostRecentAction: Action & { type: T } }) => void): () => void
 }
 
-const emptyState: AppState = {
+export const emptyState: AppState = {
   focusedWindowId: -1,
   tabs: new Map(),
   auth: { state: 'not_authed' },
