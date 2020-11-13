@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const TakeSnapshot = (
+export const TakeScreenshot = (
   <svg width="33" height="34" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       id="Take Screenshot"

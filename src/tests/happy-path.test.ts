@@ -177,19 +177,23 @@ describe('happy path', () => {
       const screenshotImage = screenshotThumbnail?.querySelector('.screenshot-image')
       const screenshotUri = activeTab(getState())?.feedbackState.screenshots[0].uri
       expect(screenshotImage).to.have.property('src', screenshotUri)
+
+      // User can't remove screenshots if there's only one
+      const closeButton = screenshotThumbnail?.querySelector('.close-button')
+      expect(closeButton).to.equal(null)
     })
 
-    it('takes a screenshot', async () => {
+    it('takes a screenshot when the TakeScreenshot button is clicked', async () => {
       const tab = activeTab(getState())!
       expect(tab.feedbackState.screenshots).to.have.lengthOf(1)
-      const takeScreenshotButton = app().querySelector('.TakeSnapshot')! as HTMLButtonElement
+      const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
       takeScreenshotButton.click()
       await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 2)
       const screenshotImages = app().querySelectorAll('.screenshot-image')
       expect(screenshotImages).to.have.lengthOf(2)
     })
 
-    it('delete a screenshot', async () => {
+    it('delete a screenshot when the close-button is clicked', async () => {
       const screenshots = app().querySelectorAll('.twitter-interface > .screenshots')!
       const secondScreenshotCloseButton = screenshots[0].querySelector('.screenshot-thumbnail > .close-button') as HTMLButtonElement
 
@@ -198,7 +202,21 @@ describe('happy path', () => {
       await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 1)
     })
 
-    // it('edit a screenshot', async () => {
+    it('disable the take screenshot button when there are 9 screenshots', async () => {
+      let screenshotsLength: number = 1
+      while (screenshotsLength < 9) {
+        const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
+        takeScreenshotButton.click()
+        await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === screenshotsLength + 1)
+        const screenshotImages = app().querySelectorAll('.screenshot-image')
+        expect(screenshotImages).to.have.lengthOf(screenshotsLength + 1)
+        screenshotsLength++
+      }
+
+      expect(app().querySelector('.TakeScreenshot')).to.have.property('disabled', true)
+    })
+
+    // it('edit a screenshot when the edit-button is clicked', async () => {
     //   const tab = activeTab(getState())!
     //   expect(tab.feedbackState.editingScreenshot).to.equal(null)
     //   const screenshotEditButton = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail > .edit-button') as HTMLButtonElement

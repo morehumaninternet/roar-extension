@@ -12,7 +12,7 @@ export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot, 
   return (
     <div className="action-bar">
       <div className="action-buttons">
-        <ActionButton kind="TakeSnapshot" onClick={clickTakeScreenshot} disabled={takeScreenshotDisabled} />
+        <ActionButton kind="TakeScreenshot" onClick={clickTakeScreenshot} disabled={takeScreenshotDisabled} />
         <ActionButton kind="AddImage" onClick={console.log} />
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} />
       </div>

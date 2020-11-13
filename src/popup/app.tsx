@@ -10,8 +10,6 @@ type AppProps = {
 }
 
 export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {
-  console.log('state.auth.state', state.auth.state)
-
   switch (state.auth.state) {
     case 'not_authed': {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />

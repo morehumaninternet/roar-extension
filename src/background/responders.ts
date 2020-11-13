@@ -1,5 +1,4 @@
 import { EditorState } from 'draft-js'
-import { pullAt } from 'lodash'
 import { ensureActiveTab } from '../selectors'
 import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
