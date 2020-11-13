@@ -1,6 +1,14 @@
 // Adapted from https://github.com/davidsemakula/draft-js-emoji-plugin/blob/master/src/modifiers/addEmoji.js
 import { Modifier, ContentState, EditorState } from 'draft-js'
 
+export function getPlainText(editorState: EditorState): string {
+  return editorState.getCurrentContent().getPlainText('\u0001')
+}
+
+export function fromText(text: string): EditorState {
+  return EditorState.createWithContent(ContentState.createFromText(text))
+}
+
 export function appendEntity(editorState: EditorState, text: string, type: 'text' | 'emoji' = 'text'): EditorState {
   const contentState = editorState.getCurrentContent()
 
@@ -32,7 +40,7 @@ export function appendEntity(editorState: EditorState, text: string, type: 'text
   return EditorState.forceSelection(newEditorState, addedContent.getSelectionAfter())
 }
 
-export function appendHandle(editorState: EditorState, handle: string): EditorState {
+export function prependHandle(editorState: EditorState, handle: string): EditorState {
   if (!handle.startsWith('@')) {
     throw new Error('handle must start with @')
   }
@@ -60,4 +68,16 @@ export function appendHandle(editorState: EditorState, handle: string): EditorSt
   const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
 
   return EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
+}
+
+export function replaceHandle(editorState: EditorState, handle: string): EditorState {
+  const text: string = getPlainText(editorState)
+
+  if (!text.startsWith('@')) {
+    throw new Error('editorState text must start with @')
+  }
+
+  const restOfTheText: string = text.split(' ').slice(1).join(' ')
+
+  return prependHandle(fromText(restOfTheText), handle)
 }
