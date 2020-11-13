@@ -41,6 +41,6 @@ export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, di
       },
     })
   } catch (error) {
-    dispatchBackgroundActions.screenshotCaptureFailure(error)
+    dispatchBackgroundActions.screenshotCaptureFailure({ error })
   }
 }

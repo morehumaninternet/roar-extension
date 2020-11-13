@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Authenticated } from './views/authenticated'
 import { Authenticating } from './views/authenticating'
 import { NotAuthed } from './views/not-authed'
-import { activeTab } from '../selectors'
+import { activeTab, deleteScreenshotDisabled, takeScreenshotDisabled } from '../selectors'
 
 type AppProps = {
   state: AppState
@@ -10,6 +10,8 @@ type AppProps = {
 }
 
 export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {
+  console.log('state.auth.state', state.auth.state)
+
   switch (state.auth.state) {
     case 'not_authed': {
       return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
@@ -29,6 +31,8 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
               isTweeting={tab.isTweeting}
               user={state.auth.user}
               pickingEmoji={state.pickingEmoji}
+              takeScreenshotDisabled={takeScreenshotDisabled(state)}
+              deleteScreenshotDisabled={deleteScreenshotDisabled(state)}
               dispatchUserActions={dispatchUserActions}
             />
           </div>

@@ -165,9 +165,38 @@ describe('happy path', () => {
 
     it('renders the screenshot', () => {
       const screenshotThumbnail = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
+
+      const screenshotImage = screenshotThumbnail?.querySelector('.screenshot-image')
       const screenshotUri = activeTab(mocks.backgroundWindow.store.getState())?.feedbackState.screenshots[0].uri
-      expect(screenshotThumbnail).to.have.property('src', screenshotUri)
+      expect(screenshotImage).to.have.property('src', screenshotUri)
     })
+
+    it('takes a screenshot', async () => {
+      const tab = activeTab(mocks.backgroundWindow.store.getState())!
+      expect(tab.feedbackState.screenshots).to.have.lengthOf(1)
+      const takeScreenshotButton = app().querySelector('.TakeSnapshot')! as HTMLButtonElement
+      takeScreenshotButton.click()
+      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 2)
+      const screenshotImages = app().querySelectorAll('.screenshot-image')
+      expect(screenshotImages).to.have.lengthOf(2)
+    })
+
+    it('delete a screenshot', async () => {
+      const screenshots = app().querySelectorAll('.twitter-interface > .screenshots')!
+      const secondScreenshotCloseButton = screenshots[0].querySelector('.screenshot-thumbnail > .close-button') as HTMLButtonElement
+
+      // If there are two screenshots, the close button should exist
+      secondScreenshotCloseButton.click()
+      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 1)
+    })
+
+    // it('edit a screenshot', async () => {
+    //   const tab = activeTab(mocks.backgroundWindow.store.getState())!
+    //   expect(tab.feedbackState.editingScreenshot).to.equal(null)
+    //   const screenshotEditButton = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail > .edit-button') as HTMLButtonElement
+    //   screenshotEditButton.click()
+    //   await whenState(mocks.backgroundWindow.store, state => !!ensureActiveTab(state).feedbackState.editingScreenshot)
+    // })
 
     // Spent too long trying to dispatch events directly to the draft editor.
     // Would be nice, but these issues suggest its too complicated

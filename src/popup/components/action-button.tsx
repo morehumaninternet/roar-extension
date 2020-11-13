@@ -3,9 +3,11 @@ import * as svgs from './action-svgs'
 
 type ActionButtonKind = keyof typeof svgs
 
-export function ActionButton({ kind, onClick }: { kind: ActionButtonKind; onClick(): void }) {
+type ActionButtonProps = { kind: ActionButtonKind; onClick(): void; disabled?: boolean }
+
+export function ActionButton({ kind, onClick, disabled }: ActionButtonProps): JSX.Element {
   return (
-    <button className="svg-btn" onClick={onClick}>
+    <button className={`svg-btn ${kind}`} onClick={onClick} disabled={disabled}>
       {svgs[kind]}
     </button>
   )

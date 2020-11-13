@@ -97,6 +97,7 @@ type UserAction =
   | { type: 'togglePickingEmoji' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
+  | { type: 'clickDeleteScreenshot'; payload: { screenshotIndex: number } }
   | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
 
 type BackgroundAction =

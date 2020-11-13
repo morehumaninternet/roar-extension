@@ -2,7 +2,7 @@ import { monitorTabs } from './monitorTabs'
 import { AppStore, create } from './store'
 import { takeScreenshot } from './screenshot'
 import { fetchTwitterHandle, postTweet } from './api'
-import { ensureActiveTab } from '../selectors'
+import { ensureActiveTab, takeScreenshotDisabled } from '../selectors'
 
 declare global {
   interface Window {
@@ -33,6 +33,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   })
 
   store.on('clickTakeScreenshot', state => {
+    if (takeScreenshotDisabled(state)) return
     takeScreenshot(ensureActiveTab(state), browser.tabs, store.dispatchers)
   })
 
