@@ -10,3 +10,15 @@ export function ensureActiveTab(state: AppState): TabInfo {
   if (tab) return tab
   throw new Error('Active tab should exist')
 }
+
+export function takeScreenshotDisabled(state: AppState): boolean {
+  const tab = activeTab(state)
+  if (!tab) return false
+  return tab.feedbackState.screenshots.length >= 9
+}
+
+export function deleteScreenshotDisabled(state: AppState): boolean {
+  const tab = activeTab(state)
+  if (!tab) return false
+  return tab.feedbackState.screenshots.length <= 1
+}

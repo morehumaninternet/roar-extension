@@ -1,10 +1,12 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
+@use './components/screenshots.scss';
 
 $human-blue: #164176;
 $human-pink: #fa759e;
-$window-height: 320px;
 $main-padding: 10px;
+$min-width: 476px;
+$min-height: 380px;
 
 html,
 body {
@@ -15,18 +17,22 @@ body {
   // https://stackoverflow.com/questions/47568794/how-can-i-set-height-of-chrome-extension-to-browser-window-height#:~:text=I%20found%20out%20that%20Chrome,and%20maximum%20width%20of%20800px.
   max-width: 800px;
   max-height: 600px;
+  min-width: $min-width;
+  min-height: $min-height;
+  background-color: $human-blue;
 }
 
 iframe {
   height: 750px;
   width: 750px;
   border: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .app {
-  background-color: $human-blue;
   display: grid;
-  grid-template-columns: 1fr 476px;
+  grid-template-columns: 1fr $min-width;
 }
 
 header {
@@ -96,20 +102,16 @@ main {
   border: none;
   background: none;
   cursor: pointer;
-}
 
-.screenshots {
-  height: 250px;
-  flex: 1 1 auto;
-  display: flex;
-  margin: 15px 0;
-}
+  svg > path {
+    fill: $human-pink;
+  }
 
-.screenshot-thumbnail {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  border-radius: 10px;
+  &:disabled {
+    svg > path {
+      fill: grey;
+    }
+  }
 }
 
 .emoji-picker-container {

@@ -181,8 +181,8 @@ export const responders: Responders<Action> = {
 
     return { tabs: nextTabs }
   },
-  screenshotCaptureFailure(): Partial<AppState> {
-    return { alert: 'SCREENSHOT FAILURE' }
+  screenshotCaptureFailure(state, { error }): Partial<AppState> {
+    return { alert: typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE' }
   },
   postTweetSuccess(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
@@ -222,6 +222,27 @@ export const responders: Responders<Action> = {
       tabs: nextTabs,
       alert: error.message,
     }
+  },
+  clickDeleteScreenshot(state, { screenshotIndex }): Partial<AppState> {
+    const tab = ensureActiveTab(state)
+
+    // The Screenshot array can't be empty
+    if (tab.feedbackState.screenshots.length === 1) return {}
+
+    // Removing the screenshot
+    // tslint:disable-next-line: readonly-array
+    const nextScreenshots = [...tab.feedbackState.screenshots]
+    nextScreenshots.splice(screenshotIndex, 1)
+    const nextTabs = new Map(state.tabs)
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        ...tab.feedbackState,
+        screenshots: nextScreenshots,
+      },
+    })
+
+    return { tabs: nextTabs }
   },
   startEditingScreenshot(state, { screenshotIndex }): Partial<AppState> {
     const tab = ensureActiveTab(state)

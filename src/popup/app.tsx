@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Authenticated } from './views/authenticated'
 import { Authenticating } from './views/authenticating'
 import { NotAuthed } from './views/not-authed'
-import { activeTab } from '../selectors'
+import { activeTab, deleteScreenshotDisabled, takeScreenshotDisabled } from '../selectors'
 
 type AppProps = {
   state: AppState
@@ -29,6 +29,8 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
               isTweeting={tab.isTweeting}
               user={state.auth.user}
               pickingEmoji={state.pickingEmoji}
+              takeScreenshotDisabled={takeScreenshotDisabled(state)}
+              deleteScreenshotDisabled={deleteScreenshotDisabled(state)}
               dispatchUserActions={dispatchUserActions}
             />
           </div>

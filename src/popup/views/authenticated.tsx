@@ -12,10 +12,21 @@ type AuthenticatedProps = {
   user: User
   isTweeting: boolean
   pickingEmoji: boolean
+  takeScreenshotDisabled: boolean
+  deleteScreenshotDisabled: boolean
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-export function Authenticated({ feedback, host, isTweeting, user, pickingEmoji, dispatchUserActions }: AuthenticatedProps): JSX.Element | null {
+export function Authenticated({
+  feedback,
+  host,
+  isTweeting,
+  user,
+  pickingEmoji,
+  takeScreenshotDisabled,
+  deleteScreenshotDisabled,
+  dispatchUserActions,
+}: AuthenticatedProps): JSX.Element | null {
   if (isTweeting) {
     return <Tweeting host={host} />
   }
@@ -31,11 +42,17 @@ export function Authenticated({ feedback, host, isTweeting, user, pickingEmoji, 
         <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
         <div className="twitter-interface">
           <FeedbackEditor editorState={feedback.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
-          <Screenshots feedback={feedback} startEditingScreenshot={dispatchUserActions.startEditingScreenshot} />
+          <Screenshots
+            feedback={feedback}
+            startEditingScreenshot={dispatchUserActions.startEditingScreenshot}
+            clickDeleteScreenshot={dispatchUserActions.clickDeleteScreenshot}
+            deleteScreenshotDisabled={deleteScreenshotDisabled}
+          />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
+            takeScreenshotDisabled={takeScreenshotDisabled}
           />
         </div>
       </main>
