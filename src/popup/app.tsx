@@ -22,18 +22,16 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
       if (!tab) return null
       if (tab.host) {
         return (
-          <div className="app">
-            <Authenticated
-              feedback={tab.feedbackState}
-              host={tab.host}
-              isTweeting={tab.isTweeting}
-              user={state.auth.user}
-              pickingEmoji={state.pickingEmoji}
-              takeScreenshotDisabled={takeScreenshotDisabled(state)}
-              deleteScreenshotDisabled={deleteScreenshotDisabled(state)}
-              dispatchUserActions={dispatchUserActions}
-            />
-          </div>
+          <Authenticated
+            feedback={tab.feedbackState}
+            host={tab.host}
+            isTweeting={tab.isTweeting}
+            user={state.auth.user}
+            pickingEmoji={state.pickingEmoji}
+            takeScreenshotDisabled={takeScreenshotDisabled(state)}
+            deleteScreenshotDisabled={deleteScreenshotDisabled(state)}
+            dispatchUserActions={dispatchUserActions}
+          />
         )
       }
       return <p>Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.</p>

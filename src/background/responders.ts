@@ -262,6 +262,21 @@ export const responders: Responders<Action> = {
 
     return { tabs: nextTabs }
   },
+  stopEditingScreenshot(state): Partial<AppState> {
+    const tab = ensureActiveTab(state)
+
+    const nextTabs = new Map(state.tabs)
+
+    nextTabs.set(tab.id, {
+      ...tab,
+      feedbackState: {
+        ...tab.feedbackState,
+        editingScreenshot: null,
+      },
+    })
+
+    return { tabs: nextTabs }
+  },
   'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
     return {
       focusedWindowId: windows.find(win => win.focused)!.id,

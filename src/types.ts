@@ -99,6 +99,7 @@ type UserAction =
   | { type: 'clickTakeScreenshot' }
   | { type: 'clickDeleteScreenshot'; payload: { screenshotIndex: number } }
   | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
+  | { type: 'stopEditingScreenshot' }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }

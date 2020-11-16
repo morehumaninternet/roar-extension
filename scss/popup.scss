@@ -1,12 +1,14 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
+@use './global.scss';
 @use './components/screenshots.scss';
+@use './components//editing-screenshot.scss';
 
-$human-blue: #164176;
-$human-pink: #fa759e;
+$human-blue: global.$human-blue;
+$human-pink: global.$human-pink;
+$min-width: global.$min-width;
+$min-height: global.$min-height;
 $main-padding: 10px;
-$min-width: 476px;
-$min-height: 380px;
 
 html,
 body {

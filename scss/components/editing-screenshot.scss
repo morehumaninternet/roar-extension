@@ -1,0 +1,22 @@
+@use '../global.scss';
+
+.editing-screenshot {
+  height: global.$min-height;
+  width: global.$min-width;
+
+  > .editing-bar {
+    height: 15%;
+    display: flex;
+
+    > .back-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+
+      > svg {
+        width: 75%;
+        height: auto;
+      }
+    }
+  }
+}

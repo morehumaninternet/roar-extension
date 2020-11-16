@@ -32,11 +32,17 @@ export function Authenticated({
   }
 
   if (feedback.editingScreenshot) {
-    return <EditingScreenshot color={feedback.editingScreenshot.color} screenshot={feedback.editingScreenshot.screenshot} />
+    return (
+      <EditingScreenshot
+        color={feedback.editingScreenshot.color}
+        screenshot={feedback.editingScreenshot.screenshot}
+        stopEditingScreenshot={dispatchUserActions.stopEditingScreenshot}
+      />
+    )
   }
 
   return (
-    <>
+    <div className="app">
       <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
       <main>
         <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
@@ -56,6 +62,6 @@ export function Authenticated({
           />
         </div>
       </main>
-    </>
+    </div>
   )
 }
