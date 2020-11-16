@@ -278,9 +278,9 @@ export const responders: Responders<Action> = {
     return { tabs: nextTabs }
   },
   'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
-    return {
-      focusedWindowId: windows.find(win => win.focused)!.id,
-    }
+    const focusedWindow = windows.find(win => win.focused)
+    if (!focusedWindow) return {}
+    return { focusedWindowId: focusedWindow.id }
   },
   'chrome.tabs.query'(state, payload): Partial<AppState> {
     const tabs: AppState['tabs'] = new Map()
