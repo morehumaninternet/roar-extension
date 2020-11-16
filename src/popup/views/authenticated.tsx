@@ -28,7 +28,11 @@ export function Authenticated({
   dispatchUserActions,
 }: AuthenticatedProps): JSX.Element | null {
   if (isTweeting) {
-    return <Tweeting host={host} />
+    return (
+      <div className="app">
+        <Tweeting host={host} />
+      </div>
+    )
   }
 
   if (feedback.editingScreenshot) {
