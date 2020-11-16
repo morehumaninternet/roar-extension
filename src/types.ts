@@ -103,7 +103,7 @@ type UserAction =
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; host: string; handle: string } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; host: string; error: any } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; host: string; alert: string } }
   | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
   | { type: 'screenshotCaptureFailure'; payload: { error: any } }
   | { type: 'postTweetSuccess'; payload: { tabId: number } }
