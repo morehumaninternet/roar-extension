@@ -84,7 +84,7 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
 }
 
 export function logErrorAndReturnAlert(alert) {
-  console.log(`catched error name: ${alert}`)
+  console.log(`Error name: ${alert}`)
 
   if (alert === 'SyntaxError') {
     window.alert(
