@@ -62,7 +62,7 @@ export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBa
 
     return dispatchBackgroundActions.fetchHandleSuccess({ tabId, host, handle: twitter_handle })
   } catch (error) {
-    let alert = error.message
+    let alert = error
 
     return dispatchBackgroundActions.fetchHandleFailure({ tabId, host, alert })
   }

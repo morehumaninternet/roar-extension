@@ -82,9 +82,13 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
   return prependHandle(fromText(restOfTheText), handle)
 }
 
-export function logErrorAndReturnAlert(alert: string) {
+export function logErrorAndReturnAlert(alert) {
   // if it is network error, return a message
   // if it is server error fetch the twitter handle, return a different message.
-  console.log('Alert Message:', alert)
+  if (alert) {
+    console.log(
+      "Server error while trying to fetch the website's twitter handle. Please try again. If the error persists, please contact support@morehumaninternet.org"
+    )
+  }
   return alert
 }
