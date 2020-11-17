@@ -1,5 +1,6 @@
 // Adapted from https://github.com/davidsemakula/draft-js-emoji-plugin/blob/master/src/modifiers/addEmoji.js
 import { Modifier, ContentState, EditorState } from 'draft-js'
+import { windows } from 'sinon-chrome'
 
 export function getPlainText(editorState: EditorState): string {
   return editorState.getCurrentContent().getPlainText('\u0001')
@@ -83,12 +84,15 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
 }
 
 export function logErrorAndReturnAlert(alert) {
-  // if it is network error, return a message
-  // if it is server error fetch the twitter handle, return a different message.
-  if (alert) {
-    console.log(
+  console.log(`catched error name: ${alert}`)
+
+  if (alert === 'SyntaxError') {
+    window.alert(
       "Server error while trying to fetch the website's twitter handle. Please try again. If the error persists, please contact support@morehumaninternet.org"
     )
+  } else {
+    window.alert('Could not connect to the server. Please check your connection and try again')
   }
+
   return alert
 }
