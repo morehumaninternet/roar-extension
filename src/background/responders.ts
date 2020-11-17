@@ -1,6 +1,6 @@
 import { EditorState } from 'draft-js'
 import { ensureActiveTab } from '../selectors'
-import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
+import { appendEntity, getPlainText, prependHandle, replaceHandle, logErrorAndReturnAlert } from '../draft-js-utils'
 
 export const emptyFeedbackState = (): FeedbackState => ({
   editingScreenshot: null,
@@ -142,10 +142,9 @@ export const responders: Responders<Action> = {
         },
       },
     })
-
     return { tabs: nextTabs }
   },
-  fetchHandleFailure(state, { tabId, host, error }): Partial<AppState> {
+  fetchHandleFailure(state, { tabId, host, alert }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
     // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
     if (!tab) return {}
@@ -162,7 +161,8 @@ export const responders: Responders<Action> = {
         },
       },
     })
-    return { tabs: nextTabs, alert: `Failed to set handle: ${error}` }
+    logErrorAndReturnAlert(alert)
+    return { tabs: nextTabs, alert: `Failed to set handle: ${alert}` }
   },
   screenshotCaptureSuccess(state, { screenshot }): Partial<AppState> {
     const tabId = screenshot.tab.id

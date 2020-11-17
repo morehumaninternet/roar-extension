@@ -81,3 +81,8 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
 
   return prependHandle(fromText(restOfTheText), handle)
 }
+
+export function logErrorAndReturnAlert(alert: string) {
+  console.log('Alert Message:', alert)
+  return null
+}
