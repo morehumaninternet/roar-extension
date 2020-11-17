@@ -86,5 +86,5 @@ export function logErrorAndReturnAlert(alert: string) {
   // if it is network error, return a message
   // if it is server error fetch the twitter handle, return a different message.
   console.log('Alert Message:', alert)
-  return null
+  return alert
 }

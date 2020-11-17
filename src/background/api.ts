@@ -54,8 +54,11 @@ export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBa
   try {
     dispatchBackgroundActions.fetchHandleStart({ tabId })
     const res = await makeHandleRequest(host)
+
+    //testing fetch response status
     const { twitter_handle } = await res.json()
     const { status } = res
+
     console.log('fetchTwitterHandel Status:', status)
     return dispatchBackgroundActions.fetchHandleSuccess({ tabId, host, handle: twitter_handle })
   } catch (alert) {
