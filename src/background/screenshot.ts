@@ -1,3 +1,5 @@
+import { domainOf } from './domain'
+
 function dataURItoBlob(dataURI: string): Blob {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
@@ -26,7 +28,7 @@ export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, di
     const moreTabInfo = await gettingTab
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
-    const { host } = new URL(tab.url!)
+    const domain = domainOf(tab.url)
     dispatchBackgroundActions.screenshotCaptureSuccess({
       screenshot: {
         tab: {
@@ -35,7 +37,7 @@ export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, di
           width: moreTabInfo.width!,
           height: moreTabInfo.height!,
         },
-        name: `${host} - ${new Date().toISOString()}.png`,
+        name: `${domain} - ${new Date().toISOString()}.png`,
         uri: screenshotUri,
         blob: screenshotBlob,
       },

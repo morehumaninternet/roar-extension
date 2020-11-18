@@ -29,8 +29,8 @@ describe('responders', () => {
         active: false,
         isTweeting: false,
         url: 'https://original-url.com',
-        host: 'original-url.com',
-        feedbackState: newFeedbackState({ host: 'original-url.com' }),
+        domain: 'original-url.com',
+        feedbackState: newFeedbackState({ domain: 'original-url.com' }),
       })
 
       const stateUpdates = responders['chrome.tabs.onUpdated'](appState, {
@@ -43,7 +43,7 @@ describe('responders', () => {
       const updatedTab = stateUpdates.tabs!.get(17)!
 
       expect(updatedTab.url).to.equal('https://updated.com/abc')
-      expect(updatedTab.host).to.equal('updated.com')
+      expect(updatedTab.domain).to.equal('updated.com')
       expect(getPlainText(updatedTab.feedbackState.editorState)).to.equal('@updated.com ')
     })
   })

@@ -20,12 +20,12 @@ export function App({ state, dispatchUserActions }: AppProps): null | JSX.Elemen
     case 'authenticated': {
       const tab = activeTab(state)
       if (!tab) return null
-      if (tab.host) {
+      if (tab.domain) {
         return (
           <div className="app">
             <Authenticated
               feedback={tab.feedbackState}
-              host={tab.host}
+              domain={tab.domain}
               isTweeting={tab.isTweeting}
               user={state.auth.user}
               pickingEmoji={state.pickingEmoji}
