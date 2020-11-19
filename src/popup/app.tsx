@@ -1,42 +1,29 @@
 import * as React from 'react'
-import { Authenticated } from './views/authenticated'
-import { Authenticating } from './views/authenticating'
-import { NotAuthed } from './views/not-authed'
-import { activeTab, deleteScreenshotDisabled, takeScreenshotDisabled } from '../selectors'
+import views from './views'
+import { toAppState } from '../selectors'
 
 type AppProps = {
-  state: AppState
+  storeState: StoreState
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-export function App({ state, dispatchUserActions }: AppProps): null | JSX.Element {
-  switch (state.auth.state) {
-    case 'not_authed': {
-      return <NotAuthed signInWithTwitter={dispatchUserActions.signInWithTwitter} />
-    }
-    case 'authenticating': {
-      return <Authenticating authenticatedViaTwitter={dispatchUserActions.authenticatedViaTwitter} />
-    }
-    case 'authenticated': {
-      const tab = activeTab(state)
-      if (!tab) return null
-      if (tab.domain) {
-        return (
-          <div className="app">
-            <Authenticated
-              feedback={tab.feedbackState}
-              domain={tab.domain}
-              isTweeting={tab.isTweeting}
-              user={state.auth.user}
-              pickingEmoji={state.pickingEmoji}
-              takeScreenshotDisabled={takeScreenshotDisabled(state)}
-              deleteScreenshotDisabled={deleteScreenshotDisabled(state)}
-              dispatchUserActions={dispatchUserActions}
-            />
-          </div>
-        )
-      }
-      return <p>Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.</p>
-    }
+export function AppContents({ storeState, dispatchUserActions }: AppProps): JSX.Element {
+  const appState = toAppState(storeState, dispatchUserActions)
+
+  switch (appState.view) {
+    case 'NotAuthed':
+      return <views.NotAuthed {...appState} />
+    case 'Authenticating':
+      return <views.Authenticating {...appState} />
+    case 'Authenticated':
+      return <views.Authenticated {...appState} />
   }
+}
+
+export function App(props: AppProps): JSX.Element {
+  return (
+    <div className="app">
+      <AppContents {...props} />
+    </div>
+  )
 }

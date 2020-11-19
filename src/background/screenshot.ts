@@ -21,7 +21,15 @@ function dataURItoBlob(dataURI: string): Blob {
   return new Blob([ab], { type: mimeString })
 }
 
-export async function takeScreenshot(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+export async function takeScreenshot(
+  target: FeedbackTarget,
+  tabs: typeof browser.tabs,
+  dispatchBackgroundActions: Dispatchers<BackgroundAction>
+): Promise<void> {
+  if (target.feedbackTargetType === 'help') {
+    return console.log('TODO take screenshot of popup on help click')
+  }
+  const tab = target
   try {
     const gettingTab = tabs.get(tab.id)
     const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)

@@ -2,6 +2,7 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as fetchMock from 'fetch-mock'
+import { Map } from 'immutable'
 import { createMocks } from './mocks'
 import { whenState } from './util'
 import { run } from '../background/run'
@@ -33,14 +34,20 @@ describe('happy path', () => {
     })
 
     it('loads window.store, which starts with an empty state', () => {
-      expect(getState()).to.eql({
-        focusedWindowId: -1,
-        tabs: new Map(),
-        auth: { state: 'not_authed' },
-        pickingEmoji: false,
-        alert: null,
-        mostRecentAction: { type: 'INITIALIZING' },
-      })
+      const state = getState()
+      expect(state.focusedWindowId).to.equal(-1)
+      expect(state.tabs).to.be.an.instanceOf(Map)
+      expect(state.tabs).to.have.property('size', 0)
+      expect(state.auth).to.eql({ state: 'not_authed' })
+      expect(state.pickingEmoji).to.equal(false)
+      expect(state.help.on).to.equal(false)
+      expect(state.help.feedbackState).to.be.an('object')
+      expect(state.help.feedbackState.editingScreenshot).to.equal(null)
+      expect(state.help.feedbackState.screenshots).to.eql([])
+      expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
+      expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
+      expect(state.alert).to.equal(null)
+      expect(state.mostRecentAction).to.eql({ type: 'INITIALIZING' })
     })
 
     it('sets the focusedWindowId when chrome.windows.getAll calls back', () => {
@@ -74,9 +81,9 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('id', 14)
       expect(activeTab).to.have.property('windowId', 2)
       expect(activeTab).to.have.property('active', true)
-      expect(activeTab).to.have.property('isTweeting', false)
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
       expect(activeTab).to.have.property('domain', 'zing.com')
+      expect(activeTab.feedbackState).to.have.property('isTweeting', false)
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
 
       expect(state.tabs.get(17)).to.have.property('domain', undefined)
@@ -117,7 +124,7 @@ describe('happy path', () => {
       expect(screenshot.tab.height).to.equal(900)
       expect(screenshot.blob).to.be.an.instanceof(Blob)
 
-      expect(activeTab.feedbackState.domainTwitterHandle.handle).to.equal('@zing')
+      expect(activeTab.feedbackState.twitterHandle.handle).to.equal('@zing')
 
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
     })
@@ -136,10 +143,10 @@ describe('happy path', () => {
     })
 
     it('transitions to an "authenticating" state and adds an iframe when the sign in with twitter button is clicked', () => {
-      const signInButton = mocks.popupWindow.document.querySelector('#app-container > button')! as HTMLButtonElement
+      const signInButton = app().querySelector('button')! as HTMLButtonElement
       signInButton.click()
       expect(getState().auth).to.have.property('state', 'authenticating')
-      const iframe = mocks.popupWindow.document.querySelector('#app-container > iframe')! as HTMLIFrameElement
+      const iframe = app().querySelector('iframe')! as HTMLIFrameElement
       expect(iframe).to.have.property('src', 'https://test-roar-server.com/v1/auth/twitter')
     })
 
@@ -161,9 +168,10 @@ describe('happy path', () => {
 
   describe('once authenticated', () => {
     it('renders the app with an emoji picker container and the main element', () => {
-      expect(app().childNodes).to.have.length(2)
-      expect(app().childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
-      expect(app().childNodes[1]).to.have.property('tagName', 'MAIN')
+      const authenticatedView = app().querySelector('.authenticated')!
+      expect(authenticatedView.childNodes).to.have.length(2)
+      expect(authenticatedView.childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
+      expect(authenticatedView.childNodes[1]).to.have.property('tagName', 'MAIN')
     })
 
     it('renders the profile image', () => {
@@ -243,6 +251,38 @@ describe('happy path', () => {
       expect(spans[0]).to.have.property('innerHTML', '@zing')
       expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
     })
+
+    it('allows you to give feedback directly to Roar by clicking the help button', async () => {
+      const helpButton = app().querySelector('.Help')! as HTMLButtonElement
+      helpButton.click()
+
+      const initialSpans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(initialSpans).to.have.length(2)
+      expect(initialSpans[0]).to.have.property('innerHTML', '@roarmhi')
+      expect(initialSpans[1]).to.have.property('innerHTML', ' ')
+
+      mocks.backgroundWindow.store.dispatch({
+        type: 'updateEditorState',
+        payload: {
+          editorState: appendEntity(getState().help.feedbackState.editorState, 'different feedback'),
+        },
+      })
+
+      const nextSpans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(nextSpans).to.have.length(2)
+      expect(nextSpans[0]).to.have.property('innerHTML', '@roarmhi')
+      expect(nextSpans[1]).to.have.property('innerHTML', ' different feedback')
+    })
+
+    it('switches back to the tab-specific feedback when you click the help button again', () => {
+      const helpButton = app().querySelector('.Help')! as HTMLButtonElement
+      helpButton.click()
+
+      const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(spans).to.have.length(2)
+      expect(spans[0]).to.have.property('innerHTML', '@zing')
+      expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
+    })
   })
 
   describe('posting feedback', () => {
@@ -271,11 +311,11 @@ describe('happy path', () => {
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const tweetInProgress = app().querySelector('.tweet-in-progress')!
-      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback for zing.com')
+      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback to @zing')
     })
 
     it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-      await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).isTweeting)
+      await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).feedbackState.isTweeting)
       expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
         url: 'https://t.co/sometweethash',
         active: true,

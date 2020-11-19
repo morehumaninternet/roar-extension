@@ -1,26 +1,18 @@
 import { Store, createStore } from 'redux'
+import { emptyStoreState } from './state'
 import { responders } from './responders'
 
-export type AppStore = Store<AppState, Action> & {
+export type AppStore = Store<StoreState, Action> & {
   dispatchers: Dispatchers<Action>
-  on<T extends Action['type']>(type: T, callback: (nextState: AppState & { mostRecentAction: Action & { type: T } }) => void): () => void
+  on<T extends Action['type']>(type: T, callback: (nextState: StoreState & { mostRecentAction: Action & { type: T } }) => void): () => void
 }
 
-export const emptyState: AppState = {
-  focusedWindowId: -1,
-  tabs: new Map(),
-  auth: { state: 'not_authed' },
-  pickingEmoji: false,
-  alert: null,
-  mostRecentAction: { type: 'INITIALIZING' },
-}
-
-function reducer(state: AppState = emptyState, action: Action): AppState {
+function reducer(state: StoreState = emptyStoreState(), action: Action): StoreState {
   // Redux initially sends a @@redux/INIT action
   if (action.type.startsWith('@@redux/INIT')) return state
 
   const responder = responders[action.type]
-  const stateUpdates: Partial<AppState> = responder(state, (action as any).payload as any)
+  const stateUpdates: Partial<StoreState> = responder(state, (action as any).payload as any)
 
   const nextState = {
     ...state,
