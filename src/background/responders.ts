@@ -1,4 +1,5 @@
 import { Map } from 'immutable'
+import { defaultsDeep } from 'lodash'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpState } from './state'
@@ -23,29 +24,21 @@ function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
   return { tabs: state.tabs.set(tab.id, tab) }
 }
 
+function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdates: Partial<FeedbackState>): Partial<StoreState> {
+  const nextFeedbackState = { ...target.feedbackState, ...feedbackUpdates }
+  const nextTarget: FeedbackTarget = { ...target, feedbackState: nextFeedbackState }
+  return nextTarget.feedbackTargetType === 'help' ? { help: nextTarget } : setTab(state, nextTarget)
+}
+
 function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
   const tab = state.tabs.get(tabId)
   if (!tab) return {}
-  const feedbackUpdates = callback(tab)
-  return setTab(state, { ...tab, feedbackState: { ...tab.feedbackState, ...feedbackUpdates } })
+  return updateFeedback(state, tab, callback(tab))
 }
 
 function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: FeedbackTarget) => Partial<FeedbackState>): Partial<StoreState> {
-  const feedbackTarget = ensureActiveFeedbackTarget(state)
-  const feedbackUpdates = callback(feedbackTarget)
-  const nextFeedbackTarget: FeedbackTarget = {
-    ...feedbackTarget,
-    feedbackState: {
-      ...feedbackTarget.feedbackState,
-      ...feedbackUpdates,
-    },
-  }
-
-  if (nextFeedbackTarget.feedbackTargetType === 'help') {
-    return { help: nextFeedbackTarget }
-  }
-
-  return setTab(state, nextFeedbackTarget)
+  const target = ensureActiveFeedbackTarget(state)
+  return updateFeedback(state, target, callback(target))
 }
 
 export const responders: Responders<Action> = {
@@ -134,22 +127,12 @@ export const responders: Responders<Action> = {
     })
   },
   postTweetFailure(state, { targetId, error }): Partial<StoreState> {
-    const feedbackUpdates =
-      targetId !== 'help'
-        ? updateTabFeedbackIfExists(state, targetId, tab => ({ isTweeting: false }))
-        : {
-            help: {
-              ...state.help,
-              feedbackState: {
-                ...state.help.feedbackState,
-                isTweeting: false,
-              },
-            },
-          }
+    const target = targetId === 'help' ? state.help : state.tabs.get(targetId)
+    if (!target) return {}
 
     return {
       alert: error.message,
-      ...feedbackUpdates,
+      ...updateFeedback(state, target, { isTweeting: false }),
     }
   },
   clickDeleteScreenshot(state, { screenshotIndex }): Partial<StoreState> {
