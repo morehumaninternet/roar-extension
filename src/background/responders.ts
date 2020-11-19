@@ -17,6 +17,7 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     url: tab.url,
     domain,
     feedbackState: newFeedbackState({ domain }),
+    uploadImageFile: {},
   }
 }
 
@@ -157,7 +158,18 @@ export const responders: Responders<Action> = {
       },
     }))
   },
-  'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
+  imageUpload(state, { file }): Partial<AppState> {
+    const tab = ensureActiveTab(state)
+    const nextTabs = new Map(state.tabs)
+
+    nextTabs.set(tab.id, {
+      ...tab,
+      uploadImageFile: file,
+    })
+
+    return { tabs: nextTabs }
+  },
+  'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
     const focusedWindow = windows.find(win => win.focused)
     if (!focusedWindow) return {}
     return { focusedWindowId: focusedWindow.id }

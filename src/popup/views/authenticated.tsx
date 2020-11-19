@@ -45,6 +45,7 @@ export function Authenticated({
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
             toggleHelp={dispatchUserActions.toggleHelp}
             takeScreenshotDisabled={takeScreenshotDisabled}
+            imageUpload={dispatchUserActions.imageUpload}
           />
         </div>
       </main>

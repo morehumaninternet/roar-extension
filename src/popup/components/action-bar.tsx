@@ -1,20 +1,26 @@
 import * as React from 'react'
 import { ActionButton } from './action-button'
+import { ImagePicker } from './image-picker'
 
 type ActionBarProps = {
   clickPost: Dispatchers<UserAction>['clickPost']
   togglePickingEmoji: Dispatchers<UserAction>['togglePickingEmoji']
   clickTakeScreenshot: Dispatchers<UserAction>['clickTakeScreenshot']
+  imageUpload: Dispatchers<UserAction>['imageUpload']
   toggleHelp: Dispatchers<UserAction>['toggleHelp']
   takeScreenshotDisabled: boolean
 }
 
-export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot, toggleHelp, takeScreenshotDisabled }: ActionBarProps) => {
+export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot, imageUpload, toggleHelp, takeScreenshotDisabled }: ActionBarProps) => {
   return (
     <div className="action-bar">
       <div className="action-buttons">
         <ActionButton kind="TakeScreenshot" onClick={clickTakeScreenshot} disabled={takeScreenshotDisabled} />
-        <ActionButton kind="AddImage" onClick={console.log} />
+        <ImagePicker
+          onSelect={(file: any) => {
+            imageUpload({ file })
+          }}
+        />
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} />
         <ActionButton kind="Help" onClick={toggleHelp} />
       </div>

@@ -61,6 +61,8 @@ type TabInfo = {
   active: boolean
   url?: string
   domain?: string
+  host?: string
+  uploadImageFile: any
   feedbackState: FeedbackState
 }
 
@@ -132,6 +134,7 @@ type UserAction =
   | { type: 'clickTakeScreenshot' }
   | { type: 'clickDeleteScreenshot'; payload: { screenshotIndex: number } }
   | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
+  | { type: 'imageUpload'; payload: { file: any } }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
