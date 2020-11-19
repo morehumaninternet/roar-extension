@@ -1,4 +1,5 @@
 import { EditorState } from 'draft-js'
+import { domainOf } from './domain'
 import { ensureActiveTab } from '../selectors'
 import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
 
@@ -6,20 +7,20 @@ export const emptyFeedbackState = (): FeedbackState => ({
   editingScreenshot: null,
   screenshots: [],
   editorState: EditorState.createEmpty(),
-  hostTwitterHandle: { status: 'NEW', handle: null },
+  domainTwitterHandle: { status: 'NEW', handle: null },
 })
 
-export const newFeedbackState = ({ host }: { host?: string }): FeedbackState => {
+export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
   const empty = emptyFeedbackState()
-  if (!host) return empty
+  if (!domain) return empty
   return {
     ...empty,
-    editorState: prependHandle(empty.editorState, `@${host}`),
+    editorState: prependHandle(empty.editorState, `@${domain}`),
   }
 }
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
-  const host = tab.url && tab.url.startsWith('http') ? new URL(tab.url).host : undefined
+  const domain = domainOf(tab.url)
 
   return {
     id: tab.id!,
@@ -27,8 +28,8 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     active: tab.active,
     isTweeting: false,
     url: tab.url,
-    host,
-    feedbackState: newFeedbackState({ host }),
+    domain,
+    feedbackState: newFeedbackState({ domain }),
   }
 }
 
@@ -72,7 +73,7 @@ export const responders: Responders<Action> = {
   updateEditorState(state, { editorState }): Partial<AppState> {
     const tab = ensureActiveTab(state)
 
-    const handle = tab.feedbackState.hostTwitterHandle.handle
+    const handle = tab.feedbackState.domainTwitterHandle.handle
     const status = getPlainText(editorState)
 
     // If the new editor state doesn't start with the handle, don't update the store.
@@ -102,9 +103,6 @@ export const responders: Responders<Action> = {
   fetchHandleStart(state, { tabId }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
 
-    // const tabHost = tab?.host
-    // const hostName = `@${tabHost}`
-
     // If the tab doesn't exist anymore, don't try to update it
     if (!tab) return {}
 
@@ -113,7 +111,7 @@ export const responders: Responders<Action> = {
       ...tab,
       feedbackState: {
         ...tab.feedbackState,
-        hostTwitterHandle: {
+        domainTwitterHandle: {
           status: 'IN_PROGRESS',
           handle: null,
         },
@@ -122,11 +120,11 @@ export const responders: Responders<Action> = {
 
     return { tabs: nextTabs }
   },
-  fetchHandleSuccess(state, { tabId, host, handle }): Partial<AppState> {
+  fetchHandleSuccess(state, { tabId, domain, handle }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
-    // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
+    // If the tab doesn't exist anymore, or if the domain has since changed, don't try to update it
     if (!tab) return {}
-    if (tab.host !== host) return {}
+    if (tab.domain !== domain) return {}
 
     const nextTabs = new Map(state.tabs)
 
@@ -136,7 +134,7 @@ export const responders: Responders<Action> = {
         editingScreenshot: tab.feedbackState.editingScreenshot,
         screenshots: tab.feedbackState.screenshots,
         editorState: replaceHandle(tab.feedbackState.editorState, handle),
-        hostTwitterHandle: {
+        domainTwitterHandle: {
           status: 'DONE',
           handle,
         },
@@ -145,18 +143,18 @@ export const responders: Responders<Action> = {
 
     return { tabs: nextTabs }
   },
-  fetchHandleFailure(state, { tabId, host, error }): Partial<AppState> {
+  fetchHandleFailure(state, { tabId, domain, error }): Partial<AppState> {
     const tab = state.tabs.get(tabId)
-    // If the tab doesn't exist anymore, or if the host has since changed, don't try to update it
+    // If the tab doesn't exist anymore, or if the domain has since changed, don't try to update it
     if (!tab) return {}
-    if (tab.host !== host) return {}
+    if (tab.domain !== domain) return {}
 
     const nextTabs = new Map(state.tabs)
     nextTabs.set(tab.id, {
       ...tab,
       feedbackState: {
         ...tab.feedbackState,
-        hostTwitterHandle: {
+        domainTwitterHandle: {
           status: 'DONE',
           handle: null,
         },
@@ -189,7 +187,7 @@ export const responders: Responders<Action> = {
     if (!tab) return {}
 
     const nextTabs = new Map(state.tabs)
-    const { handle } = tab.feedbackState.hostTwitterHandle
+    const { handle } = tab.feedbackState.domainTwitterHandle
 
     // Clear the existing feedback state for the tab once the tweet is clicked
     nextTabs.set(tab.id, {
@@ -199,7 +197,7 @@ export const responders: Responders<Action> = {
         editingScreenshot: null,
         screenshots: [],
         editorState: handle ? prependHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
-        hostTwitterHandle: tab.feedbackState.hostTwitterHandle,
+        domainTwitterHandle: tab.feedbackState.domainTwitterHandle,
       },
     })
 
@@ -288,13 +286,13 @@ export const responders: Responders<Action> = {
     const tabs = new Map(state.tabs)
     const tab = { ...tabs.get(tabId)! }
     const nextURL = changeInfo.url
-    const nextHost = new URL(nextURL).host
+    const nextDomain = domainOf(nextURL)
     tab.url = nextURL
 
     // If the domain has changed, delete the feedback
-    if (tab.host !== nextHost) {
-      tab.host = nextHost
-      tab.feedbackState = newFeedbackState({ host: nextHost })
+    if (tab.domain !== nextDomain) {
+      tab.domain = nextDomain
+      tab.feedbackState = newFeedbackState({ domain: nextDomain })
     }
 
     tabs.set(tabId, tab)

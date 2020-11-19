@@ -1,10 +1,10 @@
-function tweetFormData(feedbackState: FeedbackState, host: string): FormData {
+function tweetFormData(feedbackState: FeedbackState, domain: string): FormData {
   const tweetData = new FormData()
 
   const status = feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
 
-  tweetData.append('host', host)
+  tweetData.append('domain', domain)
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
   feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
@@ -22,7 +22,7 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
 
 export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
   try {
-    const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.host!))
+    const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.domain!))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure({
         tabId: tab.id,
@@ -43,20 +43,20 @@ export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, disp
   }
 }
 
-function makeHandleRequest(host: string): Promise<Response> {
-  const params = { domain: host }
+function makeHandleRequest(domain: string): Promise<Response> {
+  const params = { domain }
   const requestURL = new URL('v1/website', window.roarServerUrl)
   requestURL.search = new URLSearchParams(params).toString()
   return fetch(requestURL.toString())
 }
 
-export const fetchTwitterHandle = async (tabId: number, host: string, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+export const fetchTwitterHandle = async (tabId: number, domain: string, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
   try {
     dispatchBackgroundActions.fetchHandleStart({ tabId })
-    const res = await makeHandleRequest(host)
+    const res = await makeHandleRequest(domain)
     const { twitter_handle } = await res.json()
-    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, host, handle: twitter_handle })
+    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
   } catch (error) {
-    return dispatchBackgroundActions.fetchHandleFailure({ tabId, host, error })
+    return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
   }
 }

@@ -8,7 +8,7 @@ import { EditingScreenshot } from '../components/editing-screenshot'
 
 type AuthenticatedProps = {
   feedback: FeedbackState
-  host: string
+  domain: string
   user: User
   isTweeting: boolean
   pickingEmoji: boolean
@@ -19,7 +19,7 @@ type AuthenticatedProps = {
 
 export function Authenticated({
   feedback,
-  host,
+  domain,
   isTweeting,
   user,
   pickingEmoji,
@@ -28,7 +28,7 @@ export function Authenticated({
   dispatchUserActions,
 }: AuthenticatedProps): JSX.Element | null {
   if (isTweeting) {
-    return <Tweeting host={host} />
+    return <Tweeting domain={domain} />
   }
 
   if (feedback.editingScreenshot) {

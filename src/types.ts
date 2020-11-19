@@ -35,7 +35,7 @@ type ScreenshotState = {
 
 type TwitterHandleStatus = 'NEW' | 'IN_PROGRESS' | 'DONE'
 
-type HostTwitterHandle = {
+type DomainTwitterHandle = {
   status: TwitterHandleStatus
   handle: string | null
 }
@@ -49,7 +49,7 @@ type FeedbackState = {
   editingScreenshot: null | EditingScreenshotState
   screenshots: ReadonlyArray<Screenshot>
   editorState: Draft.EditorState
-  hostTwitterHandle: HostTwitterHandle
+  domainTwitterHandle: DomainTwitterHandle
 }
 
 type User = { photoUrl?: string }
@@ -62,7 +62,7 @@ type TabInfo = {
   active: boolean
   isTweeting: boolean
   url?: string
-  host?: string
+  domain?: string
   feedbackState: FeedbackState
 }
 
@@ -102,8 +102,8 @@ type UserAction =
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; host: string; handle: string } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; host: string; error: any } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: string } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
   | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
   | { type: 'screenshotCaptureFailure'; payload: { error: any } }
   | { type: 'postTweetSuccess'; payload: { tabId: number } }

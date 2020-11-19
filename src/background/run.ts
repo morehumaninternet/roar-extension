@@ -18,7 +18,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   store.on('popupConnect', state => {
     const tab = ensureActiveTab(state)
-    if (tab.isTweeting || !tab.host) return
+    if (tab.isTweeting || !tab.domain) return
 
     // Take a screenshot if no screenshots currently present for the active tab
     if (!tab.feedbackState.screenshots.length) {
@@ -27,8 +27,8 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
     // it the handle wasn't fetched before and the tab URL is valid,
     // start the fetch process
-    if (tab.feedbackState.hostTwitterHandle.status === 'NEW') {
-      fetchTwitterHandle(tab.id, tab.host, store.dispatchers)
+    if (tab.feedbackState.domainTwitterHandle.status === 'NEW') {
+      fetchTwitterHandle(tab.id, tab.domain, store.dispatchers)
     }
   })
 

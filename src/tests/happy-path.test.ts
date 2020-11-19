@@ -76,13 +76,13 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('active', true)
       expect(activeTab).to.have.property('isTweeting', false)
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
-      expect(activeTab).to.have.property('host', 'zing.com')
+      expect(activeTab).to.have.property('domain', 'zing.com')
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
 
-      expect(state.tabs.get(17)).to.have.property('host', undefined)
+      expect(state.tabs.get(17)).to.have.property('domain', undefined)
     })
 
-    it("uses the tab's host as the handle as a placeholder prior to fetching the actual twitter handle", () => {
+    it("uses the tab's domain as the handle as a placeholder prior to fetching the actual twitter handle", () => {
       const state = getState()
       const activeTab = ensureActiveTab(state)
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing.com ')
@@ -117,7 +117,7 @@ describe('happy path', () => {
       expect(screenshot.tab.height).to.equal(900)
       expect(screenshot.blob).to.be.an.instanceof(Blob)
 
-      expect(activeTab.feedbackState.hostTwitterHandle.handle).to.equal('@zing')
+      expect(activeTab.feedbackState.domainTwitterHandle.handle).to.equal('@zing')
 
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
     })
@@ -265,7 +265,7 @@ describe('happy path', () => {
 
       const body: FormData = opts!.body! as any
       expect(body.get('status')).to.equal('@zing This is some feedback')
-      expect(body.get('host')).to.equal('zing.com')
+      expect(body.get('domain')).to.equal('zing.com')
       const screenshot: any = body.get('screenshots') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
