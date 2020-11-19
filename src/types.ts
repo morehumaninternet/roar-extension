@@ -1,4 +1,5 @@
 /// <reference path="../node_modules/@types/draft-js/index.d.ts" />
+/// <reference path="../node_modules/immutable/dist/immutable.d.ts" />
 
 type Maybe<T> = T | null | undefined
 
@@ -67,7 +68,7 @@ type FeedbackTarget = TabInfo | StoreState['help']
 
 type StoreState = {
   focusedWindowId: number
-  tabs: Map<number, TabInfo>
+  tabs: Immutable.Map<number, TabInfo>
   auth: Auth
   pickingEmoji: boolean
   help: {

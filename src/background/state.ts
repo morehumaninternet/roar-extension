@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { prependHandle } from '../draft-js-utils'
 
@@ -19,7 +20,13 @@ export const emptyHelpFeedbackState = (): FeedbackState => ({
   twitterHandle: { status: 'DONE', handle: roarTwitterHandle },
 })
 
-export const newFeedbackState = ({ domain }: { domain?: string; help?: boolean }): FeedbackState => {
+export const emptyHelpState = (): StoreState['help'] => ({
+  feedbackTargetType: 'help',
+  on: false,
+  feedbackState: emptyHelpFeedbackState(),
+})
+
+export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
   const empty = emptyFeedbackState()
   if (!domain) return empty
   return {
@@ -27,3 +34,13 @@ export const newFeedbackState = ({ domain }: { domain?: string; help?: boolean }
     editorState: prependHandle(empty.editorState, `@${domain}`),
   }
 }
+
+export const emptyStoreState = (): StoreState => ({
+  focusedWindowId: -1,
+  tabs: Map(),
+  auth: { state: 'not_authed' },
+  pickingEmoji: false,
+  help: emptyHelpState(),
+  alert: null,
+  mostRecentAction: { type: 'INITIALIZING' },
+})

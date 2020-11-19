@@ -2,6 +2,7 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as fetchMock from 'fetch-mock'
+import { Map } from 'immutable'
 import { createMocks } from './mocks'
 import { whenState } from './util'
 import { run } from '../background/run'
