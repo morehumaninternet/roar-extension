@@ -27,7 +27,7 @@ export function Authenticated({
   }
 
   return (
-    <>
+    <div className="authenticated">
       <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
       <main>
         <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
@@ -48,6 +48,6 @@ export function Authenticated({
           />
         </div>
       </main>
-    </>
+    </div>
   )
 }
