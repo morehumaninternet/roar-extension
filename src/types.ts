@@ -66,7 +66,6 @@ type TabInfo = {
   active: boolean
   url?: string
   domain?: string
-  host?: string
   feedbackState: FeedbackState
 }
 
