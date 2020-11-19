@@ -1,5 +1,4 @@
 import { Map } from 'immutable'
-import { defaultsDeep } from 'lodash'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpState } from './state'
@@ -104,12 +103,12 @@ export const responders: Responders<Action> = {
       }),
     }
   },
-  screenshotCaptureSuccess(state, { screenshot }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, screenshot.tab.id, tab => ({
-      screenshots: tab.feedbackState.screenshots.concat([screenshot]),
+  imageCaptureSuccess(state, { tabId, image }): Partial<StoreState> {
+    return updateTabFeedbackIfExists(state, tabId, tab => ({
+      images: tab.feedbackState.images.concat([image]),
     }))
   },
-  screenshotCaptureFailure(state, { error }): Partial<StoreState> {
+  imageCaptureFailure(state, { error }): Partial<StoreState> {
     return { alert: typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE' }
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
@@ -121,8 +120,8 @@ export const responders: Responders<Action> = {
       const { handle } = tab.feedbackState.twitterHandle
       return {
         isTweeting: false,
-        editingScreenshot: null,
-        screenshots: [],
+        editingImage: null,
+        image: [],
         editorState: handle ? prependHandle(EditorState.createEmpty(), handle) : EditorState.createEmpty(),
       }
     })
@@ -136,40 +135,30 @@ export const responders: Responders<Action> = {
       ...updateFeedback(state, target, { isTweeting: false }),
     }
   },
-  clickDeleteScreenshot(state, { screenshotIndex }): Partial<StoreState> {
+  clickDeleteImage(state, { imageIndex }): Partial<StoreState> {
     return updateActiveFeedback(state, target => {
-      // The Screenshot array can't be empty
-      if (target.feedbackState.screenshots.length === 1) return {}
+      // The image array can't be empty
+      if (target.feedbackState.images.length === 1) return {}
 
-      // Removing the screenshot
+      // Removing the image
       // tslint:disable-next-line: readonly-array
-      const nextScreenshots = [...target.feedbackState.screenshots]
-      nextScreenshots.splice(screenshotIndex, 1)
-      return {
-        screenshots: nextScreenshots,
-      }
+      const nextImages = [...target.feedbackState.images]
+      nextImages.splice(imageIndex, 1)
+      return { images: nextImages }
     })
   },
-  startEditingScreenshot(state, { screenshotIndex }): Partial<StoreState> {
+  startEditingImage(state, { imageIndex }): Partial<StoreState> {
     return updateActiveFeedback(state, target => ({
-      editingScreenshot: {
-        screenshot: target.feedbackState.screenshots[screenshotIndex],
+      editingImage: {
+        image: target.feedbackState.images[imageIndex],
         color: '#fa759e',
       },
     }))
   },
-  imageUpload(state, { file }): Partial<AppState> {
-    const tab = ensureActiveTab(state)
-    const nextTabs = new Map(state.tabs)
-
-    nextTabs.set(tab.id, {
-      ...tab,
-      uploadImageFile: file,
-    })
-
-    return { tabs: nextTabs }
+  imageUpload(state, { file }): Partial<StoreState> {
+    return {}
   },
-  'chrome.windows.getAll'(state, { windows }): Partial<AppState> {
+  'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
     const focusedWindow = windows.find(win => win.focused)
     if (!focusedWindow) return {}
     return { focusedWindowId: focusedWindow.id }

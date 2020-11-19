@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { FeedbackEditor } from '../components/feedback-editor'
-import { Screenshots } from '../components/screenshots'
+import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
-import { EditingScreenshot } from '../components/editing-screenshot'
+import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
   feedback,
   tweeting,
   user,
   pickingEmoji,
-  takeScreenshotDisabled,
-  deleteScreenshotDisabled,
+  addImageDisabled,
+  deleteImageDisabled,
   dispatchUserActions,
 }: AuthenticatedState): JSX.Element | null {
   if (tweeting) {
@@ -33,18 +33,18 @@ export function Authenticated({
         <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
         <div className="twitter-interface">
           <FeedbackEditor editorState={feedback.state.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
-          <Screenshots
+          <Images
             feedback={feedback.state}
-            startEditingScreenshot={dispatchUserActions.startEditingScreenshot}
-            clickDeleteScreenshot={dispatchUserActions.clickDeleteScreenshot}
-            deleteScreenshotDisabled={deleteScreenshotDisabled}
+            startEditingImage={dispatchUserActions.startEditingImage}
+            clickDeleteImage={dispatchUserActions.clickDeleteImage}
+            deleteImageDisabled={deleteImageDisabled}
           />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
             toggleHelp={dispatchUserActions.toggleHelp}
-            takeScreenshotDisabled={takeScreenshotDisabled}
+            addImageDisabled={addImageDisabled}
             imageUpload={dispatchUserActions.imageUpload}
           />
         </div>

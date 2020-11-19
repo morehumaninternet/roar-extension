@@ -30,8 +30,8 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
       }
     }
 
-    // Take a screenshot if no screenshots currently present for the current feedback target
-    if (!target.feedbackState.screenshots.length) {
+    // Take a screenshot if no images currently present for the current feedback target
+    if (!target.feedbackState.images.length) {
       takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })

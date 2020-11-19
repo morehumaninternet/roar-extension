@@ -115,9 +115,9 @@ describe('happy path', () => {
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
       const state = getState()
       const activeTab = ensureActiveTab(state)
-      expect(activeTab.feedbackState.screenshots).to.have.length(1)
+      expect(activeTab.feedbackState.images).to.have.length(1)
 
-      const [screenshot] = activeTab.feedbackState.screenshots
+      const [screenshot] = activeTab.feedbackState.images
       expect(screenshot.tab.id).to.equal(activeTab.id)
       expect(screenshot.tab.url).to.equal(activeTab.url)
       expect(screenshot.tab.width).to.equal(1200)
@@ -183,7 +183,7 @@ describe('happy path', () => {
       const screenshotThumbnail = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
 
       const screenshotImage = screenshotThumbnail?.querySelector('.screenshot-image')
-      const screenshotUri = activeTab(getState())?.feedbackState.screenshots[0].uri
+      const screenshotUri = activeTab(getState())?.feedbackState.images[0].uri
       expect(screenshotImage).to.have.property('src', screenshotUri)
 
       // User can't remove screenshots if there's only one
@@ -193,7 +193,7 @@ describe('happy path', () => {
 
     it('takes a screenshot when the TakeScreenshot button is clicked', async () => {
       const tab = activeTab(getState())!
-      expect(tab.feedbackState.screenshots).to.have.lengthOf(1)
+      expect(tab.feedbackState.images).to.have.lengthOf(1)
       const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
       takeScreenshotButton.click()
       await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 2)
@@ -306,7 +306,7 @@ describe('happy path', () => {
       const body: FormData = opts!.body! as any
       expect(body.get('status')).to.equal('@zing This is some feedback')
       expect(body.get('domain')).to.equal('zing.com')
-      const screenshot: any = body.get('screenshots') as any
+      const screenshot: any = body.get('images') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 

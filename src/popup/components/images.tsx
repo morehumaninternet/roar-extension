@@ -52,7 +52,7 @@ export function Images({ feedback, startEditingImage, clickDeleteImage, deleteIm
   if (!feedback.images.length) return null
 
   return (
-    <div className="image">
+    <div className="images">
       {feedback.images.map((image, index) => (
         <ImageThumbnail
           key={`${image.uri}_${index}`}

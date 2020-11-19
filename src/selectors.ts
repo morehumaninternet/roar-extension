@@ -21,12 +21,12 @@ export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
   return ensureActiveTab(state)
 }
 
-export function takeScreenshotDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
   return feedbackTarget.feedbackState.screenshots.length >= 9
 }
 
-export function deleteScreenshotDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
   return feedbackTarget.feedbackState.screenshots.length <= 1
 }
@@ -65,8 +65,8 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
         tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
         helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
-        takeScreenshotDisabled: takeScreenshotDisabled(feedbackTarget),
-        deleteScreenshotDisabled: deleteScreenshotDisabled(feedbackTarget),
+        addImageDisabled: addImageDisabled(feedbackTarget),
+        deleteImageDisabled: deleteImageDisabled(feedbackTarget),
         dispatchUserActions,
       }
     }

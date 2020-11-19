@@ -8,14 +8,14 @@ type ActionBarProps = {
   clickTakeScreenshot: Dispatchers<UserAction>['clickTakeScreenshot']
   imageUpload: Dispatchers<UserAction>['imageUpload']
   toggleHelp: Dispatchers<UserAction>['toggleHelp']
-  takeScreenshotDisabled: boolean
+  addImageDisabled: boolean
 }
 
-export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot, imageUpload, toggleHelp, takeScreenshotDisabled }: ActionBarProps) => {
+export const ActionBar = ({ clickPost, togglePickingEmoji, clickTakeScreenshot, imageUpload, toggleHelp, addImageDisabled }: ActionBarProps) => {
   return (
     <div className="action-bar">
       <div className="action-buttons">
-        <ActionButton kind="TakeScreenshot" onClick={clickTakeScreenshot} disabled={takeScreenshotDisabled} />
+        <ActionButton kind="TakeScreenshot" onClick={clickTakeScreenshot} disabled={addImageDisabled} />
         <ImagePicker
           onSelect={(file: any) => {
             imageUpload({ file })

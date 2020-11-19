@@ -18,6 +18,7 @@ type SystemInfo = {
 }
 
 type Screenshot = {
+  type: 'screenshot'
   tab: {
     id: number
     url: string
@@ -29,20 +30,24 @@ type Screenshot = {
   blob: Blob
 }
 
-type ScreenshotState = {
-  requestedByUser: boolean
-  screenshots: ReadonlyArray<Screenshot>
+type ImageUpload = {
+  type: 'imageupload'
+  name: string
+  uri: string
+  blob: Blob
 }
 
-type EditingScreenshotState = {
+type Image = Screenshot | ImageUpload
+
+type EditingImageState = {
   color: string
-  screenshot: Screenshot
+  image: Image
 }
 
 type FeedbackState = {
   isTweeting: boolean
-  editingScreenshot: null | EditingScreenshotState
-  screenshots: ReadonlyArray<Screenshot>
+  editingImage: null | EditingImageState
+  images: ReadonlyArray<Image>
   editorState: Draft.EditorState
   twitterHandle: {
     status: 'NEW' | 'IN_PROGRESS' | 'DONE'
@@ -99,8 +104,8 @@ type AuthenticatedState = {
   tweeting: null | { at: string }
   helpOn: boolean
   pickingEmoji: boolean
-  takeScreenshotDisabled: boolean
-  deleteScreenshotDisabled: boolean
+  addImageDisabled: boolean
+  deleteImageDisabled: boolean
   dispatchUserActions: Dispatchers<UserAction>
 }
 
@@ -132,18 +137,18 @@ type UserAction =
   | { type: 'toggleHelp' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
-  | { type: 'clickDeleteScreenshot'; payload: { screenshotIndex: number } }
-  | { type: 'startEditingScreenshot'; payload: { screenshotIndex: number } }
+  | { type: 'clickDeleteImage'; payload: { imageIndex: number } }
+  | { type: 'startEditingImage'; payload: { imageIndex: number } }
   | { type: 'imageUpload'; payload: { file: any } }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
-  | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
-  | { type: 'screenshotCaptureFailure'; payload: { error: any } }
   | { type: 'postTweetSuccess'; payload: { targetId: TweetTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: TweetTargetId; error: any } }
+  | { type: 'imageCaptureSuccess'; payload: { tabId: number; image: Image } }
+  | { type: 'imageCaptureFailure'; payload: { error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }

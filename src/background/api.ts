@@ -10,8 +10,8 @@ function tweetFormData(target: FeedbackTarget): FormData {
     tweetData.append('help', 'true')
   }
 
-  // Adding all the screenshot files under the same form key - 'screenshots'.
-  target.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
+  // Adding all the screenshot files under the same form key - 'images'.
+  target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
 
   return tweetData
 }
