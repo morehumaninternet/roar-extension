@@ -168,9 +168,10 @@ describe('happy path', () => {
 
   describe('once authenticated', () => {
     it('renders the app with an emoji picker container and the main element', () => {
-      expect(app().childNodes).to.have.length(2)
-      expect(app().childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
-      expect(app().childNodes[1]).to.have.property('tagName', 'MAIN')
+      const authenticatedView = app().querySelector('.authenticated')!
+      expect(authenticatedView.childNodes).to.have.length(2)
+      expect(authenticatedView.childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
+      expect(authenticatedView.childNodes[1]).to.have.property('tagName', 'MAIN')
     })
 
     it('renders the profile image', () => {
