@@ -33,14 +33,20 @@ describe('happy path', () => {
     })
 
     it('loads window.store, which starts with an empty state', () => {
-      expect(getState()).to.eql({
-        focusedWindowId: -1,
-        tabs: new Map(),
-        auth: { state: 'not_authed' },
-        pickingEmoji: false,
-        alert: null,
-        mostRecentAction: { type: 'INITIALIZING' },
-      })
+      const state = getState()
+      expect(state.focusedWindowId).to.equal(-1)
+      expect(state.tabs).to.be.an.instanceOf(Map)
+      expect(state.tabs).to.have.property('size', 0)
+      expect(state.auth).to.eql({ state: 'not_authed' })
+      expect(state.pickingEmoji).to.equal(false)
+      expect(state.helpClicked).to.equal(false)
+      expect(state.extensionFeedback).to.be.an('object')
+      expect(state.extensionFeedback.editingScreenshot).to.equal(null)
+      expect(state.extensionFeedback.screenshots).to.eql([])
+      expect(getPlainText(state.extensionFeedback.editorState)).to.equal('@roarmhi ')
+      expect(state.extensionFeedback.domainTwitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
+      expect(state.alert).to.equal(null)
+      expect(state.mostRecentAction).to.eql({ type: 'INITIALIZING' })
     })
 
     it('sets the focusedWindowId when chrome.windows.getAll calls back', () => {
@@ -237,6 +243,38 @@ describe('happy path', () => {
           editorState: appendEntity(tab.feedbackState.editorState, 'This is some feedback'),
         },
       })
+
+      const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(spans).to.have.length(2)
+      expect(spans[0]).to.have.property('innerHTML', '@zing')
+      expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
+    })
+
+    it('allows you to give feedback directly to Roar by clicking the help button', async () => {
+      const helpButton = app().querySelector('.Help')! as HTMLButtonElement
+      helpButton.click()
+
+      const initialSpans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(initialSpans).to.have.length(2)
+      expect(initialSpans[0]).to.have.property('innerHTML', '@roarmhi')
+      expect(initialSpans[1]).to.have.property('innerHTML', ' ')
+
+      mocks.backgroundWindow.store.dispatch({
+        type: 'updateEditorState',
+        payload: {
+          editorState: appendEntity(getState().extensionFeedback.editorState, 'different feedback'),
+        },
+      })
+
+      const nextSpans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+      expect(nextSpans).to.have.length(2)
+      expect(nextSpans[0]).to.have.property('innerHTML', '@roarmhi')
+      expect(nextSpans[1]).to.have.property('innerHTML', ' different feedback')
+    })
+
+    it('switches back to the tab-specific feedback when you click the help button again', () => {
+      const helpButton = app().querySelector('.Help')! as HTMLButtonElement
+      helpButton.click()
 
       const spans = app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
       expect(spans).to.have.length(2)

@@ -71,6 +71,8 @@ type AppState = {
   tabs: Map<number, TabInfo>
   auth: Auth
   pickingEmoji: boolean
+  helpClicked: boolean
+  extensionFeedback: FeedbackState
   alert: null | string | { __html: string }
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }

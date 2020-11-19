@@ -1,23 +1,8 @@
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
+import { newFeedbackState } from './feedback-state'
 import { ensureActiveTab } from '../selectors'
 import { appendEntity, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
-
-export const emptyFeedbackState = (): FeedbackState => ({
-  editingScreenshot: null,
-  screenshots: [],
-  editorState: EditorState.createEmpty(),
-  domainTwitterHandle: { status: 'NEW', handle: null },
-})
-
-export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
-  const empty = emptyFeedbackState()
-  if (!domain) return empty
-  return {
-    ...empty,
-    editorState: prependHandle(empty.editorState, `@${domain}`),
-  }
-}
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const domain = domainOf(tab.url)

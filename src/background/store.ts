@@ -1,4 +1,5 @@
 import { Store, createStore } from 'redux'
+import { emptyExtensionFeedbackState } from './feedback-state'
 import { responders } from './responders'
 
 export type AppStore = Store<AppState, Action> & {
@@ -6,16 +7,18 @@ export type AppStore = Store<AppState, Action> & {
   on<T extends Action['type']>(type: T, callback: (nextState: AppState & { mostRecentAction: Action & { type: T } }) => void): () => void
 }
 
-export const emptyState: AppState = {
+export const emptyState = (): AppState => ({
   focusedWindowId: -1,
   tabs: new Map(),
   auth: { state: 'not_authed' },
   pickingEmoji: false,
+  helpClicked: false,
+  extensionFeedback: emptyExtensionFeedbackState(),
   alert: null,
   mostRecentAction: { type: 'INITIALIZING' },
-}
+})
 
-function reducer(state: AppState = emptyState, action: Action): AppState {
+function reducer(state: AppState = emptyState(), action: Action): AppState {
   // Redux initially sends a @@redux/INIT action
   if (action.type.startsWith('@@redux/INIT')) return state
 

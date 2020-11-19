@@ -1,19 +1,20 @@
 import { expect } from 'chai'
 import { emptyState } from '../background/store'
-import { responders, newFeedbackState } from '../background/responders'
+import { responders } from '../background/responders'
+import { newFeedbackState } from '../background/feedback-state'
 import { getPlainText } from '../draft-js-utils'
 
 describe('responders', () => {
   describe('chrome.windows.getAll', () => {
     it('sets the focusedWindowId to be that of the focused window', () => {
-      const stateUpdates = responders['chrome.windows.getAll'](emptyState, {
+      const stateUpdates = responders['chrome.windows.getAll'](emptyState(), {
         windows: [{ id: 1, focused: false } as any, { id: 2, focused: true } as any],
       })
       expect(stateUpdates).to.eql({ focusedWindowId: 2 })
     })
 
     it('returns no updates if no window is focused', () => {
-      const stateUpdates = responders['chrome.windows.getAll'](emptyState, {
+      const stateUpdates = responders['chrome.windows.getAll'](emptyState(), {
         windows: [{ id: 1, focused: false } as any, { id: 2, focused: false } as any],
       })
       expect(stateUpdates).to.eql({})
@@ -21,7 +22,7 @@ describe('responders', () => {
   })
   describe('chrome.tabs.onUpdated', () => {
     it('makes a new empty feedback with the updated host, if the url changes', () => {
-      const appState: AppState = { ...emptyState }
+      const appState: AppState = emptyState()
 
       appState.tabs.set(17, {
         id: 17,
