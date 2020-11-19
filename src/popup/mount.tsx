@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom'
 import { AppStore } from '../background/store'
 import { App } from './app'
 
-function render(dispatchUserActions: Dispatchers<UserAction>, state: AppState, appContainer: HTMLElement) {
-  return ReactDOM.render(<App state={state} dispatchUserActions={dispatchUserActions} />, appContainer)
+function render(dispatchUserActions: Dispatchers<UserAction>, storeState: StoreState, appContainer: HTMLElement) {
+  return ReactDOM.render(<App storeState={storeState} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
 export function mount(chrome: typeof global.chrome, popupWindow: Window) {

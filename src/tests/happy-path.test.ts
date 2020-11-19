@@ -39,12 +39,12 @@ describe('happy path', () => {
       expect(state.tabs).to.have.property('size', 0)
       expect(state.auth).to.eql({ state: 'not_authed' })
       expect(state.pickingEmoji).to.equal(false)
-      expect(state.helpClicked).to.equal(false)
-      expect(state.extensionFeedback).to.be.an('object')
-      expect(state.extensionFeedback.editingScreenshot).to.equal(null)
-      expect(state.extensionFeedback.screenshots).to.eql([])
-      expect(getPlainText(state.extensionFeedback.editorState)).to.equal('@roarmhi ')
-      expect(state.extensionFeedback.domainTwitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
+      expect(state.help.on).to.equal(false)
+      expect(state.help.feedbackState).to.be.an('object')
+      expect(state.help.feedbackState.editingScreenshot).to.equal(null)
+      expect(state.help.feedbackState.screenshots).to.eql([])
+      expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
+      expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
       expect(state.alert).to.equal(null)
       expect(state.mostRecentAction).to.eql({ type: 'INITIALIZING' })
     })
@@ -80,9 +80,9 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('id', 14)
       expect(activeTab).to.have.property('windowId', 2)
       expect(activeTab).to.have.property('active', true)
-      expect(activeTab).to.have.property('isTweeting', false)
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
       expect(activeTab).to.have.property('domain', 'zing.com')
+      expect(activeTab.feedbackState).to.have.property('isTweeting', false)
       expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
 
       expect(state.tabs.get(17)).to.have.property('domain', undefined)
@@ -123,7 +123,7 @@ describe('happy path', () => {
       expect(screenshot.tab.height).to.equal(900)
       expect(screenshot.blob).to.be.an.instanceof(Blob)
 
-      expect(activeTab.feedbackState.domainTwitterHandle.handle).to.equal('@zing')
+      expect(activeTab.feedbackState.twitterHandle.handle).to.equal('@zing')
 
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
     })
@@ -142,10 +142,10 @@ describe('happy path', () => {
     })
 
     it('transitions to an "authenticating" state and adds an iframe when the sign in with twitter button is clicked', () => {
-      const signInButton = mocks.popupWindow.document.querySelector('#app-container > button')! as HTMLButtonElement
+      const signInButton = app().querySelector('button')! as HTMLButtonElement
       signInButton.click()
       expect(getState().auth).to.have.property('state', 'authenticating')
-      const iframe = mocks.popupWindow.document.querySelector('#app-container > iframe')! as HTMLIFrameElement
+      const iframe = app().querySelector('iframe')! as HTMLIFrameElement
       expect(iframe).to.have.property('src', 'https://test-roar-server.com/v1/auth/twitter')
     })
 
@@ -262,7 +262,7 @@ describe('happy path', () => {
       mocks.backgroundWindow.store.dispatch({
         type: 'updateEditorState',
         payload: {
-          editorState: appendEntity(getState().extensionFeedback.editorState, 'different feedback'),
+          editorState: appendEntity(getState().help.feedbackState.editorState, 'different feedback'),
         },
       })
 
@@ -309,11 +309,11 @@ describe('happy path', () => {
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const tweetInProgress = app().querySelector('.tweet-in-progress')!
-      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback for zing.com')
+      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback to @zing')
     })
 
     it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-      await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).isTweeting)
+      await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).feedbackState.isTweeting)
       expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
         url: 'https://t.co/sometweethash',
         active: true,

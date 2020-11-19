@@ -4,17 +4,19 @@ import { prependHandle } from '../draft-js-utils'
 const roarTwitterHandle = '@roarmhi'
 
 export const emptyFeedbackState = (): FeedbackState => ({
+  isTweeting: false,
   editingScreenshot: null,
   screenshots: [],
   editorState: EditorState.createEmpty(),
-  domainTwitterHandle: { status: 'NEW', handle: null },
+  twitterHandle: { status: 'NEW', handle: null },
 })
 
-export const emptyExtensionFeedbackState = (): FeedbackState => ({
+export const emptyHelpFeedbackState = (): FeedbackState => ({
+  isTweeting: false,
   editingScreenshot: null,
   screenshots: [],
   editorState: prependHandle(EditorState.createEmpty(), roarTwitterHandle),
-  domainTwitterHandle: { status: 'DONE', handle: roarTwitterHandle },
+  twitterHandle: { status: 'DONE', handle: roarTwitterHandle },
 })
 
 export const newFeedbackState = ({ domain }: { domain?: string; help?: boolean }): FeedbackState => {

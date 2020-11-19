@@ -1,13 +1,17 @@
-function tweetFormData(feedbackState: FeedbackState, domain: string): FormData {
+function tweetFormData(target: FeedbackTarget): FormData {
   const tweetData = new FormData()
 
-  const status = feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
+  const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
 
-  tweetData.append('domain', domain)
+  if (target.feedbackTargetType === 'tab') {
+    tweetData.append('domain', target.domain!)
+  } else {
+    tweetData.append('help', 'true')
+  }
 
   // Adding all the screenshot files under the same form key - 'screenshots'.
-  feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
+  target.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
 
   return tweetData
 }
@@ -20,26 +24,28 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
   })
 }
 
-export const postTweet = async (tab: TabInfo, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+export const postTweet = async (target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+  const targetId: TweetTargetId = target.feedbackTargetType === 'help' ? 'help' : target.id
+
   try {
-    const res = await makeTweetRequest(tweetFormData(tab.feedbackState, tab.domain!))
+    const res = await makeTweetRequest(tweetFormData(target))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure({
-        tabId: tab.id,
+        targetId,
         error: { message: await res.text() },
       })
     }
     const tweetResult = await res.json()
     if (!tweetResult.url) {
       return dispatchBackgroundActions.postTweetFailure({
-        tabId: tab.id,
+        targetId,
         error: { message: 'Response must include a url' },
       })
     }
     chrome.tabs.create({ url: tweetResult.url, active: true })
-    return dispatchBackgroundActions.postTweetSuccess({ tabId: tab.id })
+    return dispatchBackgroundActions.postTweetSuccess({ targetId })
   } catch (error) {
-    return dispatchBackgroundActions.postTweetFailure({ tabId: tab.id, error })
+    return dispatchBackgroundActions.postTweetFailure({ targetId, error })
   }
 }
 

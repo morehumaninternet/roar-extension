@@ -22,13 +22,13 @@ describe('responders', () => {
   })
   describe('chrome.tabs.onUpdated', () => {
     it('makes a new empty feedback with the updated host, if the url changes', () => {
-      const appState: AppState = emptyState()
+      const appState: StoreState = emptyState()
 
       appState.tabs.set(17, {
+        feedbackTargetType: 'tab',
         id: 17,
         windowId: 5,
         active: false,
-        isTweeting: false,
         url: 'https://original-url.com',
         domain: 'original-url.com',
         feedbackState: newFeedbackState({ domain: 'original-url.com' }),

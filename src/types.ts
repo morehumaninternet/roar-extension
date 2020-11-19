@@ -33,23 +33,20 @@ type ScreenshotState = {
   screenshots: ReadonlyArray<Screenshot>
 }
 
-type TwitterHandleStatus = 'NEW' | 'IN_PROGRESS' | 'DONE'
-
-type DomainTwitterHandle = {
-  status: TwitterHandleStatus
-  handle: string | null
-}
-
 type EditingScreenshotState = {
   color: string
   screenshot: Screenshot
 }
 
 type FeedbackState = {
+  isTweeting: boolean
   editingScreenshot: null | EditingScreenshotState
   screenshots: ReadonlyArray<Screenshot>
   editorState: Draft.EditorState
-  domainTwitterHandle: DomainTwitterHandle
+  twitterHandle: {
+    status: 'NEW' | 'IN_PROGRESS' | 'DONE'
+    handle: string | null
+  }
 }
 
 type User = { photoUrl?: string }
@@ -57,32 +54,64 @@ type User = { photoUrl?: string }
 type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
 type TabInfo = {
+  feedbackTargetType: 'tab'
   id: number
   windowId: number
   active: boolean
-  isTweeting: boolean
   url?: string
   domain?: string
   feedbackState: FeedbackState
 }
 
-type AppState = {
+type FeedbackTarget = TabInfo | StoreState['help']
+
+type StoreState = {
   focusedWindowId: number
   tabs: Map<number, TabInfo>
   auth: Auth
   pickingEmoji: boolean
-  helpClicked: boolean
-  extensionFeedback: FeedbackState
+  help: {
+    feedbackTargetType: 'help'
+    on: boolean
+    feedbackState: FeedbackState
+  }
   alert: null | string | { __html: string }
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
+
+type NotAuthedState = {
+  view: 'NotAuthed'
+  signInWithTwitter: Dispatchers<UserAction>['signInWithTwitter']
+}
+
+type AuthenticatingState = {
+  view: 'Authenticating'
+  authenticatedViaTwitter: Dispatchers<UserAction>['authenticatedViaTwitter']
+}
+
+type AuthenticatedState = {
+  view: 'Authenticated'
+  feedback: { exists: true; state: FeedbackState } | { exists: false; reasonDisabledMessage: null | string }
+  user: User
+  tweeting: null | { at: string }
+  helpOn: boolean
+  pickingEmoji: boolean
+  takeScreenshotDisabled: boolean
+  deleteScreenshotDisabled: boolean
+  dispatchUserActions: Dispatchers<UserAction>
+}
+
+type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
+
+// A tweet may target either a tab based on its numeric id or be because the user hit the help button
+type TweetTargetId = number | 'help'
 
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
 // object of responders, each of which only need return those parts of the state that we are updating
 type Responder<A extends Action, T extends A['type']> = A extends { type: T; payload: any }
-  ? (state: AppState, payload: A['payload']) => Partial<AppState>
-  : (state: AppState) => Partial<AppState>
+  ? (state: StoreState, payload: A['payload']) => Partial<StoreState>
+  : (state: StoreState) => Partial<StoreState>
 
 type Responders<A extends Action> = {
   [T in A['type']]: Responder<A, T>
@@ -97,6 +126,7 @@ type UserAction =
   | { type: 'updateEditorState'; payload: { editorState: any } }
   | { type: 'clickPost' }
   | { type: 'togglePickingEmoji' }
+  | { type: 'toggleHelp' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
   | { type: 'clickDeleteScreenshot'; payload: { screenshotIndex: number } }
@@ -108,8 +138,8 @@ type BackgroundAction =
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
   | { type: 'screenshotCaptureSuccess'; payload: { screenshot: Screenshot } }
   | { type: 'screenshotCaptureFailure'; payload: { error: any } }
-  | { type: 'postTweetSuccess'; payload: { tabId: number } }
-  | { type: 'postTweetFailure'; payload: { tabId: number; error: any } }
+  | { type: 'postTweetSuccess'; payload: { targetId: TweetTargetId } }
+  | { type: 'postTweetFailure'; payload: { targetId: TweetTargetId; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }

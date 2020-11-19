@@ -2,7 +2,7 @@ import { monitorTabs } from './monitorTabs'
 import { AppStore, create } from './store'
 import { takeScreenshot } from './screenshot'
 import { fetchTwitterHandle, postTweet } from './api'
-import { ensureActiveTab, takeScreenshotDisabled } from '../selectors'
+import { ensureActiveFeedbackTarget, ensureActiveTab } from '../selectors'
 
 declare global {
   interface Window {
@@ -17,28 +17,31 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   const store = (backgroundWindow.store = create())
 
   store.on('popupConnect', state => {
-    const tab = ensureActiveTab(state)
-    if (tab.isTweeting || !tab.domain) return
+    const target = ensureActiveFeedbackTarget(state)
+    if (target.feedbackState.isTweeting) return
 
-    // Take a screenshot if no screenshots currently present for the active tab
-    if (!tab.feedbackState.screenshots.length) {
-      takeScreenshot(tab, browser.tabs, store.dispatchers)
+    if (target.feedbackTargetType === 'tab') {
+      const tab = target
+      if (!tab.domain) return
+      // it the handle wasn't fetched before and the tab domain exists,
+      // start the fetch process
+      if (tab.feedbackState.twitterHandle.status === 'NEW') {
+        fetchTwitterHandle(tab.id, tab.domain, store.dispatchers)
+      }
     }
 
-    // it the handle wasn't fetched before and the tab URL is valid,
-    // start the fetch process
-    if (tab.feedbackState.domainTwitterHandle.status === 'NEW') {
-      fetchTwitterHandle(tab.id, tab.domain, store.dispatchers)
+    // Take a screenshot if no screenshots currently present for the current feedback target
+    if (!target.feedbackState.screenshots.length) {
+      takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })
 
   store.on('clickTakeScreenshot', state => {
-    if (takeScreenshotDisabled(state)) return
-    takeScreenshot(ensureActiveTab(state), browser.tabs, store.dispatchers)
+    takeScreenshot(ensureActiveFeedbackTarget(state), browser.tabs, store.dispatchers)
   })
 
   store.on('clickPost', state => {
-    postTweet(ensureActiveTab(state), chrome, store.dispatchers)
+    postTweet(ensureActiveFeedbackTarget(state), chrome, store.dispatchers)
   })
 
   monitorTabs(store.dispatchers, chrome)
