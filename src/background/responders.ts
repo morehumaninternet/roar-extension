@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpFeedbackState } from './feedback-state'
@@ -18,13 +19,15 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   }
 }
 
+function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
+  return { tabs: state.tabs.set(tab.id, tab) }
+}
+
 function updateTabIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<TabInfo>): Partial<StoreState> {
   const tab = state.tabs.get(tabId)
   if (!tab) return {}
   const tabUpdates = callback(tab)
-  const nextTabs = new Map(state.tabs)
-  nextTabs.set(tab.id, { ...tab, ...tabUpdates })
-  return { tabs: nextTabs }
+  return setTab(state, { ...tab, ...tabUpdates })
 }
 
 function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: FeedbackTarget) => Partial<FeedbackState>): Partial<StoreState> {
@@ -42,10 +45,7 @@ function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: Feed
     return { help: nextFeedbackTarget }
   }
 
-  const tab = nextFeedbackTarget
-  const nextTabs = new Map(state.tabs)
-  nextTabs.set(tab.id, nextFeedbackTarget)
-  return { tabs: nextTabs }
+  return setTab(state, nextFeedbackTarget)
 }
 
 export const responders: Responders<Action> = {
@@ -219,15 +219,12 @@ export const responders: Responders<Action> = {
     return { focusedWindowId: focusedWindow.id }
   },
   'chrome.tabs.query'(state, payload): Partial<StoreState> {
-    const tabs: StoreState['tabs'] = new Map()
-    payload.tabs.forEach(tab => tabs.set(tab.id!, newTabInfo(tab)))
-    return { tabs }
+    return {
+      tabs: payload.tabs.reduce((tabsMap, tab) => tabsMap.set(tab.id!, newTabInfo(tab)), Map()),
+    }
   },
   'chrome.tabs.onCreated'(state, payload): Partial<StoreState> {
-    const { tab } = payload
-    const tabs = new Map(state.tabs)
-    tabs.set(tab.id!, newTabInfo(tab))
-    return { tabs }
+    return setTab(state, newTabInfo(payload.tab))
   },
   'chrome.tabs.onRemoved'(state, { tabId }): Partial<StoreState> {
     const tabs = new Map(state.tabs)
