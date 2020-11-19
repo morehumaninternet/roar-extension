@@ -50,40 +50,32 @@ export async function takeScreenshot(
         uri: screenshotUri,
         blob: screenshotBlob,
       },
-      tabId: tab.id,
+      targetId: tab.id,
     })
   } catch (error) {
-    dispatchBackgroundActions.imageCaptureFailure(error)
+    dispatchBackgroundActions.imageCaptureFailure({ targetId: tab.id, error })
   }
 }
 
-function readFileAsync(file: any): Promise<string> {
+function readFileUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
-    let reader = new FileReader()
-    reader.onload = () => {
-      resolve(String(reader.result))
-    }
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
     reader.onerror = reject
     reader.readAsDataURL(file)
   })
 }
 
-export async function imageUpload(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+export async function imageUpload(targetId: FeedbackTargetId, file: File, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
   try {
-    const file = tab.uploadImageFile
-    const uri = await readFileAsync(file)
-    const screenshotBlob = dataURItoBlob(uri)
-    const { host } = new URL(tab.url!)
+    const uri = await readFileUri(file)
+    const blob = dataURItoBlob(uri)
+
     dispatchBackgroundActions.imageCaptureSuccess({
-      image: {
-        type: 'imageupload',
-        name: `${host} - ${new Date().toISOString()}.png`,
-        uri: uri,
-        blob: screenshotBlob,
-      },
-      tabId: tab.id,
+      targetId,
+      image: { type: 'imageupload', name: file.name, uri, blob },
     })
   } catch (error) {
-    dispatchBackgroundActions.imageCaptureFailure(error)
+    dispatchBackgroundActions.imageCaptureFailure({ targetId, error })
   }
 }

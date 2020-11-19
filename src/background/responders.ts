@@ -16,7 +16,6 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     url: tab.url,
     domain,
     feedbackState: newFeedbackState({ domain }),
-    uploadImageFile: {},
   }
 }
 
@@ -103,12 +102,15 @@ export const responders: Responders<Action> = {
       }),
     }
   },
-  imageCaptureSuccess(state, { tabId, image }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => ({
+  imageCaptureSuccess(state, { targetId, image }): Partial<StoreState> {
+    if (targetId === 'help') {
+      throw new Error('TODO: support uploading images to help')
+    }
+    return updateTabFeedbackIfExists(state, targetId, tab => ({
       images: tab.feedbackState.images.concat([image]),
     }))
   },
-  imageCaptureFailure(state, { error }): Partial<StoreState> {
+  imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
     return { alert: typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE' }
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {

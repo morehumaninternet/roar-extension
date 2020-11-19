@@ -67,11 +67,12 @@ type TabInfo = {
   url?: string
   domain?: string
   host?: string
-  uploadImageFile: any
   feedbackState: FeedbackState
 }
 
 type FeedbackTarget = TabInfo | StoreState['help']
+
+type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
   focusedWindowId: number
@@ -80,6 +81,7 @@ type StoreState = {
   pickingEmoji: boolean
   help: {
     feedbackTargetType: 'help'
+    id: 'help'
     on: boolean
     feedbackState: FeedbackState
   }
@@ -111,9 +113,6 @@ type AuthenticatedState = {
 
 type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
 
-// A tweet may target either a tab based on its numeric id or be because the user hit the help button
-type TweetTargetId = number | 'help'
-
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
 // object of responders, each of which only need return those parts of the state that we are updating
@@ -139,16 +138,16 @@ type UserAction =
   | { type: 'clickTakeScreenshot' }
   | { type: 'clickDeleteImage'; payload: { imageIndex: number } }
   | { type: 'startEditingImage'; payload: { imageIndex: number } }
-  | { type: 'imageUpload'; payload: { file: any } }
+  | { type: 'imageUpload'; payload: { file: File } }
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
-  | { type: 'postTweetSuccess'; payload: { targetId: TweetTargetId } }
-  | { type: 'postTweetFailure'; payload: { targetId: TweetTargetId; error: any } }
-  | { type: 'imageCaptureSuccess'; payload: { tabId: number; image: Image } }
-  | { type: 'imageCaptureFailure'; payload: { error: any } }
+  | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
+  | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; error: any } }
+  | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
+  | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }

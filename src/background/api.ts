@@ -25,7 +25,7 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
 }
 
 export const postTweet = async (target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
-  const targetId: TweetTargetId = target.feedbackTargetType === 'help' ? 'help' : target.id
+  const targetId: FeedbackTargetId = target.feedbackTargetType === 'help' ? 'help' : target.id
 
   try {
     const res = await makeTweetRequest(tweetFormData(target))

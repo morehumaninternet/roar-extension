@@ -1,8 +1,8 @@
 import { monitorTabs } from './monitorTabs'
 import { AppStore, create } from './store'
-import { takeScreenshot, imageUpload } from './screenshot'
+import { takeScreenshot, imageUpload } from './images'
 import { fetchTwitterHandle, postTweet } from './api'
-import { ensureActiveFeedbackTarget, ensureActiveTab } from '../selectors'
+import { ensureActiveFeedbackTarget, ensureActiveTab, addImageDisabled } from '../selectors'
 
 declare global {
   interface Window {
@@ -37,15 +37,20 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   })
 
   store.on('clickTakeScreenshot', state => {
-    takeScreenshot(ensureActiveFeedbackTarget(state), browser.tabs, store.dispatchers)
-  })
-
-  store.on('clickPost', state => {
-    postTweet(ensureActiveFeedbackTarget(state), chrome, store.dispatchers)
+    const target = ensureActiveFeedbackTarget(state)
+    if (addImageDisabled(target)) return
+    takeScreenshot(target, browser.tabs, store.dispatchers)
   })
 
   store.on('imageUpload', state => {
-    imageUpload(ensureActiveTab(state), browser.tabs, store.dispatchers)
+    const target = ensureActiveFeedbackTarget(state)
+    if (addImageDisabled(target)) return
+    const { file } = state.mostRecentAction.payload
+    imageUpload(target.id, file, store.dispatchers)
+  })
+
+  store.on('clickPost', state => {
+    postTweet(ensureActiveTab(state), chrome, store.dispatchers)
   })
 
   monitorTabs(store.dispatchers, chrome)

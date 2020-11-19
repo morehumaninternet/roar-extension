@@ -1,6 +1,6 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
-@use './components/screenshots.scss';
+@use './components/images.scss';
 
 $human-blue: #164176;
 $human-pink: #fa759e;
@@ -83,6 +83,10 @@ main {
     svg {
       height: 36px;
     }
+  }
+
+  > input[type="file"] {
+    display: none;
   }
 
   > .post-btn {
