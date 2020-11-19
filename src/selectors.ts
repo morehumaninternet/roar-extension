@@ -23,12 +23,12 @@ export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
 
 export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
-  return feedbackTarget.feedbackState.screenshots.length >= 9
+  return feedbackTarget.feedbackState.images.length >= 9
 }
 
 export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
-  return feedbackTarget.feedbackState.screenshots.length <= 1
+  return feedbackTarget.feedbackState.images.length <= 1
 }
 
 function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {

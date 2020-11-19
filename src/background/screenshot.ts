@@ -37,7 +37,7 @@ export async function takeScreenshot(
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const domain = domainOf(tab.url)
-    dispatchBackgroundActions.screenshotCaptureSuccess({
+    dispatchBackgroundActions.imageCaptureSuccess({
       image: {
         type: 'screenshot',
         tab: {
