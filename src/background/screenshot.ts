@@ -87,3 +87,77 @@ export async function imageUpload(tab: TabInfo, tabs: typeof browser.tabs, dispa
     dispatchBackgroundActions.imageCaptureFailure(error)
   }
 }
+
+function readFileAsync(file: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let reader = new FileReader()
+    reader.onload = () => {
+      resolve(String(reader.result))
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+export async function imageUpload(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+  try {
+    const gettingTab = tabs.get(tab.id)
+    const moreTabInfo = await gettingTab
+    const file = tab.uploadImageFile
+    const uri = await readFileAsync(file)
+    const screenshotBlob = dataURItoBlob(uri)
+    const { host } = new URL(tab.url!)
+    dispatchBackgroundActions.screenshotCaptureSuccess({
+      screenshot: {
+        tab: {
+          id: tab.id,
+          url: tab.url!,
+          width: moreTabInfo.width!,
+          height: moreTabInfo.height!,
+        },
+        name: `${host} - ${new Date().toISOString()}.png`,
+        uri: uri,
+        blob: screenshotBlob,
+      },
+    })
+  } catch (error) {
+    dispatchBackgroundActions.screenshotCaptureFailure(error)
+  }
+}
+/*
+export async function imageUpload(tab: TabInfo, tabs: typeof browser.tabs, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+  try {
+    const gettingTab = tabs.get(tab.id)
+    const moreTabInfo = await gettingTab
+
+    const file = tab.uploadImageFile
+    const reader = new FileReader()
+    reader.addEventListener(
+      'load',
+      function () {
+        // convert image file to base64 string
+        const uri = String(reader.result)
+        const screenshotBlob = dataURItoBlob(uri)
+        const { host } = new URL(tab.url!)
+        dispatchBackgroundActions.screenshotCaptureSuccess({
+          screenshot: {
+            tab: {
+              id: tab.id,
+              url: tab.url!,
+              width: moreTabInfo.width!,
+              height: moreTabInfo.height!,
+            },
+            name: `${host} - ${new Date().toISOString()}.png`,
+            uri: uri,
+            blob: screenshotBlob,
+          },
+        })
+      },
+      false
+    )
+    reader.readAsDataURL(file)
+  } catch (error) {
+    dispatchBackgroundActions.screenshotCaptureFailure(error)
+  }
+}
+*/
