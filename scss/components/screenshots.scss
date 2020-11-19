@@ -2,12 +2,12 @@
   height: 250px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-row-gap: 2px;
+  grid-column-gap: 4px;
   margin: 15px 0;
 
   .screenshot-thumbnail {
-    height: 250px;
     position: relative;
-    margin: 2px;
 
     > .screenshot-image {
       height: 100%;
