@@ -38,13 +38,11 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   store.on('clickTakeScreenshot', state => {
     const target = ensureActiveFeedbackTarget(state)
-    if (addImageDisabled(target)) return
     takeScreenshot(target, browser.tabs, store.dispatchers)
   })
 
   store.on('imageUpload', state => {
     const target = ensureActiveFeedbackTarget(state)
-    if (addImageDisabled(target)) return
     const { file } = state.mostRecentAction.payload
     imageUpload(target.id, file, store.dispatchers)
   })

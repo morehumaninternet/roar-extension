@@ -157,7 +157,7 @@ export const responders: Responders<Action> = {
       },
     }))
   },
-  imageUpload(state, { file }): Partial<StoreState> {
+  imageUpload(state): Partial<StoreState> {
     return {}
   },
   'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
