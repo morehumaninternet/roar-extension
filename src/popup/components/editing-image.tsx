@@ -16,11 +16,11 @@ class ColoredRect extends React.Component {
   }
 }
 
-export function EditingScreenshot({ color, screenshot }: EditingScreenshotState): JSX.Element {
+export function EditingImage({ color, image }: EditingImageState): JSX.Element | null {
   const img = document.createElement('img')
-  img.src = screenshot.uri
-
-  screenshot.tab.height
+  img.src = image.uri
+  return null
+  /*  image.tab.height
 
   return (
     <Stage width={window.innerWidth} height={window.innerHeight}>
@@ -30,5 +30,5 @@ export function EditingScreenshot({ color, screenshot }: EditingScreenshotState)
         <ColoredRect />
       </Layer>
     </Stage>
-  )
+  ) */
 }

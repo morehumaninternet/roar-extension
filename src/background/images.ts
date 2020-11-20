@@ -37,8 +37,9 @@ export async function takeScreenshot(
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const domain = domainOf(tab.url)
-    dispatchBackgroundActions.screenshotCaptureSuccess({
-      screenshot: {
+    dispatchBackgroundActions.imageCaptureSuccess({
+      image: {
+        type: 'screenshot',
         tab: {
           id: tab.id,
           url: tab.url!,
@@ -49,8 +50,32 @@ export async function takeScreenshot(
         uri: screenshotUri,
         blob: screenshotBlob,
       },
+      targetId: tab.id,
     })
   } catch (error) {
-    dispatchBackgroundActions.screenshotCaptureFailure({ error })
+    dispatchBackgroundActions.imageCaptureFailure({ targetId: tab.id, error })
+  }
+}
+
+function readFileUri(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+export async function imageUpload(targetId: FeedbackTargetId, file: File, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+  try {
+    const uri = await readFileUri(file)
+    const blob = dataURItoBlob(uri)
+
+    dispatchBackgroundActions.imageCaptureSuccess({
+      targetId,
+      image: { type: 'imageupload', name: file.name, uri, blob },
+    })
+  } catch (error) {
+    dispatchBackgroundActions.imageCaptureFailure({ targetId, error })
   }
 }

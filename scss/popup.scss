@@ -1,6 +1,6 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
-@use './components/screenshots.scss';
+@use './components/images.scss';
 
 $human-blue: #164176;
 $human-pink: #fa759e;
@@ -85,6 +85,10 @@ main {
     }
   }
 
+  > input[type="file"] {
+    display: none;
+  }
+
   > .post-btn {
     flex-grow: 0;
     height: 36px;
@@ -123,10 +127,6 @@ main {
     width: 0;
     overflow: hidden;
   }
-}
-
-.emoji-mart-scroll {
-  // height: calc(100% - 84px);
 }
 
 .emoji-mart-preview {

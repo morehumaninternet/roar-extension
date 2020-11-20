@@ -20,10 +20,10 @@ describe('responders', () => {
     })
   })
   describe('chrome.tabs.onUpdated', () => {
-    it('makes a new empty feedback with the updated host, if the url changes', () => {
-      const appState: StoreState = emptyStoreState()
+    it('makes a new empty feedback with the updated domain, if the url changes', () => {
+      const storeState: StoreState = emptyStoreState()
 
-      appState.tabs = appState.tabs.set(17, {
+      storeState.tabs = storeState.tabs.set(17, {
         feedbackTargetType: 'tab',
         id: 17,
         windowId: 5,
@@ -33,7 +33,7 @@ describe('responders', () => {
         feedbackState: newFeedbackState({ domain: 'original-url.com' }),
       })
 
-      const stateUpdates = responders['chrome.tabs.onUpdated'](appState, {
+      const stateUpdates = responders['chrome.tabs.onUpdated'](storeState, {
         tabId: 17,
         changeInfo: { url: 'https://updated.com/abc' },
       })

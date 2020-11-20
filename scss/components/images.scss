@@ -1,4 +1,4 @@
-.screenshots {
+.images {
   height: 250px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -6,10 +6,10 @@
   grid-column-gap: 4px;
   margin: 15px 0;
 
-  .screenshot-thumbnail {
+  .image-thumbnail {
     position: relative;
 
-    > .screenshot-image {
+    > .image-image {
       height: 100%;
       width: 100%;
       object-fit: cover;
@@ -43,8 +43,8 @@
     }
 
     // On image hovering, display the edit button
-    .screenshot-image:hover ~ .edit-button,
-    .screenshot-image:hover ~ .close-button,
+    .image-image:hover ~ .edit-button,
+    .image-image:hover ~ .close-button,
     .edit-button:hover,
     .close-button:hover {
       display: inline-block;

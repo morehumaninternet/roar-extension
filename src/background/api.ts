@@ -10,8 +10,8 @@ function tweetFormData(target: FeedbackTarget): FormData {
     tweetData.append('help', 'true')
   }
 
-  // Adding all the screenshot files under the same form key - 'screenshots'.
-  target.feedbackState.screenshots.forEach(screenshot => tweetData.append('screenshots', screenshot.blob, screenshot.name))
+  // Adding all the screenshot files under the same form key - 'images'.
+  target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
 
   return tweetData
 }
@@ -25,7 +25,7 @@ function makeTweetRequest(formData: FormData): Promise<Response> {
 }
 
 export const postTweet = async (target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
-  const targetId: TweetTargetId = target.feedbackTargetType === 'help' ? 'help' : target.id
+  const targetId: FeedbackTargetId = target.id
 
   try {
     const res = await makeTweetRequest(tweetFormData(target))

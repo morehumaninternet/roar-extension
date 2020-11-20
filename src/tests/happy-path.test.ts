@@ -42,8 +42,8 @@ describe('happy path', () => {
       expect(state.pickingEmoji).to.equal(false)
       expect(state.help.on).to.equal(false)
       expect(state.help.feedbackState).to.be.an('object')
-      expect(state.help.feedbackState.editingScreenshot).to.equal(null)
-      expect(state.help.feedbackState.screenshots).to.eql([])
+      expect(state.help.feedbackState.editingImage).to.equal(null)
+      expect(state.help.feedbackState.images).to.eql([])
       expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
       expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
       expect(state.alert).to.equal(null)
@@ -84,7 +84,7 @@ describe('happy path', () => {
       expect(activeTab).to.have.property('url', 'https://zing.com/abc')
       expect(activeTab).to.have.property('domain', 'zing.com')
       expect(activeTab.feedbackState).to.have.property('isTweeting', false)
-      expect(activeTab.feedbackState).to.have.property('screenshots').that.eql([])
+      expect(activeTab.feedbackState).to.have.property('images').that.eql([])
 
       expect(state.tabs.get(17)).to.have.property('domain', undefined)
     })
@@ -115,14 +115,15 @@ describe('happy path', () => {
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
       const state = getState()
       const activeTab = ensureActiveTab(state)
-      expect(activeTab.feedbackState.screenshots).to.have.length(1)
+      expect(activeTab.feedbackState.images).to.have.length(1)
 
-      const [screenshot] = activeTab.feedbackState.screenshots
-      expect(screenshot.tab.id).to.equal(activeTab.id)
-      expect(screenshot.tab.url).to.equal(activeTab.url)
-      expect(screenshot.tab.width).to.equal(1200)
-      expect(screenshot.tab.height).to.equal(900)
-      expect(screenshot.blob).to.be.an.instanceof(Blob)
+      const [image] = activeTab.feedbackState.images
+      if (image.type === 'imageupload') throw new Error('Expected screenshot')
+      expect(image.tab.id).to.equal(activeTab.id)
+      expect(image.tab.url).to.equal(activeTab.url)
+      expect(image.tab.width).to.equal(1200)
+      expect(image.tab.height).to.equal(900)
+      expect(image.blob).to.be.an.instanceof(Blob)
 
       expect(activeTab.feedbackState.twitterHandle.handle).to.equal('@zing')
 
@@ -180,45 +181,45 @@ describe('happy path', () => {
     })
 
     it('renders the screenshot', () => {
-      const screenshotThumbnail = app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail')
+      const imageThumbnail = app().querySelector('.twitter-interface > .images > .image-thumbnail')
 
-      const screenshotImage = screenshotThumbnail?.querySelector('.screenshot-image')
-      const screenshotUri = activeTab(getState())?.feedbackState.screenshots[0].uri
-      expect(screenshotImage).to.have.property('src', screenshotUri)
+      const imageImage = imageThumbnail?.querySelector('.image-image')
+      const imageUri = activeTab(getState())?.feedbackState.images[0].uri
+      expect(imageImage).to.have.property('src', imageUri)
 
-      // User can't remove screenshots if there's only one
-      const closeButton = screenshotThumbnail?.querySelector('.close-button')
+      // User can't remove images if there's only one
+      const closeButton = imageThumbnail?.querySelector('.close-button')
       expect(closeButton).to.equal(null)
     })
 
     it('takes a screenshot when the TakeScreenshot button is clicked', async () => {
       const tab = activeTab(getState())!
-      expect(tab.feedbackState.screenshots).to.have.lengthOf(1)
+      expect(tab.feedbackState.images).to.have.lengthOf(1)
       const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
       takeScreenshotButton.click()
-      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 2)
-      const screenshotImages = app().querySelectorAll('.screenshot-image')
-      expect(screenshotImages).to.have.lengthOf(2)
+      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 2)
+      const images = app().querySelectorAll('.image-image')
+      expect(images).to.have.lengthOf(2)
     })
 
     it('delete a screenshot when the close-button is clicked', async () => {
-      const screenshots = app().querySelectorAll('.twitter-interface > .screenshots')!
-      const secondScreenshotCloseButton = screenshots[0].querySelector('.screenshot-thumbnail > .close-button') as HTMLButtonElement
+      const images = app().querySelectorAll('.twitter-interface > .images')!
+      const secondScreenshotCloseButton = images[0].querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
 
-      // If there are two screenshots, the close button should exist
+      // If there are two images, the close button should exist
       secondScreenshotCloseButton.click()
-      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === 1)
+      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 1)
     })
 
-    it('disable the take screenshot button when there are 9 screenshots', async () => {
-      let screenshotsLength: number = 1
-      while (screenshotsLength < 9) {
+    it('disable the take screenshot button when there are 9 images', async () => {
+      let imagesLength: number = 1
+      while (imagesLength < 9) {
         const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
         takeScreenshotButton.click()
-        await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.screenshots.length === screenshotsLength + 1)
-        const screenshotImages = app().querySelectorAll('.screenshot-image')
-        expect(screenshotImages).to.have.lengthOf(screenshotsLength + 1)
-        screenshotsLength++
+        await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === imagesLength + 1)
+        const images = app().querySelectorAll('.image-image')
+        expect(images).to.have.lengthOf(imagesLength + 1)
+        imagesLength++
       }
 
       expect(app().querySelector('.TakeScreenshot')).to.have.property('disabled', true)
@@ -306,7 +307,7 @@ describe('happy path', () => {
       const body: FormData = opts!.body! as any
       expect(body.get('status')).to.equal('@zing This is some feedback')
       expect(body.get('domain')).to.equal('zing.com')
-      const screenshot: any = body.get('screenshots') as any
+      const screenshot: any = body.get('images') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
