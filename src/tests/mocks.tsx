@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import { last } from 'lodash'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
@@ -17,6 +18,7 @@ export type Mocks = {
   popupWindow: DOMWindow
   browser: MockBrowser
   chrome: typeof chrome
+  resolveLatestCaptureVisibleTab(): void
   teardown(): void
 }
 
@@ -31,10 +33,18 @@ export function createMocks(): Mocks {
   const popupWindow = new JSDOM(popupHTML).window
   popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
+  const captureVisibleTabResolvers: any[] = []
+  const resolveLatestCaptureVisibleTab = () => {
+    const resolver = last(captureVisibleTabResolvers)
+    resolver(screenshotUri)
+  }
+
   const browser: MockBrowser = {
     tabs: {
-      captureVisibleTab: sinon.stub().withArgs({ format: 'png' }).resolves(screenshotUri),
       get: sinon.stub().throws(),
+      captureVisibleTab() {
+        return new Promise(resolve => captureVisibleTabResolvers.push(resolve))
+      },
     },
   } as any
 
@@ -60,5 +70,5 @@ export function createMocks(): Mocks {
     chrome.reset()
   }
 
-  return { backgroundWindow, popupWindow, browser, chrome, teardown }
+  return { backgroundWindow, popupWindow, browser, chrome, resolveLatestCaptureVisibleTab, teardown }
 }

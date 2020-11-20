@@ -23,7 +23,8 @@ export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
 
 export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
-  return feedbackTarget.feedbackState.images.length >= 9
+  const { addingImages, images } = feedbackTarget.feedbackState
+  return addingImages + images.length >= 9
 }
 
 export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {

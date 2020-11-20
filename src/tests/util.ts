@@ -37,7 +37,7 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
       unsubscribed = true
     }
 
-    reject('timeout')
+    reject(new Error('timeout'))
   }, timeoutMillis)
 
   callback()

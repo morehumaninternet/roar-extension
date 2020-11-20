@@ -2,7 +2,7 @@ import { monitorTabs } from './monitorTabs'
 import { AppStore, create } from './store'
 import { takeScreenshot, imageUpload } from './images'
 import { fetchTwitterHandle, postTweet } from './api'
-import { ensureActiveFeedbackTarget, ensureActiveTab, addImageDisabled } from '../selectors'
+import { ensureActiveFeedbackTarget, ensureActiveTab } from '../selectors'
 
 declare global {
   interface Window {

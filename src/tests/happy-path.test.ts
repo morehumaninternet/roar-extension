@@ -42,6 +42,7 @@ describe('happy path', () => {
       expect(state.pickingEmoji).to.equal(false)
       expect(state.help.on).to.equal(false)
       expect(state.help.feedbackState).to.be.an('object')
+      expect(state.help.feedbackState.addingImages).to.equal(0)
       expect(state.help.feedbackState.editingImage).to.equal(null)
       expect(state.help.feedbackState.images).to.eql([])
       expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
@@ -112,22 +113,12 @@ describe('happy path', () => {
       expect(signInWithTwitter).to.have.property('innerHTML', 'Sign in with twitter')
     })
 
-    it('dispatches popupConnect, resulting in the twitter handle being fetched & a screenshot of the active tab getting added to the state', () => {
-      const state = getState()
-      const activeTab = ensureActiveTab(state)
-      expect(activeTab.feedbackState.images).to.have.length(1)
-
-      const [image] = activeTab.feedbackState.images
-      if (image.type === 'imageupload') throw new Error('Expected screenshot')
-      expect(image.tab.id).to.equal(activeTab.id)
-      expect(image.tab.url).to.equal(activeTab.url)
-      expect(image.tab.width).to.equal(1200)
-      expect(image.tab.height).to.equal(900)
-      expect(image.blob).to.be.an.instanceof(Blob)
+    it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
+      const activeTab = ensureActiveTab(getState())
 
       expect(activeTab.feedbackState.twitterHandle.handle).to.equal('@zing')
-
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
+      expect(activeTab.feedbackState.addingImages).to.equal(1)
     })
   })
 
@@ -180,12 +171,32 @@ describe('happy path', () => {
       expect(profileImage).to.have.property('src', 'https://some-image-url.com/123')
     })
 
-    it('renders the screenshot', () => {
+    it('renders an image spinner until the screenshot is added', () => {
+      const activeTab = ensureActiveTab(getState())
+      expect(activeTab.feedbackState.addingImages).to.equal(1)
+      expect(activeTab.feedbackState.images).to.have.length(0)
+      expect(app().querySelectorAll('.image-spinner')).to.have.length(1)
+    })
+
+    it('renders the screenshot and removes the spinner once it is added', async () => {
+      mocks.resolveLatestCaptureVisibleTab()
+      const state = await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.addingImages === 0)
+      const activeTab = ensureActiveTab(state)
+      expect(activeTab.feedbackState.addingImages).to.equal(0)
+      expect(activeTab.feedbackState.images).to.have.length(1)
+      const [image] = activeTab.feedbackState.images
+      if (image.type === 'imageupload') throw new Error('Expected screenshot')
+      expect(image.tab.id).to.equal(activeTab.id)
+      expect(image.tab.url).to.equal(activeTab.url)
+      expect(image.tab.width).to.equal(1200)
+      expect(image.tab.height).to.equal(900)
+      expect(image.blob).to.be.an.instanceof(Blob)
+
+      expect(app().querySelectorAll('.image-spinner')).to.have.length(0)
       const imageThumbnail = app().querySelector('.twitter-interface > .images > .image-thumbnail')
 
       const imageImage = imageThumbnail?.querySelector('.image-image')
-      const imageUri = activeTab(getState())?.feedbackState.images[0].uri
-      expect(imageImage).to.have.property('src', imageUri)
+      expect(imageImage).to.have.property('src', image.uri)
 
       // User can't remove images if there's only one
       const closeButton = imageThumbnail?.querySelector('.close-button')
@@ -197,6 +208,7 @@ describe('happy path', () => {
       expect(tab.feedbackState.images).to.have.lengthOf(1)
       const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
       takeScreenshotButton.click()
+      mocks.resolveLatestCaptureVisibleTab()
       await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 2)
       const images = app().querySelectorAll('.image-image')
       expect(images).to.have.lengthOf(2)
@@ -216,7 +228,10 @@ describe('happy path', () => {
       while (imagesLength < 9) {
         const takeScreenshotButton = app().querySelector('.TakeScreenshot')! as HTMLButtonElement
         takeScreenshotButton.click()
+        expect(app().querySelectorAll('.image-spinner')).to.have.length(1)
+        mocks.resolveLatestCaptureVisibleTab()
         await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === imagesLength + 1)
+        expect(app().querySelectorAll('.image-spinner')).to.have.length(0)
         const images = app().querySelectorAll('.image-image')
         expect(images).to.have.lengthOf(imagesLength + 1)
         imagesLength++

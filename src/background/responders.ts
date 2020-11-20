@@ -19,6 +19,10 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   }
 }
 
+function targetById(state: StoreState, targetId: FeedbackTargetId): Maybe<FeedbackTarget> {
+  return targetId === 'help' ? state.help : state.tabs.get(targetId)
+}
+
 function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
   return { tabs: state.tabs.set(tab.id, tab) }
 }
@@ -27,6 +31,16 @@ function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdat
   const nextFeedbackState = { ...target.feedbackState, ...feedbackUpdates }
   const nextTarget: FeedbackTarget = { ...target, feedbackState: nextFeedbackState }
   return nextTarget.feedbackTargetType === 'help' ? { help: nextTarget } : setTab(state, nextTarget)
+}
+
+function updateFeedbackByTargetId(
+  state: StoreState,
+  targetId: FeedbackTargetId,
+  callback: (target: FeedbackTarget) => Partial<FeedbackState>
+): Partial<StoreState> {
+  const target = targetById(state, targetId)
+  if (!target) return {}
+  return updateFeedback(state, target, callback(target))
 }
 
 function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
@@ -73,7 +87,7 @@ export const responders: Responders<Action> = {
   updateEditorState(state, { editorState }): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ editorState }))
   },
-  clickTakeScreenshot(): Partial<StoreState> {
+  clickTakeScreenshot(state): Partial<StoreState> {
     return {}
   },
   clickPost(state): Partial<StoreState> {
@@ -102,16 +116,25 @@ export const responders: Responders<Action> = {
       }),
     }
   },
+  imageCaptureStart(state, { targetId }): Partial<StoreState> {
+    return updateFeedbackByTargetId(state, targetId, target => ({
+      addingImages: target.feedbackState.addingImages + 1,
+    }))
+  },
   imageCaptureSuccess(state, { targetId, image }): Partial<StoreState> {
-    if (targetId === 'help') {
-      throw new Error('TODO: support uploading images to help')
-    }
-    return updateTabFeedbackIfExists(state, targetId, tab => ({
-      images: tab.feedbackState.images.concat([image]),
+    return updateFeedbackByTargetId(state, targetId, target => ({
+      addingImages: target.feedbackState.addingImages - 1,
+      images: target.feedbackState.images.concat([image]),
     }))
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
-    return { alert: typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE' }
+    const alert = typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE'
+    return {
+      alert,
+      ...updateFeedbackByTargetId(state, targetId, target => ({
+        addingImages: target.feedbackState.addingImages - 1,
+      })),
+    }
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
     if (targetId === 'help') {
@@ -129,7 +152,7 @@ export const responders: Responders<Action> = {
     })
   },
   postTweetFailure(state, { targetId, error }): Partial<StoreState> {
-    const target = targetId === 'help' ? state.help : state.tabs.get(targetId)
+    const target = targetById(state, targetId)
     if (!target) return {}
 
     return {

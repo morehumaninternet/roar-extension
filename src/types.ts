@@ -47,6 +47,7 @@ type EditingImageState = {
 type FeedbackState = {
   isTweeting: boolean
   editingImage: null | EditingImageState
+  addingImages: number
   images: ReadonlyArray<Image>
   editorState: Draft.EditorState
   twitterHandle: {
@@ -145,6 +146,7 @@ type BackgroundAction =
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; error: any } }
+  | { type: 'imageCaptureStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
   | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; error: any } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }

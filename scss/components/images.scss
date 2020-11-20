@@ -6,6 +6,13 @@
   grid-column-gap: 4px;
   margin: 15px 0;
 
+  .image-spinner {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    background-color: white;
+  }
+
   .image-thumbnail {
     position: relative;
 
