@@ -9,8 +9,8 @@ If you want to open a bug, please open a new issue with the following details:
 
 - A short description of the bug. e.g. "Can't upload an image".
 - Details about your setup - extension version, server version, chrome version etc.
-- What you expect to happen. e.g. "When uploading a new PNG image, the extension crash".
-- What actually happens. e.g. "When uploading a new PNG image, the extension should display the new image".
+- What actually happens. e.g. "When uploading a new PNG image, the extension crash".
+- What you expect to happen. e.g. "When uploading a new PNG image, the extension should display the new image".
 - Steps to reproduce the bug.
   Screenshots and short videos can help us identify and solve the bug and they'll be greatly appreciated.
 
