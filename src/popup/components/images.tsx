@@ -48,12 +48,22 @@ export function ImageThumbnail({ image, startEditingImage, clickDeleteImage, del
   )
 }
 
+function ImageSpinner() {
+  return (
+    <div className="image-spinner">
+      <div className="spinner-container">
+        <div className="spinner" />
+      </div>
+    </div>
+  )
+}
+
 export function Images({ feedback, startEditingImage, clickDeleteImage, deleteImageDisabled }: ImagesProps): null | JSX.Element {
   if (!feedback.images.length && !feedback.addingImages) return null
 
   return (
     <div className="images">
-      {!!feedback.addingImages && <div className="image-spinner" />}
+      {!!feedback.addingImages && <ImageSpinner />}
       {feedback.images.map((image, index) => (
         <ImageThumbnail
           key={`${image.uri}_${index}`}

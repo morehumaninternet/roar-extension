@@ -34,6 +34,7 @@
     "react-dom": "17.0.1",
     "react-konva": "17.0.0-0",
     "redux": "4.0.1",
+    "spinthatshit": "1.0.4",
     "urijs": "1.19.1",
     "webextension-polyfill": "0.3.1"
   },
