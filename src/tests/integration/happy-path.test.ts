@@ -2,12 +2,12 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { createMocks } from './mocks'
-import { whenState } from '../redux-utils'
-import { activeTab, ensureActiveFeedbackTarget, ensureActiveTab } from '../selectors'
-import { appendEntity } from '../draft-js-utils'
-import { runBackground } from './run-background'
-import { mountPopup } from './mount-popup'
-import { authenticateViaTwitter } from './authenticate-via-twitter'
+import { whenState } from '../../redux-utils'
+import { activeTab, ensureActiveFeedbackTarget, ensureActiveTab } from '../../selectors'
+import { appendEntity } from '../../draft-js-utils'
+import { runBackground } from './steps/run-background'
+import { mountPopup } from './steps/mount-popup'
+import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
 
 describe('happy path', () => {
   const mocks = createMocks()

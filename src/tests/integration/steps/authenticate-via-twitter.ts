@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
-import { Mocks } from './mocks'
+import { Mocks } from '../mocks'
 
 export function authenticateViaTwitter(mocks: Mocks) {
   describe('authentication via twitter', () => {

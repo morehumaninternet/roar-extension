@@ -27,7 +27,7 @@ export type Mocks = {
 }
 
 const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: 'utf-8' })
-const screenshotUri = readFileSync(`${process.cwd()}/src/tests/screenshotUri`, { encoding: 'utf-8' })
+const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
 export function createMocks(): Mocks {
   // We need to create a new chrome for each test

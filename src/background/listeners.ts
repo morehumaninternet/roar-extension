@@ -41,15 +41,15 @@ export function imageUpload(store: AppStore) {
   })
 }
 
+// Even if the post button is clicked we may not be ready to tweet yet.
+// We have to wait for any in-flight images to be added and for the twitter
+// handle to have been fetched. While waiting an alert my fire or we may lose
+// the target (perhaps the tab closed). If that happens we say we are ready even
+// though we won't actually post the tweet.
 export function clickPost(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome) {
   store.on('clickPost', state => {
     const targetId = ensureActiveFeedbackTarget(state).id
 
-    // Even if the post button is clicked we may not be ready to tweet yet.
-    // We have to wait for any in-flight images to be added and for the twitter
-    // handle to have been fetched. While waiting an alert my fire or we may lose
-    // the target (perhaps the tab closed). If that happens we say we are ready even
-    // though we won't actually post the tweet.
     function ready(state: StoreState): boolean {
       const target = targetById(state, targetId)
       if (state.alert) return true

@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { createMocks } from './mocks'
-import { whenState } from '../redux-utils'
-import { runBackground } from './run-background'
-import { mountPopup } from './mount-popup'
-import { authenticateViaTwitter } from './authenticate-via-twitter'
+import { whenState } from '../../redux-utils'
+import { runBackground } from './steps/run-background'
+import { mountPopup } from './steps/mount-popup'
+import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
 
 describe('screenshotCaptureFailure + clickPost', () => {
   const mocks = createMocks()

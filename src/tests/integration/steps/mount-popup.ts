@@ -1,10 +1,10 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
-import { Mocks } from './mocks'
-import { mount } from '../popup/mount'
-import { ensureActiveTab } from '../selectors'
-import { getPlainText } from '../draft-js-utils'
+import { Mocks } from '../mocks'
+import { mount } from '../../../popup/mount'
+import { ensureActiveTab } from '../../../selectors'
+import { getPlainText } from '../../../draft-js-utils'
 
 export function mountPopup(mocks: Mocks) {
   describe('popup:mount', () => {

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
-import { responders } from '../background/responders'
-import { emptyStoreState, newFeedbackState } from '../background/state'
-import { getPlainText } from '../draft-js-utils'
+import { responders } from '../../background/responders'
+import { emptyStoreState, newFeedbackState } from '../../background/state'
+import { getPlainText } from '../../draft-js-utils'
 
 describe('responders', () => {
   describe('chrome.windows.getAll', () => {
