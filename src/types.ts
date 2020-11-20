@@ -3,6 +3,11 @@
 
 type Maybe<T> = T | null | undefined
 
+type ObjectKeys<T> = T extends object ? (keyof T)[] : T extends number ? [] : T extends Array<any> | string ? string[] : never
+interface ObjectConstructor {
+  keys<T>(o: T): ObjectKeys<T>
+}
+
 type SystemInfo = {
   user_agent: string
   online: boolean
@@ -144,6 +149,7 @@ type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
+  | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; error: any } }
   | { type: 'imageCaptureStart'; payload: { targetId: FeedbackTargetId } }

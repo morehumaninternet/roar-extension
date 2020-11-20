@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { range } from 'lodash'
 
 type ImagesProps = {
   feedback: FeedbackState
@@ -63,7 +64,9 @@ export function Images({ feedback, startEditingImage, clickDeleteImage, deleteIm
 
   return (
     <div className="images">
-      {!!feedback.addingImages && <ImageSpinner />}
+      {range(feedback.addingImages).map(n => (
+        <ImageSpinner key={n} />
+      ))}
       {feedback.images.map((image, index) => (
         <ImageThumbnail
           key={`${image.uri}_${index}`}

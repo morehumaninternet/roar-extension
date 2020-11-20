@@ -2,7 +2,7 @@ import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpState } from './state'
-import { ensureActiveFeedbackTarget } from '../selectors'
+import { targetById, ensureActiveFeedbackTarget } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
@@ -17,10 +17,6 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     domain,
     feedbackState: newFeedbackState({ domain }),
   }
-}
-
-function targetById(state: StoreState, targetId: FeedbackTargetId): Maybe<FeedbackTarget> {
-  return targetId === 'help' ? state.help : state.tabs.get(targetId)
 }
 
 function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
@@ -87,7 +83,7 @@ export const responders: Responders<Action> = {
   updateEditorState(state, { editorState }): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ editorState }))
   },
-  clickTakeScreenshot(state): Partial<StoreState> {
+  clickTakeScreenshot(): Partial<StoreState> {
     return {}
   },
   clickPost(state): Partial<StoreState> {
@@ -135,6 +131,9 @@ export const responders: Responders<Action> = {
         addingImages: target.feedbackState.addingImages - 1,
       })),
     }
+  },
+  postTweetStart(state, { targetId }) {
+    return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
     if (targetId === 'help') {
