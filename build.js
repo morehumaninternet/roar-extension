@@ -68,7 +68,7 @@ console.log(
 )
 
 // Run the build. If any commands fail, kill the others and exit with its exit code
-concurrently(commands, { outputStream, killOthers: ['failure'] }).catch(results => {
+concurrently(commands, { outputStream, prefix: '{name} {time}', killOthers: ['failure'] }).catch(results => {
   const { exitCode } = results.find(result => result.exitCode !== 0 && typeof result.exitCode === 'number')
   process.exit(exitCode)
 })
