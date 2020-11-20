@@ -132,7 +132,7 @@ export const responders: Responders<Action> = {
       })),
     }
   },
-  postTweetStart(state, { targetId }) {
+  postTweetStart(state, { targetId }): Partial<StoreState> {
     return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {

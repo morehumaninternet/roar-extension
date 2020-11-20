@@ -1,8 +1,9 @@
+// tslint:disable:no-let
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import { Mocks } from '../mocks'
 
-export function authenticateViaTwitter(mocks: Mocks) {
+export function authenticateViaTwitter(mocks: Mocks): void {
   describe('authentication via twitter', () => {
     let addEventListener: sinon.SinonStub
     let removeEventListener: sinon.SinonStub

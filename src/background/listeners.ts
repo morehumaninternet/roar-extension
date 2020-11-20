@@ -4,7 +4,7 @@ import { fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
 import { ensureActiveFeedbackTarget, targetById } from '../selectors'
 
-export function popupConnect(store: AppStore, browser: typeof global.browser) {
+export function popupConnect(store: AppStore, browser: typeof global.browser): void {
   store.on('popupConnect', state => {
     const target = ensureActiveFeedbackTarget(state)
     if (target.feedbackState.isTweeting) return
@@ -26,14 +26,14 @@ export function popupConnect(store: AppStore, browser: typeof global.browser) {
   })
 }
 
-export function clickTakeScreenshot(store: AppStore, browser: typeof global.browser) {
+export function clickTakeScreenshot(store: AppStore, browser: typeof global.browser): void {
   store.on('clickTakeScreenshot', state => {
     const target = ensureActiveFeedbackTarget(state)
     images.takeScreenshot(target, browser.tabs, store.dispatchers)
   })
 }
 
-export function imageUpload(store: AppStore) {
+export function imageUpload(store: AppStore): void {
   store.on('imageUpload', state => {
     const target = ensureActiveFeedbackTarget(state)
     const { file } = state.mostRecentAction.payload
@@ -46,14 +46,13 @@ export function imageUpload(store: AppStore) {
 // handle to have been fetched. While waiting an alert my fire or we may lose
 // the target (perhaps the tab closed). If that happens we say we are ready even
 // though we won't actually post the tweet.
-export function clickPost(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome) {
+export function clickPost(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome): void {
   store.on('clickPost', state => {
     const targetId = ensureActiveFeedbackTarget(state).id
 
     function ready(state: StoreState): boolean {
       const target = targetById(state, targetId)
-      if (state.alert) return true
-      if (!target) return true
+      if (state.alert || !target) return true
       const imagesReady = !target.feedbackState.addingImages
       const twitterHandleReady = target.feedbackState.twitterHandle.status === 'DONE'
       return imagesReady && twitterHandleReady

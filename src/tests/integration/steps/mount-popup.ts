@@ -6,7 +6,7 @@ import { mount } from '../../../popup/mount'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
 
-export function mountPopup(mocks: Mocks) {
+export function mountPopup(mocks: Mocks): void {
   describe('popup:mount', () => {
     before(() => {
       fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle: '@zing' } })

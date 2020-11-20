@@ -6,7 +6,7 @@ import { run } from '../../../background/run'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
 
-export function runBackground(mocks: Mocks, opts: { allowActionFailure: boolean } = { allowActionFailure: false }) {
+export function runBackground(mocks: Mocks, opts: { allowActionFailure: boolean } = { allowActionFailure: false }): void {
   let unsubscribe
   after(() => unsubscribe && unsubscribe())
 
