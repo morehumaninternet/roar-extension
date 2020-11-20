@@ -20,7 +20,7 @@
       width: 36px;
 
       > .spinner {
-        @include loader07($size: 18px, $color: $human-blue, $duration: 1s, $align: middle);;
+        @include loader07($size: 13px, $color: $human-blue, $duration: 1s, $align: middle);;
       }
     }
   }
