@@ -5,8 +5,6 @@ import { Store } from 'redux'
 // Reject if the state doesn't meet that predicate before a given timeout.
 // Unsubscribe from the store in either case
 export function whenState<State>(store: Store<State>, predicate: (state: State) => boolean, timeoutMillis: number = 1000): Promise<State> {
-  let timeout: any
-  let unsubscribed: boolean = false
   let resolve: (state: State) => void
   let reject: (error: any) => void
 
@@ -15,31 +13,21 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
     reject = rej
   })
 
+  const timeout = setTimeout(() => {
+    unsubscribe()
+    reject(new Error('timeout'))
+  }, timeoutMillis)
+
   const callback = () => {
     const state = store.getState()
     if (predicate(state)) {
       clearTimeout(timeout)
-
-      if (!unsubscribed) {
-        unsubscribe()
-        unsubscribed = true
-      }
-
+      unsubscribe()
       resolve(state)
     }
   }
 
   const unsubscribe = store.subscribe(callback)
-
-  timeout = setTimeout(() => {
-    if (!unsubscribed) {
-      unsubscribe()
-      unsubscribed = true
-    }
-
-    reject(new Error('timeout'))
-  }, timeoutMillis)
-
   callback()
 
   return promise

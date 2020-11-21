@@ -3,9 +3,7 @@ import * as ReactDOM from 'react-dom'
 import { last } from 'lodash'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
-import * as sinonChrome from 'sinon-chrome'
-import * as ChromeApi from 'sinon-chrome/api'
-import * as chromeConfig from 'sinon-chrome/config/stable-api.json'
+import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
 
 type MockBrowser = typeof global.browser & {
@@ -19,7 +17,7 @@ export type Mocks = {
   backgroundWindow: Window
   popupWindow: DOMWindow
   browser: MockBrowser
-  chrome: typeof sinonChrome
+  chrome: typeof chrome
   app(): HTMLDivElement
   getState(): StoreState
   resolveLatestCaptureVisibleTab(): void
@@ -30,12 +28,7 @@ const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: '
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
 export function createMocks(): Mocks {
-  // We need to create a new chrome for each test
-  const chrome = new ChromeApi(chromeConfig).create()
-
   const backgroundWindow: Window = {} as any
-
-  chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
 
   const popupWindow = new JSDOM(popupHTML).window
   popupWindow.roarServerUrl = 'https://test-roar-server.com'
@@ -74,7 +67,10 @@ export function createMocks(): Mocks {
   }
 
   // ReactDOM needs a global window to work
-  const setup = () => Object.assign(global, popupWindowGlobals)
+  const setup = () => {
+    Object.assign(global, popupWindowGlobals)
+    chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
+  }
 
   const teardown = () => {
     // Render a blank div into the app-container before removing globals to trigger any cleanup from the React components themselves
