@@ -8,6 +8,7 @@ import { appendEntity } from '../../draft-js-utils'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
+import { onceAuthenticated } from './steps/once-authenticated'
 
 describe('happy path', () => {
   const mocks = createMocks()
@@ -15,20 +16,9 @@ describe('happy path', () => {
   runBackground(mocks)
   mountPopup(mocks)
   authenticateViaTwitter(mocks)
+  onceAuthenticated(mocks)
 
-  describe('once authenticated', () => {
-    it('renders the app with an emoji picker container and the main element', () => {
-      const authenticatedView = mocks.app().querySelector('.authenticated')!
-      expect(authenticatedView.childNodes).to.have.length(2)
-      expect(authenticatedView.childNodes[0]).to.have.property('className', 'emoji-picker-container closed')
-      expect(authenticatedView.childNodes[1]).to.have.property('tagName', 'MAIN')
-    })
-
-    it('renders the profile image', () => {
-      const profileImage = mocks.app().querySelector('img.profile-img')!
-      expect(profileImage).to.have.property('src', 'https://some-image-url.com/123')
-    })
-
+  describe('images', () => {
     it('renders an image spinner until the screenshot is added', () => {
       const activeTab = ensureActiveTab(mocks.getState())
       expect(activeTab.feedbackState.addingImages).to.equal(1)
@@ -110,6 +100,9 @@ describe('happy path', () => {
     // Would be nice, but these issues suggest its too complicated
     // https://github.com/facebook/draft-js/issues/325
     // https://github.com/jsdom/jsdom/issues/1670
+  })
+
+  describe('feedback editing', () => {
     it('can edit the feedback', () => {
       const tab = ensureActiveTab(mocks.getState())
 
