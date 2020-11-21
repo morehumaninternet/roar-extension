@@ -67,3 +67,11 @@ export const fetchTwitterHandle = async (tabId: number, domain: string, dispatch
     return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
   }
 }
+
+export async function detectLogin(dispatchActions: Dispatchers<Action>) {
+  const requestURL = new URL('v1/me', window.roarServerUrl).toString()
+  const response = await fetch(requestURL, { credentials: 'include' })
+  if (response.status !== 200) return
+  const user = await response.json()
+  dispatchActions.authenticatedViaTwitter(user)
+}

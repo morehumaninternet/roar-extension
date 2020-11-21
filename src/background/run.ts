@@ -1,6 +1,7 @@
 import { AppStore, create } from './store'
 import { detectBrowser } from './browser-detection'
 import * as listeners from './listeners'
+import { detectLogin } from './api'
 import { monitorTabs } from './monitorTabs'
 
 declare global {
@@ -17,5 +18,6 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   for (const listener of Object.values(listeners)) {
     listener(store, browser, chrome)
   }
+  detectLogin(store.dispatchers)
   monitorTabs(store.dispatchers, chrome)
 }
