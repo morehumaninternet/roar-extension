@@ -1,4 +1,5 @@
 import { AppStore, create } from './store'
+import { detectBrowser } from './browser-detection'
 import * as listeners from './listeners'
 import { monitorTabs } from './monitorTabs'
 
@@ -9,10 +10,10 @@ declare global {
   }
 }
 
-export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome): void {
+export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome, navigator: typeof window.navigator): void {
   // Attach the store to the window so the popup can access it
   // see src/popup/mount.tsx
-  const store = (backgroundWindow.store = create())
+  const store = (backgroundWindow.store = create(detectBrowser(navigator)))
   for (const listener of Object.values(listeners)) {
     listener(store, browser, chrome)
   }

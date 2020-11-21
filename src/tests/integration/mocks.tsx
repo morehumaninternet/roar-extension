@@ -28,7 +28,11 @@ const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: '
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
 export function createMocks(): Mocks {
-  const backgroundWindow: Window = {} as any
+  const backgroundWindow: Window = {
+    navigator: {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
+    },
+  } as any
 
   const popupWindow = new JSDOM(popupHTML).window
   popupWindow.roarServerUrl = 'https://test-roar-server.com'

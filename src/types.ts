@@ -3,19 +3,9 @@
 
 type Maybe<T> = T | null | undefined
 
-type SystemInfo = {
-  user_agent: string
-  online: boolean
-  cookie_enabled: boolean
-  do_not_track: null | string
-  languages: ReadonlyArray<string>
-  time: number
-  timezone_offset: number
-  memory: chrome.system.memory.MemoryInfo
-  storage: chrome.system.storage.StorageUnitInfo[] // tslint:disable-line:readonly-array
-  cpu: chrome.system.cpu.CpuInfo
-  zoom: number
-}
+type SupportedBrowser = 'Firefox' | 'Chrome'
+
+type BrowserInfo = { browser: SupportedBrowser; version: number }
 
 type Screenshot = {
   type: 'screenshot'
@@ -80,6 +70,7 @@ type FeedbackTarget = TabInfo | StoreState['help']
 type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
+  browserInfo: BrowserInfo
   focusedWindowId: number
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth
