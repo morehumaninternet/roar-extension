@@ -10,7 +10,7 @@
     "publish": "./publish.sh",
     "scss": "sass scss/popup.scss bundled/popup.css",
     "rollup": "rollup --config rollup.config.js",
-    "test": "nyc --exclude src/types.ts --exclude src/tests/**/*.* mocha -r src/tests/setup.js -r src/types.ts src/**/*.test.ts*",
+    "test": "nyc --exclude src/types.ts --exclude src/tests mocha -r src/tests/setup.js -r src/types.ts src/**/*.test.ts*",
     "zip-source-code-for-firefox": "cd .. && find extensions | grep -v 'node_modules' | grep -v '.git' | grep -v 'manifest.json' | grep -v '^extensions/compiled' | grep -v '^extensions/bundled' | grep -v '^extensions/publish' | grep -v '^extensions$' | grep -v '.zip$' | zip -rTg extension-source-code.zip -@ && cd extensions"
   },
   "repository": {
@@ -34,6 +34,7 @@
     "react-dom": "17.0.1",
     "react-konva": "17.0.0-0",
     "redux": "4.0.1",
+    "spinthatshit": "1.0.4",
     "urijs": "1.19.1",
     "webextension-polyfill": "0.3.1"
   },

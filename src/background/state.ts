@@ -6,6 +6,7 @@ const roarTwitterHandle = '@roarmhi'
 
 export const emptyFeedbackState = (): FeedbackState => ({
   isTweeting: false,
+  addingImages: 0,
   editingImage: null,
   images: [],
   editorState: EditorState.createEmpty(),
@@ -13,9 +14,7 @@ export const emptyFeedbackState = (): FeedbackState => ({
 })
 
 export const emptyHelpFeedbackState = (): FeedbackState => ({
-  isTweeting: false,
-  editingImage: null,
-  images: [],
+  ...emptyFeedbackState(),
   editorState: prependHandle(EditorState.createEmpty(), roarTwitterHandle),
   twitterHandle: { status: 'DONE', handle: roarTwitterHandle },
 })

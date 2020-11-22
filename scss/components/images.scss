@@ -6,6 +6,25 @@
   grid-column-gap: 4px;
   margin: 15px 0;
 
+  .image-spinner {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    > .spinner-container {
+      height: 36px;
+      width: 36px;
+
+      > .spinner {
+        @include loader07($size: 13px, $color: $human-blue, $duration: 1s, $align: middle);;
+      }
+    }
+  }
+
   .image-thumbnail {
     position: relative;
 

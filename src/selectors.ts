@@ -11,6 +11,10 @@ export function ensureActiveTab(state: StoreState): TabInfo {
   throw new Error('Active tab should exist')
 }
 
+export function targetById(state: StoreState, targetId: FeedbackTargetId): Maybe<FeedbackTarget> {
+  return targetId === 'help' ? state.help : state.tabs.get(targetId)
+}
+
 export function activeFeedbackTarget(state: StoreState): null | FeedbackTarget {
   if (state.help.on) return state.help
   return activeTab(state)
@@ -23,7 +27,8 @@ export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
 
 export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
-  return feedbackTarget.feedbackState.images.length >= 9
+  const { addingImages, images } = feedbackTarget.feedbackState
+  return addingImages + images.length >= 9
 }
 
 export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
