@@ -1,4 +1,3 @@
-import { EditorState } from 'draft-js'
 import { getLength } from './draft-js-utils'
 
 export function activeTab(state: StoreState): null | TabInfo {

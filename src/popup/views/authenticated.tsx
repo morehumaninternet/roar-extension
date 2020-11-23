@@ -4,7 +4,6 @@ import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
-import { postTweetDisabled } from '../../selectors'
 // import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
