@@ -42,8 +42,8 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   const popupWindow: any = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
   popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
-  sinon.spy(popupWindow, 'addEventListener')
-  sinon.spy(popupWindow, 'removeEventListener')
+  let addEventListener: sinon.SinonSpy
+  let removeEventListener: sinon.SinonSpy
 
   const captureVisibleTabResolvers: any[] = []
   const captureVisibleTabRejecters: any[] = []
@@ -81,11 +81,15 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
 
   // ReactDOM needs a global window to work
   const setup = () => {
+    addEventListener = sinon.spy(popupWindow, 'addEventListener')
+    removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
     Object.assign(global, popupWindowGlobals)
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
   }
 
   const teardown = () => {
+    addEventListener.restore()
+    removeEventListener.restore()
     // Render a blank div into the app-container before removing globals to trigger any cleanup from the React components themselves
     ReactDOM.render(<div />, popupWindow.document.getElementById('app-container'))
     for (const key in popupWindowGlobals) {

@@ -36,6 +36,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
         }
       })
     })
+
     after(() => {
       if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
       fetchMock.restore()

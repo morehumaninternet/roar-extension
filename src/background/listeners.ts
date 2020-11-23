@@ -24,7 +24,7 @@ export function popupConnect(store: AppStore, browser: typeof global.browser): v
     }
 
     // Take a screenshot if no images currently present for the current feedback target
-    if (!target.feedbackState.images.length) {
+    if (target.feedbackState.addingImages + target.feedbackState.images.length < 1) {
       images.takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })
@@ -48,8 +48,7 @@ export function imageUpload(store: AppStore): void {
 export function signInWithTwitter(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome): void {
   store.on('signInWithTwitter', state => {
     if (state.browserInfo.browser === 'Firefox') {
-      console.log('zzz', `${window.roarServerUrl}/v1/auth/twitter`)
-      console.log(chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true }))
+      chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
     }
   })
 }

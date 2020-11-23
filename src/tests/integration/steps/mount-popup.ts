@@ -40,8 +40,8 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
     })
 
     it('adds an event listener for when the window unloads', () => {
-      expect(mocks.popupWindow.addEventListener).to.have.callCount(1)
-      const [eventName, callback] = mocks.popupWindow.addEventListener.firstCall.args
+      const unloadCall = mocks.popupWindow.addEventListener.getCalls().find(call => call.args[0] === 'unload')!
+      const [eventName, callback] = unloadCall.args
       expect(eventName).to.equal('unload')
       expect(callback).to.be.a('function')
     })
