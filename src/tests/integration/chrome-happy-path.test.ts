@@ -10,7 +10,7 @@ import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
 import { onceAuthenticated } from './steps/once-authenticated'
 
-describe('happy path', () => {
+describe('chrome happy path', () => {
   const mocks = createMocks()
 
   runBackground(mocks)
@@ -87,19 +87,6 @@ describe('happy path', () => {
 
       expect(mocks.app().querySelector('.TakeScreenshot')).to.have.property('disabled', true)
     })
-
-    // it('edit a screenshot when the edit-button is clicked', async () => {
-    //   const tab = activeTab(mocks.getState())!
-    //   expect(tab.feedbackState.editingScreenshot).to.equal(null)
-    //   const screenshotEditButton = mocks.app().querySelector('.twitter-interface > .screenshots > .screenshot-thumbnail > .edit-button') as HTMLButtonElement
-    //   screenshotEditButton.click()
-    //   await whenState(mocks.backgroundWindow.store, state => !!ensureActiveTab(state).feedbackState.editingScreenshot)
-    // })
-
-    // Spent too long trying to dispatch events directly to the draft editor.
-    // Would be nice, but these issues suggest its too complicated
-    // https://github.com/facebook/draft-js/issues/325
-    // https://github.com/jsdom/jsdom/issues/1670
   })
 
   describe('feedback editing', () => {

@@ -1,11 +1,15 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { fetchTwitterHandle, postTweet } from './api'
+import { detectLogin, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
 import { ensureActiveFeedbackTarget, targetById } from '../selectors'
 
 export function popupConnect(store: AppStore, browser: typeof global.browser): void {
   store.on('popupConnect', state => {
+    if (state.browserInfo.browser === 'Firefox' && state.auth.state === 'authenticating') {
+      detectLogin(store.dispatchers)
+    }
+
     const target = ensureActiveFeedbackTarget(state)
     if (target.feedbackState.isTweeting) return
 
@@ -38,6 +42,15 @@ export function imageUpload(store: AppStore): void {
     const target = ensureActiveFeedbackTarget(state)
     const { file } = state.mostRecentAction.payload
     images.imageUpload(target.id, file, store.dispatchers)
+  })
+}
+
+export function signInWithTwitter(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome): void {
+  store.on('signInWithTwitter', state => {
+    if (state.browserInfo.browser === 'Firefox') {
+      console.log('zzz', `${window.roarServerUrl}/v1/auth/twitter`)
+      console.log(chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true }))
+    }
   })
 }
 

@@ -92,6 +92,7 @@ type NotAuthedState = {
 
 type AuthenticatingState = {
   view: 'Authenticating'
+  browser: SupportedBrowser
   authenticatedViaTwitter: Dispatchers<UserAction>['authenticatedViaTwitter']
 }
 

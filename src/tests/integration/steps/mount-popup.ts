@@ -38,5 +38,12 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
       expect(activeTab.feedbackState.addingImages).to.equal(1)
     })
+
+    it('adds an event listener for when the window unloads', () => {
+      expect(mocks.popupWindow.addEventListener).to.have.callCount(1)
+      const [eventName, callback] = mocks.popupWindow.addEventListener.firstCall.args
+      expect(eventName).to.equal('unload')
+      expect(callback).to.be.a('function')
+    })
   })
 }

@@ -13,9 +13,13 @@ type MockBrowser = typeof global.browser & {
   }
 }
 
+type CreateMocksOpts = {
+  browser?: SupportedBrowser
+}
+
 export type Mocks = {
   backgroundWindow: Window
-  popupWindow: DOMWindow
+  popupWindow: DOMWindow & { addEventListener: sinon.SinonSpy }
   browser: MockBrowser
   chrome: typeof chrome
   app(): HTMLDivElement
@@ -27,15 +31,19 @@ export type Mocks = {
 const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: 'utf-8' })
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
-export function createMocks(): Mocks {
-  const backgroundWindow: Window = {
-    navigator: {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
-    },
-  } as any
+export function createMocks(opts: CreateMocksOpts = {}): Mocks {
+  const userAgent =
+    opts.browser === 'Firefox'
+      ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:82.0) Gecko/20100101 Firefox/82.0'
+      : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
 
-  const popupWindow = new JSDOM(popupHTML).window
+  const backgroundWindow: Window = { navigator: { userAgent } } as any
+
+  const popupWindow: any = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
   popupWindow.roarServerUrl = 'https://test-roar-server.com'
+
+  sinon.spy(popupWindow, 'addEventListener')
+  sinon.spy(popupWindow, 'removeEventListener')
 
   const captureVisibleTabResolvers: any[] = []
   const captureVisibleTabRejecters: any[] = []
@@ -62,6 +70,7 @@ export function createMocks(): Mocks {
 
   const popupWindowGlobals = {
     window: popupWindow,
+    location: popupWindow.location,
     document: popupWindow.document,
     Blob: popupWindow.Blob,
     Node: popupWindow.Node,

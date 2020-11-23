@@ -43,7 +43,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
 
     it('loads window.store, which starts with an empty state', () => {
       const state = mocks.getState()
-      expect(state.browserInfo).to.eql({ browser: 'Chrome', version: 86 })
+      expect(state.browserInfo).to.have.all.keys('browser', 'version')
       expect(state.focusedWindowId).to.equal(-1)
       expect(state.tabs).to.be.an.instanceOf(Map)
       expect(state.tabs).to.have.property('size', 0)
@@ -59,10 +59,13 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
     })
 
     if (opts.alreadyAuthenticated) {
-      it('is already authenticated', () =>
-        expect(mocks.getState().auth).to.eql({ state: 'authenticated', user: { photoUrl: 'https://some-image-url.com/123' } }))
+      it('is already authenticated', () => {
+        expect(mocks.getState().auth).to.eql({ state: 'authenticated', user: { photoUrl: 'https://some-image-url.com/123' } })
+      })
     } else {
-      it('is not yet authenticated', () => expect(mocks.getState().auth).to.eql({ state: 'not_authed' }))
+      it('is not yet authenticated', () => {
+        expect(mocks.getState().auth).to.eql({ state: 'not_authed' })
+      })
     }
 
     it('sets the focusedWindowId when chrome.windows.getAll calls back', () => {
