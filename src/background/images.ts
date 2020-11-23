@@ -29,8 +29,10 @@ export async function takeScreenshot(
   if (target.feedbackTargetType === 'help') {
     return console.log('TODO take screenshot of popup on help click')
   }
-  const tab = target
+
   try {
+    dispatchBackgroundActions.imageCaptureStart({ targetId: target.id })
+    const tab = target
     const gettingTab = tabs.get(tab.id)
     const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)
     const moreTabInfo = await gettingTab
@@ -53,7 +55,7 @@ export async function takeScreenshot(
       targetId: tab.id,
     })
   } catch (error) {
-    dispatchBackgroundActions.imageCaptureFailure({ targetId: tab.id, error })
+    dispatchBackgroundActions.imageCaptureFailure({ targetId: target.id, error })
   }
 }
 
@@ -68,6 +70,7 @@ function readFileUri(file: File): Promise<string> {
 
 export async function imageUpload(targetId: FeedbackTargetId, file: File, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
   try {
+    dispatchBackgroundActions.imageCaptureStart({ targetId })
     const uri = await readFileUri(file)
     const blob = dataURItoBlob(uri)
 

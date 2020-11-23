@@ -1,10 +1,9 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
-@use './components/images.scss';
+@import '../node_modules/spinthatshit/src/loaders.scss';
+@import './colors';
+@import './components/images.scss';
 
-$human-blue: #164176;
-$human-pink: #fa759e;
-$human-yellow-warning: #7e5e00;
 $main-padding: 10px;
 $min-width: 476px;
 $min-height: 380px;

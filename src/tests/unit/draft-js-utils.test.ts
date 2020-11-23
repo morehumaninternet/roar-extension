@@ -1,6 +1,6 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
-import { fromText, getPlainText, prependHandle, replaceHandle } from '../draft-js-utils'
+import { fromText, getPlainText, prependHandle, replaceHandle } from '../../draft-js-utils'
 
 describe('draft-js-utils', () => {
   describe('getPlainText', () => {

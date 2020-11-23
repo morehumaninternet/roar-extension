@@ -28,6 +28,7 @@ export const postTweet = async (target: FeedbackTarget, chrome: typeof global.ch
   const targetId: FeedbackTargetId = target.id
 
   try {
+    dispatchBackgroundActions.postTweetStart({ targetId })
     const res = await makeTweetRequest(tweetFormData(target))
     if (res.status !== 201) {
       return dispatchBackgroundActions.postTweetFailure({
