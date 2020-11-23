@@ -14,7 +14,7 @@ export function Authenticated({
   addImageDisabled,
   deleteImageDisabled,
   dispatchUserActions,
-  charactersLeft,
+  characterLimit,
   postTweetDisabled,
 }: AuthenticatedState): JSX.Element | null {
   if (tweeting) {
@@ -48,7 +48,7 @@ export function Authenticated({
             toggleHelp={dispatchUserActions.toggleHelp}
             addImageDisabled={addImageDisabled}
             imageUpload={dispatchUserActions.imageUpload}
-            charactersLeft={charactersLeft}
+            characterLimit={characterLimit}
             postTweetDisabled={postTweetDisabled}
           />
         </div>

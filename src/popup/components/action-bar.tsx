@@ -9,7 +9,7 @@ type ActionBarProps = {
   imageUpload: Dispatchers<UserAction>['imageUpload']
   toggleHelp: Dispatchers<UserAction>['toggleHelp']
   addImageDisabled: boolean
-  charactersLeft: number
+  characterLimit: CharacterLimit
   postTweetDisabled: boolean
 }
 
@@ -20,7 +20,7 @@ export const ActionBar = ({
   imageUpload,
   toggleHelp,
   addImageDisabled,
-  charactersLeft,
+  characterLimit,
   postTweetDisabled,
 }: ActionBarProps) => {
   const imageRef: React.MutableRefObject<HTMLInputElement> = React.useRef() as any
@@ -34,7 +34,7 @@ export const ActionBar = ({
         <ActionButton kind="Help" onClick={toggleHelp} />
       </div>
       <input ref={imageRef} type="file" accept=".png" onChange={evt => imageUpload({ file: evt.target.files![0] })} />
-      <CharacterCountdown charactersLeft={charactersLeft} />
+      <CharacterCountdown characterLimit={characterLimit} />
       <button className="post-btn" onClick={clickPost} disabled={postTweetDisabled}>
         Post
       </button>

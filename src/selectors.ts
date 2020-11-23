@@ -39,12 +39,15 @@ export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): bool
 }
 
 export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
-  return charactersLeft(feedbackTarget) < 0
+  return getCharacterLimit(feedbackTarget).remaining < 0
 }
 
-export function charactersLeft(feedbackTarget: null | FeedbackTarget): number {
-  if (!feedbackTarget) return 280
-  return 280 - getLength(feedbackTarget?.feedbackState.editorState)
+export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): CharacterLimit {
+  const maxTweetLength = 280
+  const currentTweetLength = feedbackTarget ? getLength(feedbackTarget.feedbackState.editorState) : 0
+  const remaining = maxTweetLength - currentTweetLength
+  const percentageCompleted = (1 - remaining / maxTweetLength) * 100
+  return { remaining, percentageCompleted }
 }
 
 function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {
@@ -84,7 +87,7 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
         addImageDisabled: addImageDisabled(feedbackTarget),
         deleteImageDisabled: deleteImageDisabled(feedbackTarget),
         postTweetDisabled: postTweetDisabled(feedbackTarget),
-        charactersLeft: charactersLeft(feedbackTarget),
+        characterLimit: getCharacterLimit(feedbackTarget),
         dispatchUserActions,
       }
     }
