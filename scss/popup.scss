@@ -4,7 +4,6 @@
 @import './colors';
 @import './components/images.scss';
 
-
 $main-padding: 10px;
 $min-width: 476px;
 $min-height: 380px;
@@ -80,14 +79,55 @@ main {
     display: flex;
     align-items: flex-start;
     flex-grow: 0;
-
+    margin-right: auto;
     svg {
       height: 36px;
     }
   }
 
-  > input[type="file"] {
+  > input[type='file'] {
     display: none;
+  }
+
+  > .circular-chart {
+    height: 36px;
+    width: 36px;
+    display: block;
+    margin-right: 12px;
+
+    > .circle {
+      stroke: $human-pink;
+      fill: none;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      animation: progress 1s ease-out forwards;
+    }
+
+    > .circle__warning {
+      stroke: $human-yellow-warning;
+      fill: none;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      animation: progress 1s ease-out forwards;
+    }
+
+    > .inner-text {
+      fill: $human-pink;
+      font-size: 1.2em;
+      text-anchor: middle;
+    }
+
+    > .inner-text__warning {
+      fill: $human-yellow-warning;
+      font-size: 1.2em;
+      text-anchor: middle;
+    }
+
+    @keyframes progress {
+      0% {
+        stroke-dasharray: 0 100;
+      }
+    }
   }
 
   > .post-btn {
@@ -100,6 +140,10 @@ main {
     color: $human-blue;
     border: none;
     border-radius: 50px;
+
+    &:disabled {
+      opacity: 0.65;
+    }
   }
 }
 

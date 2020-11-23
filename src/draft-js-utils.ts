@@ -5,6 +5,10 @@ export function getPlainText(editorState: EditorState): string {
   return editorState.getCurrentContent().getPlainText('\u0001')
 }
 
+export function getLength(editorState: EditorState): number {
+  return getPlainText(editorState).length
+}
+
 export function fromText(text: string): EditorState {
   return EditorState.createWithContent(ContentState.createFromText(text))
 }

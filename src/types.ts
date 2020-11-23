@@ -56,6 +56,11 @@ type FeedbackState = {
   }
 }
 
+type CharacterLimit = {
+  remaining: number
+  percentageCompleted: number
+}
+
 type User = { photoUrl?: string }
 
 type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
@@ -108,6 +113,8 @@ type AuthenticatedState = {
   pickingEmoji: boolean
   addImageDisabled: boolean
   deleteImageDisabled: boolean
+  postTweetDisabled: boolean
+  characterLimit: CharacterLimit
   dispatchUserActions: Dispatchers<UserAction>
 }
 

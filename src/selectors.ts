@@ -1,3 +1,5 @@
+import { getLength } from './draft-js-utils'
+
 export function activeTab(state: StoreState): null | TabInfo {
   for (const tab of state.tabs.values()) {
     if (tab.windowId === state.focusedWindowId && tab.active) return tab
@@ -36,6 +38,18 @@ export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): bool
   return feedbackTarget.feedbackState.images.length <= 1
 }
 
+export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+  return getCharacterLimit(feedbackTarget).remaining < 0
+}
+
+export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): CharacterLimit {
+  const maxTweetLength = 280
+  const currentTweetLength = feedbackTarget ? getLength(feedbackTarget.feedbackState.editorState) : 0
+  const remaining = maxTweetLength - currentTweetLength
+  const percentageCompleted = (1 - remaining / maxTweetLength) * 100
+  return { remaining, percentageCompleted }
+}
+
 function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {
   if (!feedbackTarget) {
     return { exists: false, reasonDisabledMessage: null }
@@ -72,6 +86,8 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),
         deleteImageDisabled: deleteImageDisabled(feedbackTarget),
+        postTweetDisabled: postTweetDisabled(feedbackTarget),
+        characterLimit: getCharacterLimit(feedbackTarget),
         dispatchUserActions,
       }
     }

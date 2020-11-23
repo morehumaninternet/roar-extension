@@ -4,7 +4,7 @@ import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
-import { EditingImage } from '../components/editing-image'
+// import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
   feedback,
@@ -14,6 +14,8 @@ export function Authenticated({
   addImageDisabled,
   deleteImageDisabled,
   dispatchUserActions,
+  characterLimit,
+  postTweetDisabled,
 }: AuthenticatedState): JSX.Element | null {
   if (tweeting) {
     return <Tweeting at={tweeting.at} />
@@ -46,6 +48,8 @@ export function Authenticated({
             toggleHelp={dispatchUserActions.toggleHelp}
             addImageDisabled={addImageDisabled}
             imageUpload={dispatchUserActions.imageUpload}
+            characterLimit={characterLimit}
+            postTweetDisabled={postTweetDisabled}
           />
         </div>
       </main>
