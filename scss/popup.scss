@@ -3,6 +3,7 @@
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
 @import './components/images.scss';
+@import './components/sign-in-page.scss';
 
 $main-padding: 10px;
 $min-width: 476px;
@@ -183,5 +184,5 @@ main {
 }
 
 .authenticating-spinner {
-  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);;
+  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);
 }
