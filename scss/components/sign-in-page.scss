@@ -1,0 +1,31 @@
+// .not-authed {
+//   display: grid;
+//   grid-template-columns: 1fr 476px;
+// }
+
+.login {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.login button {
+  border-radius: 25px;
+  color: #1da1f2;
+  display: flex;
+  align-items: center;
+}
+
+.login > p {
+  color: $human-pink;
+  font-size: 18px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.login a {
+  color: $human-pink;
+  font-size: 18px;
+  font-family: 'Roboto', sans-serif;
+}
