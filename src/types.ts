@@ -107,6 +107,8 @@ type AuthenticatedState = {
   pickingEmoji: boolean
   addImageDisabled: boolean
   deleteImageDisabled: boolean
+  postTweetDisabled: boolean
+  charactersLeft: number
   dispatchUserActions: Dispatchers<UserAction>
 }
 

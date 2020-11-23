@@ -1,3 +1,6 @@
+import { EditorState } from 'draft-js'
+import { getLength } from './draft-js-utils'
+
 export function activeTab(state: StoreState): null | TabInfo {
   for (const tab of state.tabs.values()) {
     if (tab.windowId === state.focusedWindowId && tab.active) return tab
@@ -29,6 +32,15 @@ export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean
 export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
   if (!feedbackTarget) return false
   return feedbackTarget.feedbackState.images.length <= 1
+}
+
+export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+  return charactersLeft(feedbackTarget) < 0
+}
+
+export function charactersLeft(feedbackTarget: null | FeedbackTarget): number {
+  if (!feedbackTarget) return 280
+  return 280 - getLength(feedbackTarget?.feedbackState.editorState)
 }
 
 function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {
@@ -67,6 +79,8 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),
         deleteImageDisabled: deleteImageDisabled(feedbackTarget),
+        postTweetDisabled: postTweetDisabled(feedbackTarget),
+        charactersLeft: charactersLeft(feedbackTarget),
         dispatchUserActions,
       }
     }
