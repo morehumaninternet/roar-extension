@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import { Mocks } from '../mocks'
 
-export function onceAuthenticated(mocks: Mocks) {
+export function onceAuthenticated(mocks: Mocks): void {
   describe('once authenticated', () => {
     it('renders the app with an emoji picker container and the main element', () => {
       const authenticatedView = mocks.app().querySelector('.authenticated')!

@@ -65,7 +65,7 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
     case 'not_authed': {
       return {
         view: 'NotAuthed',
-        signInWithTwitter() {
+        signInWithTwitter(): void {
           dispatchUserActions.signInWithTwitter()
           if (storeState.browserInfo.browser === 'Firefox') {
             window.close()

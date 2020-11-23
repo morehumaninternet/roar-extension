@@ -21,13 +21,4 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   }
   detectLogin(store.dispatchers)
   monitorTabs(store.dispatchers, chrome)
-
-  if (browserInfo.browser === 'Firefox') {
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-      if (changeInfo.url === `${window.roarServerUrl}/v1/auth/twitter/success`) {
-        window.open('popup.html', 'extension_popup', 'width=300,height=400,status=no,scrollbars=yes,resizable=no')
-        chrome.tabs.remove(tabId)
-      }
-    })
-  }
 }

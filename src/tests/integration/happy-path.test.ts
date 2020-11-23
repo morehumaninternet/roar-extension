@@ -14,7 +14,7 @@ import { signInViaTwitter } from './steps/sign-in-via-twitter'
 happyPath({ browser: 'Chrome' })
 happyPath({ browser: 'Firefox' })
 
-function happyPath(opts: { browser: SupportedBrowser }) {
+function happyPath(opts: { browser: SupportedBrowser }): void {
   describe('happy path for ' + opts.browser, () => {
     const mocks = createMocks(opts)
 
@@ -142,6 +142,32 @@ function happyPath(opts: { browser: SupportedBrowser }) {
         expect(spans).to.have.length(2)
         expect(spans[0]).to.have.property('innerHTML', '@zing')
         expect(spans[1]).to.have.property('innerHTML', ' This is some feedback')
+      })
+    })
+
+    describe('character limit', () => {
+      it('disable the post button when the feedback is longer than 280 characters', () => {
+        const tab = ensureActiveTab(mocks.getState())
+
+        // Updating the editor state with a long feedback
+        mocks.backgroundWindow.store.dispatch({
+          type: 'updateEditorState',
+          payload: {
+            editorState: appendEntity(tab.feedbackState.editorState, 'x'.repeat(281)),
+          },
+        })
+
+        // Make sure the post button is disabled
+        const postButton = mocks.app().querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
+        expect(postButton.disabled).to.equal(true)
+
+        // Update the editor state to the original state
+        mocks.backgroundWindow.store.dispatch({
+          type: 'updateEditorState',
+          payload: {
+            editorState: tab.feedbackState.editorState,
+          },
+        })
       })
     })
 

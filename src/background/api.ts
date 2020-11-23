@@ -68,7 +68,7 @@ export const fetchTwitterHandle = async (tabId: number, domain: string, dispatch
   }
 }
 
-export async function detectLogin(dispatchActions: Dispatchers<Action>) {
+export async function detectLogin(dispatchActions: Dispatchers<Action>): Promise<void> {
   const requestURL = new URL('v1/me', window.roarServerUrl).toString()
   const response = await fetch(requestURL, { credentials: 'include' })
   if (response.status !== 200) return
