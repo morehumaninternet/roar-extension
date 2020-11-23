@@ -159,6 +159,32 @@ describe('happy path', () => {
     })
   })
 
+  describe('character limit', () => {
+    it('disable the post button when the feedback is longer than 280 characters', () => {
+      const tab = ensureActiveTab(mocks.getState())
+
+      // Updating the editor state with a long feedback
+      mocks.backgroundWindow.store.dispatch({
+        type: 'updateEditorState',
+        payload: {
+          editorState: appendEntity(tab.feedbackState.editorState, 'x'.repeat(281)),
+        },
+      })
+
+      // Make sure the post button is disabled
+      const postButton = mocks.app().querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
+      expect(postButton.disabled).to.equal(true)
+
+      // Update the editor state to the original state
+      mocks.backgroundWindow.store.dispatch({
+        type: 'updateEditorState',
+        payload: {
+          editorState: tab.feedbackState.editorState,
+        },
+      })
+    })
+  })
+
   describe('posting feedback', () => {
     before(() => {
       fetchMock.mock('https://test-roar-server.com/v1/feedback', { status: 201, body: { url: 'https://t.co/sometweethash' } })
