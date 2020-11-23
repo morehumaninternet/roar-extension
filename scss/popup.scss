@@ -78,7 +78,8 @@ main {
 .emoji-picker-container {
   display: inherit;
   transition: width 0.2s;
-  // width: $emoji-container-width;
+  border-right: 1px solid;
+  border-color: var(--emoji-picker-border-color);
 
   &.closed {
     width: 0;

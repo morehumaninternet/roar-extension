@@ -1,3 +1,8 @@
+.svg-btn, .post-btn {
+  border: none;
+  outline: none;
+}
+
 .action-bar {
   display: flex;
   justify-content: space-between;
@@ -80,8 +85,37 @@
   background: none;
   cursor: pointer;
 
-  svg > path {
+  svg > path:not(.circle-outline) {
     fill: $human-pink;
+  }
+
+  svg > path.circle-outline {
+    stroke: $human-pink;
+  }
+
+  &.Help.on {
+    svg > path:not(.circle-outline) {
+      fill: var(--background-color);
+    }
+
+    svg > path.circle-outline {
+      fill: $human-pink;
+    }
+  }
+
+  &.AddEmoji.off {
+    svg > circle {
+      fill: none;
+    }
+  }
+
+  &.AddEmoji.on {
+    svg > circle {
+      fill: $human-pink;
+    }
+    svg > path.smile {
+      fill: var(--background-color);
+    }
   }
 
   &:disabled {
