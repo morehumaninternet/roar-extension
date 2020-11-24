@@ -7,23 +7,18 @@
   justify-content: space-evenly;
   flex-direction: column;
   position: relative;
-}
 
-.not-authed button {
-  border-radius: 25px;
-  color: #1da1f2;
-  display: flex;
-  align-items: center;
-}
+  button {
+    border-radius: 25px;
+    color: $twitter-blue;
+    display: flex;
+    align-items: center;
+  }
 
-.not-authed > p {
-  color: $human-pink;
-  font-size: 18px;
-  font-family: 'Roboto', sans-serif;
-}
-
-.not-authed a {
-  color: $human-pink;
-  font-size: 18px;
-  font-family: 'Roboto', sans-serif;
+  p,
+  a {
+    color: $human-pink;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+  }
 }
