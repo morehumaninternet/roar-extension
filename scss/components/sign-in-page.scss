@@ -9,8 +9,12 @@
   position: relative;
 
   button {
+    border: none;
+    outline: none;
     border-radius: 25px;
+    background-color: white;
     color: $twitter-blue;
+    font-weight: bold;
     display: flex;
     align-items: center;
   }
