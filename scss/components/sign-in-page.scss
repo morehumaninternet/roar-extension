@@ -8,15 +8,27 @@
   flex-direction: column;
   position: relative;
 
+  img {
+    height: 128px;
+    width: 128px;
+  }
+
   button {
     border: none;
     outline: none;
     border-radius: 25px;
     background-color: white;
     color: $twitter-blue;
+    padding: 6px 16px 6px 6px;
     font-weight: bold;
     display: flex;
     align-items: center;
+
+    img {
+      padding: 3px;
+      height: 18px;
+      width: 18px;
+    }
   }
 
   p,
