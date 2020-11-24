@@ -5,7 +5,7 @@ export function NotAuthed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, '
     <div className="not-authed">
       <img src="../../../img/roar_128.png" width="128px" height="128px" />
       <button onClick={signInWithTwitter}>
-        <img src="../../../img/twitter_logo_blue.png" width="32px" height="32px" />
+        <img src="../../../img/twitter_logo_blue.svg" width="32px" height="32px" />
         Log in with Twitter
       </button>
       <p>
