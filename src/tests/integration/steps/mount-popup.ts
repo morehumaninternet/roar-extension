@@ -39,7 +39,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
 >>>>>>> 879452c... correct typo
       const appContainer = mocks.popupWindow.document.getElementById('app-container')!
       const signInWithTwitter = appContainer.querySelector('button')!
-      expect(signInWithTwitter).to.have.property('innerHTML', 'Log in with Twitter')
+      expect(signInWithTwitter.innerHTML).to.match(/.+(Log in with Twitter)$/)
     })
 >>>>>>> 8ad0810... change sign in with twitter to log in with twitter
 
