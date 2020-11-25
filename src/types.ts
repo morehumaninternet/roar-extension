@@ -5,7 +5,7 @@ type Maybe<T> = T | null | undefined
 
 type SupportedBrowser = 'Firefox' | 'Chrome'
 
-type BrowserInfo = { browser: SupportedBrowser; version: number }
+type BrowserInfo = { browser: SupportedBrowser; majorVersion: number }
 
 type Screenshot = {
   type: 'screenshot'
@@ -53,7 +53,7 @@ type CharacterLimit = {
 
 type User = { photoUrl?: string }
 
-type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
+type Auth = { state: 'not_authed' } | { state: 'auth_failed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
@@ -87,13 +87,19 @@ type StoreState = {
 
 type NotAuthedState = {
   view: 'NotAuthed'
-  signInWithTwitter: Dispatchers<UserAction>['signInWithTwitter']
+  signInWithTwitter(): void
 }
 
 type AuthenticatingState = {
   view: 'Authenticating'
   browser: SupportedBrowser
-  authenticatedViaTwitter: Dispatchers<UserAction>['authenticatedViaTwitter']
+  authenticationFailure: Dispatchers<UserAction>['authenticationFailure']
+  authenticationSuccess: Dispatchers<UserAction>['authenticationSuccess']
+}
+
+type AuthFailedState = {
+  view: 'AuthFailed'
+  signInWithTwitter(): void
 }
 
 type AuthenticatedState = {
@@ -110,7 +116,7 @@ type AuthenticatedState = {
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
+type AppState = NotAuthedState | AuthenticatingState | AuthFailedState | AuthenticatedState
 
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
@@ -127,7 +133,8 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'authenticatedViaTwitter'; payload: { photoUrl?: string } }
+  | { type: 'authenticationSuccess'; payload: { photoUrl?: string } }
+  | { type: 'authenticationFailure'; payload: { error: any } }
   | { type: 'dismissAlert' }
   | { type: 'updateEditorState'; payload: { editorState: any } }
   | { type: 'clickPost' }

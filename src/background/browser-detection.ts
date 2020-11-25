@@ -3,10 +3,10 @@ function testBrowser(browser: SupportedBrowser, navigator: typeof window.navigat
   const regex = new RegExp(`${browser}\\/([\\d\\.]+)`)
   const matches = str.match(regex)
   if (!matches || !matches[1]) return null
-  const [versionStr] = matches[1].split('.')
-  if (!versionStr) return null
-  const version = parseInt(versionStr, 10)
-  return version ? { browser, version } : null
+  const [majorVersionStr] = matches[1].split('.')
+  if (!majorVersionStr) return null
+  const majorVersion = parseInt(majorVersionStr, 10)
+  return majorVersion ? { browser, majorVersion } : null
 }
 
 export function detectBrowser(navigator: typeof window.navigator): BrowserInfo {

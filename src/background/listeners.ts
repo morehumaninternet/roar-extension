@@ -6,8 +6,11 @@ import { ensureActiveFeedbackTarget, targetById } from '../selectors'
 
 export function popupConnect(store: AppStore, browser: typeof global.browser): void {
   store.on('popupConnect', state => {
+    // For firefox, we open a separate tab that the user authenticatess with. So if they open the popup back up
+    // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
+    // aren't logged in
     if (state.browserInfo.browser === 'Firefox' && state.auth.state === 'authenticating') {
-      detectLogin(store.dispatchers)
+      detectLogin(store.dispatchers, { failIfNotLoggedIn: true })
     }
 
     const target = ensureActiveFeedbackTarget(state)

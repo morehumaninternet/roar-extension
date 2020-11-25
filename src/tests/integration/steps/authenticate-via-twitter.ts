@@ -54,7 +54,7 @@ function authenticateViaTwitterFirefox(mocks: Mocks): void {
 }
 
 function authenticateViaTwitterChrome(mocks: Mocks): void {
-  describe('authentication via twitter for Chrome', () => {
+  describe('authentication via twitter for chrome', () => {
     it('does not create a new tab or close the window', () => {
       expect(mocks.chrome.tabs.create).to.have.callCount(0)
     })
