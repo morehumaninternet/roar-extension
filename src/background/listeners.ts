@@ -4,7 +4,7 @@ import { detectLogin, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
 import { ensureActiveFeedbackTarget, targetById } from '../selectors'
 
-export function popupConnect(store: AppStore, browser: typeof global.browser): void {
+export function popupConnect(store: AppStore, browser: typeof global.browser, chrome: typeof global.chrome): void {
   store.on('popupConnect', state => {
     // For firefox, we open a separate tab that the user authenticatess with. So if they open the popup back up
     // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
@@ -22,7 +22,7 @@ export function popupConnect(store: AppStore, browser: typeof global.browser): v
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        fetchTwitterHandle(tab.id, tab.domain, store.dispatchers)
+        fetchTwitterHandle(tab.id, tab.domain, store.dispatchers, chrome)
       }
     }
 

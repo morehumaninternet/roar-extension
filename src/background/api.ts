@@ -57,15 +57,45 @@ function makeHandleRequest(domain: string): Promise<Response> {
   return fetch(requestURL.toString())
 }
 
-export const fetchTwitterHandle = async (tabId: number, domain: string, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
-  try {
-    dispatchBackgroundActions.fetchHandleStart({ tabId })
-    const res = await makeHandleRequest(domain)
-    const { twitter_handle } = await res.json()
-    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
-  } catch (error) {
-    return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
-  }
+export const fetchTwitterHandle = async (
+  tabId: number,
+  domain: string,
+  dispatchBackgroundActions: Dispatchers<BackgroundAction>,
+  chrome: typeof global.chrome
+) => {
+  dispatchBackgroundActions.fetchHandleStart({ tabId })
+
+  // We save a cache of the last 50 Twitter handles in the local storage of the browser.
+  chrome.storage.local.get(async result => {
+    try {
+      // All the cache is saved under the 'handleCache' key.
+      // The value of 'handleCache' is an array of objects.
+      // Each object is a single key-value pair - {"domain_name": "handle"}
+      // tslint:disable-next-line: no-let
+      let handlesList: readonly { [key: string]: string }[] | undefined = result['handleCache']
+      if (!handlesList) {
+        handlesList = []
+      }
+
+      // If we find the domain in the cache, use the appropriate handle
+      const cachedObject = handlesList.find(handleObject => domain in handleObject)
+      if (cachedObject) return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: cachedObject[domain] })
+
+      // If we didn't find the handle in the cache, fetch the request from the server
+      const res = await makeHandleRequest(domain)
+      const { twitter_handle } = await res.json()
+      if (!twitter_handle) return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error: `Could not find a twitter handle for domain ${domain}` })
+
+      // Update the cache with latest 50 handles
+      handlesList = [...handlesList, { [domain]: twitter_handle }]
+      if (handlesList.length > 50) handlesList = handlesList.slice(1)
+      chrome.storage.local.set({ handleCache: handlesList }, () => {
+        return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
+      })
+    } catch (error) {
+      return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
+    }
+  })
 }
 
 export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {
