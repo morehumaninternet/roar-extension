@@ -1,5 +1,5 @@
 import { Store, createStore } from 'redux'
-import { emptyStoreState } from './state'
+import { newStoreState } from './state'
 import { responders } from './responders'
 
 export type AppStore = Store<StoreState, Action> & {
@@ -7,7 +7,7 @@ export type AppStore = Store<StoreState, Action> & {
   on<T extends Action['type']>(type: T, callback: (nextState: StoreState & { mostRecentAction: Action & { type: T } }) => void): () => void
 }
 
-function reducer(state: StoreState = emptyStoreState(), action: Action): StoreState {
+function reducer(state: StoreState, action: Action): StoreState {
   // Redux initially sends a @@redux/INIT action
   if (action.type.startsWith('@@redux/INIT')) return state
 
@@ -30,8 +30,8 @@ function reducer(state: StoreState = emptyStoreState(), action: Action): StoreSt
   return nextState
 }
 
-export function create(): AppStore {
-  const store: AppStore = createStore(reducer)
+export function create(browserInfo: BrowserInfo): AppStore {
+  const store: AppStore = createStore(reducer, newStoreState(browserInfo))
 
   // Create dispatchers for each action type, one for each key in responders
   store.dispatchers = Object.keys(responders).reduce(

@@ -60,18 +60,33 @@ function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): Auth
   return { exists: true, state: feedbackTarget.feedbackState }
 }
 
-export function toAppState(storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
+export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
+  const signInWithTwitter = () => {
+    dispatchUserActions.signInWithTwitter()
+    if (storeState.browserInfo.browser === 'Firefox') {
+      popupWindow.close()
+    }
+  }
+
   switch (storeState.auth.state) {
     case 'not_authed': {
       return {
         view: 'NotAuthed',
-        signInWithTwitter: dispatchUserActions.signInWithTwitter,
+        signInWithTwitter,
+      }
+    }
+    case 'auth_failed': {
+      return {
+        view: 'AuthFailed',
+        signInWithTwitter,
       }
     }
     case 'authenticating': {
       return {
         view: 'Authenticating',
-        authenticatedViaTwitter: dispatchUserActions.authenticatedViaTwitter,
+        browser: storeState.browserInfo.browser,
+        authenticationFailure: dispatchUserActions.authenticationFailure,
+        authenticationSuccess: dispatchUserActions.authenticationSuccess,
       }
     }
     case 'authenticated': {

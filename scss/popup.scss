@@ -181,3 +181,7 @@ main {
 .emoji-mart-bar:last-child {
   display: none;
 }
+
+.authenticating-spinner {
+  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);;
+}

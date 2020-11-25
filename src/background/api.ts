@@ -67,3 +67,15 @@ export const fetchTwitterHandle = async (tabId: number, domain: string, dispatch
     return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
   }
 }
+
+export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {
+  const requestURL = new URL('v1/me', window.roarServerUrl).toString()
+  const response = await fetch(requestURL, { credentials: 'include' })
+  if (response.status === 200) {
+    const user = await response.json()
+    return dispatchActions.authenticationSuccess(user)
+  }
+  if (opts.failIfNotLoggedIn) {
+    dispatchActions.authenticationFailure({ error: { message: 'Not logged in.' } })
+  }
+}

@@ -60,8 +60,11 @@ export const responders: Responders<Action> = {
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
   },
-  authenticatedViaTwitter(state, { photoUrl }): Partial<StoreState> {
+  authenticationSuccess(state, { photoUrl }): Partial<StoreState> {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
+  },
+  authenticationFailure(state, { error }): Partial<StoreState> {
+    return { alert: error.message, auth: { state: 'auth_failed' } }
   },
   dismissAlert(): Partial<StoreState> {
     return { alert: null }

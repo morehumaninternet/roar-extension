@@ -3,19 +3,9 @@
 
 type Maybe<T> = T | null | undefined
 
-type SystemInfo = {
-  user_agent: string
-  online: boolean
-  cookie_enabled: boolean
-  do_not_track: null | string
-  languages: ReadonlyArray<string>
-  time: number
-  timezone_offset: number
-  memory: chrome.system.memory.MemoryInfo
-  storage: chrome.system.storage.StorageUnitInfo[] // tslint:disable-line:readonly-array
-  cpu: chrome.system.cpu.CpuInfo
-  zoom: number
-}
+type SupportedBrowser = 'Firefox' | 'Chrome'
+
+type BrowserInfo = { browser: SupportedBrowser; majorVersion: number }
 
 type Screenshot = {
   type: 'screenshot'
@@ -63,7 +53,7 @@ type CharacterLimit = {
 
 type User = { photoUrl?: string }
 
-type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
+type Auth = { state: 'not_authed' } | { state: 'auth_failed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
@@ -80,6 +70,7 @@ type FeedbackTarget = TabInfo | StoreState['help']
 type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
+  browserInfo: BrowserInfo
   focusedWindowId: number
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth
@@ -96,12 +87,19 @@ type StoreState = {
 
 type NotAuthedState = {
   view: 'NotAuthed'
-  signInWithTwitter: Dispatchers<UserAction>['signInWithTwitter']
+  signInWithTwitter(): void
 }
 
 type AuthenticatingState = {
   view: 'Authenticating'
-  authenticatedViaTwitter: Dispatchers<UserAction>['authenticatedViaTwitter']
+  browser: SupportedBrowser
+  authenticationFailure: Dispatchers<UserAction>['authenticationFailure']
+  authenticationSuccess: Dispatchers<UserAction>['authenticationSuccess']
+}
+
+type AuthFailedState = {
+  view: 'AuthFailed'
+  signInWithTwitter(): void
 }
 
 type AuthenticatedState = {
@@ -118,7 +116,7 @@ type AuthenticatedState = {
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
+type AppState = NotAuthedState | AuthenticatingState | AuthFailedState | AuthenticatedState
 
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
@@ -135,7 +133,8 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'authenticatedViaTwitter'; payload: { photoUrl?: string } }
+  | { type: 'authenticationSuccess'; payload: { photoUrl?: string } }
+  | { type: 'authenticationFailure'; payload: { error: any } }
   | { type: 'dismissAlert' }
   | { type: 'updateEditorState'; payload: { editorState: any } }
   | { type: 'clickPost' }
