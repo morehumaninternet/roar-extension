@@ -24,6 +24,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
     })
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!opts.alreadyAuthenticated) {
       it('mounts the app with a button to sign in with twitter', () => {
         const appContainer = mocks.popupWindow.document.getElementById('app-container')!
@@ -33,6 +34,9 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
     }
 =======
     it('mounts the app with a button to login in with twitter', () => {
+=======
+    it('mounts the app with a button to log in with twitter', () => {
+>>>>>>> 879452c... correct typo
       const appContainer = mocks.popupWindow.document.getElementById('app-container')!
       const signInWithTwitter = appContainer.querySelector('button')!
       expect(signInWithTwitter).to.have.property('innerHTML', 'Log in with Twitter')
