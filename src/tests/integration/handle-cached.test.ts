@@ -12,7 +12,6 @@ describe('use existing handle if it is cached', () => {
 
   it('should not cache the handle if it is already cached', () => {
     // tslint:disable no-unused-expression
-    console.log('9'.repeat(200))
     // expect(mocks.chrome.storage.local.get).to.be.calledOnce  ---- TODO - not working
     expect(mocks.chrome.storage.local.set).to.have.not.been.called
     // tslint:enable no-unused-expression
