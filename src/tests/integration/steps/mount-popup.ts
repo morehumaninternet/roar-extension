@@ -33,7 +33,8 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
 
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
       const activeTab = ensureActiveTab(mocks.getState())
-
+      // The handle should be cached the first time it's discovered
+      expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ 'zing.com': '@zing' }] })
       expect(activeTab.feedbackState.twitterHandle.handle).to.equal('@zing')
       expect(getPlainText(activeTab.feedbackState.editorState)).to.equal('@zing ')
       expect(activeTab.feedbackState.addingImages).to.equal(1)
