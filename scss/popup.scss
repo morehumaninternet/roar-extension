@@ -10,6 +10,7 @@ $min-height: 380px;
 
 html,
 body {
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -60,6 +61,7 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 .DraftEditor-root {
@@ -68,6 +70,7 @@ main {
   font-size: 18px;
   margin-top: 7px;
   min-height: 20px;
+  overflow-wrap: break-word;
 }
 
 .action-bar {
@@ -183,5 +186,5 @@ main {
 }
 
 .authenticating-spinner {
-  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);;
+  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);
 }
