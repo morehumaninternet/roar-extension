@@ -23,25 +23,13 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts = {}): void {
       fetchMock.restore()
     })
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     if (!opts.alreadyAuthenticated) {
       it('mounts the app with a button to sign in with twitter', () => {
         const appContainer = mocks.popupWindow.document.getElementById('app-container')!
         const signInWithTwitter = appContainer.querySelector('button')!
-        expect(signInWithTwitter).to.have.property('innerHTML', 'Sign in with twitter')
+        expect(signInWithTwitter.innerHTML).to.match(/.+(Log in with Twitter)$/)
       })
     }
-=======
-    it('mounts the app with a button to login in with twitter', () => {
-=======
-    it('mounts the app with a button to log in with twitter', () => {
->>>>>>> 879452c... correct typo
-      const appContainer = mocks.popupWindow.document.getElementById('app-container')!
-      const signInWithTwitter = appContainer.querySelector('button')!
-      expect(signInWithTwitter.innerHTML).to.match(/.+(Log in with Twitter)$/)
-    })
->>>>>>> 8ad0810... change sign in with twitter to log in with twitter
 
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
       const activeTab = ensureActiveTab(mocks.getState())
