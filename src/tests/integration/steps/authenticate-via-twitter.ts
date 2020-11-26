@@ -59,18 +59,7 @@ function authenticateViaTwitterChrome(mocks: Mocks): void {
       expect(mocks.chrome.tabs.create).to.have.callCount(0)
     })
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     it('adds an iframe when the sign in with twitter button is clicked', () => {
-=======
-    it('transitions to an "authenticating" state and adds an iframe when the login in with twitter button is clicked', () => {
-=======
-    it('transitions to an "authenticating" state and adds an iframe when the log in with twitter button is clicked', () => {
->>>>>>> 879452c... correct typo
-      const signInButton = mocks.app().querySelector('button')! as HTMLButtonElement
-      signInButton.click()
-      expect(mocks.getState().auth).to.have.property('state', 'authenticating')
->>>>>>> 8ad0810... change sign in with twitter to log in with twitter
       const iframe = mocks.app().querySelector('iframe')! as HTMLIFrameElement
       expect(iframe).to.have.property('src', 'https://test-roar-server.com/v1/auth/twitter')
     })
