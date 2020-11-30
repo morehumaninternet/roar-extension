@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { RoarLogo } from '../components/roar-logo'
 
 function TwitterLogo() {
   return (
@@ -11,7 +12,7 @@ function TwitterLogo() {
 export function NotAuthed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, 'signInWithTwitter'>): JSX.Element {
   return (
     <div className="not-authed">
-      <img src="/img/roar_128.png" />
+      <RoarLogo />
       <button onClick={signInWithTwitter}>
         <TwitterLogo />
         Log in with Twitter
