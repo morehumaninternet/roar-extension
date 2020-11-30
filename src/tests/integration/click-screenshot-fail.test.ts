@@ -10,7 +10,7 @@ describe('screenshotCaptureFailure + clickPost', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { allowActionFailure: true })
-  mountPopup(mocks)
+  mountPopup(mocks, { handle: 'exists' })
   signInViaTwitter(mocks)
   authenticateViaTwitter(mocks)
 

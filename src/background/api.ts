@@ -82,14 +82,13 @@ export const fetchTwitterHandle = async (
       // If we didn't find the handle in the cache, fetch the request from the server
       const res = await makeHandleRequest(domain)
       const { twitter_handle } = await res.json()
-      if (!twitter_handle) return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error: `Could not find a twitter handle for domain ${domain}` })
-
-      // Update the cache with latest 50 handles
-      handlesList = [...handlesList, { [domain]: twitter_handle }]
-      if (handlesList.length > 50) handlesList = handlesList.slice(1)
-      chrome.storage.local.set({ handleCache: handlesList }, () => {
-        return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
-      })
+      if (twitter_handle) {
+        // Update the cache with latest 50 handles
+        handlesList = [...handlesList, { [domain]: twitter_handle }]
+        if (handlesList.length > 50) handlesList = handlesList.slice(1)
+        chrome.storage.local.set({ handleCache: handlesList })
+      }
+      return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
     } catch (error) {
       return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
     }

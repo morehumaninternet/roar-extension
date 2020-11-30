@@ -85,12 +85,6 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
     Object.assign(global, popupWindowGlobals)
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
-
-    // Mocks for the handle caching.
-    // Call the callback passed to get with empty result
-    // Call the callback passed to set (second argument)
-    chrome.storage.local.get.callsArgWith(0, {})
-    chrome.storage.local.set.callsArg(1)
   }
 
   const teardown = () => {

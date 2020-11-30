@@ -101,7 +101,7 @@ export const responders: Responders<Action> = {
     return updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return {
-        editorState: replaceHandle(tab.feedbackState.editorState, handle),
+        editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
         twitterHandle: { status: 'DONE', handle },
       }
     })
