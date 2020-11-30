@@ -37,4 +37,13 @@
     font-size: 18px;
     font-family: 'Roboto', sans-serif;
   }
+
+  svg.twitter-logo {
+    padding: 3px;
+    height: 25px;
+
+    path {
+      fill: $twitter-blue;
+    }
+  }
 }
