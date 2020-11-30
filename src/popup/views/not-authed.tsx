@@ -9,7 +9,10 @@ export function NotAuthed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, '
         Log in with Twitter
       </button>
       <p>
-        Built with ❤️ by the team at <a href="<button onClick={signInWithTwitter}>Log in with Twitter</button>">https://morehumaninternet.org</a>
+        Built with ❤️ by the team at{' '}
+        <a target="_blank" href="https://morehumaninternet.org">
+          morehumaninternet.org
+        </a>
       </p>
     </div>
   )
