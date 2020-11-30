@@ -72,13 +72,11 @@ export const fetchTwitterHandle = async (
       // The value of 'handleCache' is an array of objects.
       // Each object is a single key-value pair - {"domain_name": "handle"}
       // tslint:disable-next-line: no-let
-      let handlesList: readonly { [key: string]: string }[] | undefined = result['handleCache']
-      if (!handlesList) {
-        handlesList = []
-      }
+      let handlesList: readonly { [key: string]: string }[] = result['handleCache'] || []
 
       // If we find the domain in the cache, use the appropriate handle
       const cachedObject = handlesList.find(handleObject => domain in handleObject)
+
       if (cachedObject) return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: cachedObject[domain] })
 
       // If we didn't find the handle in the cache, fetch the request from the server
