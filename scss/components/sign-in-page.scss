@@ -1,0 +1,52 @@
+.not-authed {
+  min-height: 380px;
+  min-width: 476px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: column;
+  position: relative;
+
+  img {
+    height: 128px;
+    width: 128px;
+  }
+
+  button {
+    border: none;
+    outline: none;
+    border-radius: 25px;
+    background-color: white;
+    color: $twitter-blue;
+    padding: 6px 16px 6px 6px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+
+    img {
+      padding: 3px;
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  p,
+  a {
+    color: $human-pink;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  svg.roar-logo {
+    height: 128px;
+  }
+  svg.twitter-logo {
+    padding: 3px;
+    height: 25px;
+
+    path {
+      fill: $twitter-blue;
+    }
+  }
+}
