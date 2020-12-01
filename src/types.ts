@@ -177,3 +177,7 @@ type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; pa
 type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
 }
+
+type TwitterHandleCacheItem = { [key: string]: string }
+
+type TwitterHandleCache = readonly TwitterHandleCacheItem[]
