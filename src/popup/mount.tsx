@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { AppStore } from '../background/store'
-import { darkMode } from './darkMode'
 import { App } from './app'
 
 function render(popupWindow: Window, dispatchUserActions: Dispatchers<UserAction>, storeState: StoreState, appContainer: HTMLElement) {
@@ -10,7 +9,6 @@ function render(popupWindow: Window, dispatchUserActions: Dispatchers<UserAction
 
 export function mount(chrome: typeof global.chrome, popupWindow: Window) {
   const appContainer = popupWindow.document.getElementById('app-container')!
-  const setDarkMode = darkMode(popupWindow)
 
   let dispatchUserActions: Dispatchers<UserAction>
   let unsubscribe: () => void
@@ -20,11 +18,7 @@ export function mount(chrome: typeof global.chrome, popupWindow: Window) {
     const store: AppStore = backgroundWindow.store
     dispatchUserActions = store.dispatchers
 
-    const onStateChange = () => {
-      const state = store.getState()
-      setDarkMode(state.darkModeOn)
-      render(popupWindow, dispatchUserActions, store.getState(), appContainer)
-    }
+    const onStateChange = () => render(popupWindow, dispatchUserActions, store.getState(), appContainer)
 
     onStateChange()
     unsubscribe = store.subscribe(onStateChange)

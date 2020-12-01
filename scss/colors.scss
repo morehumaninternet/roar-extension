@@ -3,11 +3,20 @@ $human-pink: #fa759e;
 $human-yellow-warning: #7e5e00;
 $twitter-blue: #1da1f2;
 
-:root {
+.light-theme {
   --background-color: white;
   --text-color: #{$human-blue};
   --post-btn-background-color: #{$human-blue};
   --post-btn-text-color: white;
   --image-border-color: #{$human-blue};
   --emoji-picker-border-color: #d9d9d9;
+}
+
+.dark-theme {
+  --background-color: #{$human-blue} !important;
+  --text-color: white;
+  --post-btn-background-color: #{$human-pink};
+  --post-btn-text-color: #{$human-blue};
+  --image-border-color: #{$human-pink};
+  --emoji-picker-border-color: 'transparent';
 }

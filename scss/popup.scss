@@ -22,6 +22,9 @@ body {
   max-height: 600px;
   min-width: $min-width;
   min-height: $min-height;
+}
+
+.app {
   background-color: var(--background-color);
 }
 

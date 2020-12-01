@@ -40,7 +40,7 @@ export const ActionBar = ({
         <ActionButton kind="AddImage" onClick={() => imageRef.current!.click()} disabled={addImageDisabled} />
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} additionalClassNames={pickingEmoji ? 'on' : 'off'} />
         <ActionButton kind="Help" onClick={toggleHelp} additionalClassNames={helpOn ? 'on' : 'off'} />
-        {darkModeOn ? <ActionButton kind="DarkMode" onClick={toggleDarkMode} /> : <ActionButton kind="LightMode" onClick={toggleDarkMode} />}
+        <ActionButton kind={darkModeOn ? 'DarkMode' : 'LightMode'} onClick={toggleDarkMode} />
       </div>
       <input ref={imageRef} type="file" accept=".png" onChange={evt => imageUpload({ file: evt.target.files![0] })} />
       <CharacterCountdown characterLimit={characterLimit} />
