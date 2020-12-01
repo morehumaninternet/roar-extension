@@ -10,6 +10,7 @@ import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
 import { onceAuthenticated } from './steps/once-authenticated'
 import { signInViaTwitter } from './steps/sign-in-via-twitter'
+import { captureFirstScreenshot } from './steps/capture-first-screenshot'
 
 happyPath({ browser: 'Chrome' })
 happyPath({ browser: 'Firefox' })
@@ -23,40 +24,9 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
     signInViaTwitter(mocks, opts)
     authenticateViaTwitter(mocks, opts)
     onceAuthenticated(mocks)
+    captureFirstScreenshot(mocks)
 
-    describe('images', () => {
-      it('renders an image spinner until the screenshot is added', () => {
-        const activeTab = ensureActiveTab(mocks.getState())
-        expect(activeTab.feedbackState.addingImages).to.equal(1)
-        expect(activeTab.feedbackState.images).to.have.length(0)
-        expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)
-      })
-
-      it('renders the screenshot and removes the spinner once it is added', async () => {
-        mocks.resolveLatestCaptureVisibleTab()
-        const state = await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.addingImages === 0)
-        const activeTab = ensureActiveTab(state)
-        expect(activeTab.feedbackState.addingImages).to.equal(0)
-        expect(activeTab.feedbackState.images).to.have.length(1)
-        const [image] = activeTab.feedbackState.images
-        if (image.type === 'imageupload') throw new Error('Expected screenshot')
-        expect(image.tab.id).to.equal(activeTab.id)
-        expect(image.tab.url).to.equal(activeTab.url)
-        expect(image.tab.width).to.equal(1200)
-        expect(image.tab.height).to.equal(900)
-        expect(image.blob).to.be.an.instanceof(Blob)
-
-        expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(0)
-        const imageThumbnail = mocks.app().querySelector('.twitter-interface > .images > .image-thumbnail')
-
-        const imageImage = imageThumbnail?.querySelector('.image-image')
-        expect(imageImage).to.have.property('src', image.uri)
-
-        // User can't remove images if there's only one
-        const closeButton = imageThumbnail?.querySelector('.close-button')
-        expect(closeButton).to.equal(null)
-      })
-
+    describe('taking screenshots', () => {
       it('takes a screenshot when the TakeScreenshot button is clicked', async () => {
         const tab = activeTab(mocks.getState())!
         expect(tab.feedbackState.images).to.have.lengthOf(1)
@@ -70,9 +40,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
 
       it('delete a screenshot when the close-button is clicked', async () => {
         const images = mocks.app().querySelectorAll('.twitter-interface > .images')!
-        const secondScreenshotCloseButton = images[0].querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
-
-        // If there are two images, the close button should exist
+        const secondScreenshotCloseButton = images[1].querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
         secondScreenshotCloseButton.click()
         await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 1)
       })

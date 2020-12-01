@@ -112,7 +112,6 @@ type AuthenticatedState = {
   darkModeOn: boolean
   pickingEmoji: boolean
   addImageDisabled: boolean
-  deleteImageDisabled: boolean
   postTweetDisabled: boolean
   characterLimit: CharacterLimit
   dispatchUserActions: Dispatchers<UserAction>

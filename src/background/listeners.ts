@@ -2,7 +2,7 @@ import { AppStore } from './store'
 import * as images from './images'
 import { detectLogin, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
-import { ensureActiveFeedbackTarget, targetById } from '../selectors'
+import { ensureActiveFeedbackTarget, targetById, totalImages } from '../selectors'
 
 type ListenerDependencies = {
   store: AppStore
@@ -34,7 +34,7 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
     }
 
     // Take a screenshot if no images currently present for the current feedback target
-    if (target.feedbackState.addingImages + target.feedbackState.images.length < 1) {
+    if (totalImages(target) < 1) {
       images.takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })
@@ -59,6 +59,15 @@ export function signInWithTwitter({ store, chrome }: ListenerDependencies): void
   store.on('signInWithTwitter', state => {
     if (state.browserInfo.browser === 'Firefox') {
       chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
+    }
+  })
+}
+
+export function clickDeleteImage({ store, browser }: ListenerDependencies): void {
+  store.on('clickDeleteImage', state => {
+    const target = ensureActiveFeedbackTarget(state)
+    if (totalImages(target) < 1) {
+      images.takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })
 }

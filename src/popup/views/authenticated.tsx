@@ -14,7 +14,6 @@ export function Authenticated({
   helpOn,
   darkModeOn,
   addImageDisabled,
-  deleteImageDisabled,
   dispatchUserActions,
   characterLimit,
   postTweetDisabled,
@@ -37,12 +36,7 @@ export function Authenticated({
         <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
         <div className="twitter-interface">
           <FeedbackEditor editorState={feedback.state.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
-          <Images
-            feedback={feedback.state}
-            startEditingImage={dispatchUserActions.startEditingImage}
-            clickDeleteImage={dispatchUserActions.clickDeleteImage}
-            deleteImageDisabled={deleteImageDisabled}
-          />
+          <Images feedback={feedback.state} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
