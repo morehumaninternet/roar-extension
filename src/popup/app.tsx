@@ -24,8 +24,9 @@ export function AppContents({ popupWindow, storeState, dispatchUserActions }: Ap
 }
 
 export function App(props: AppProps): JSX.Element {
+  const theme = props.storeState.darkModeOn ? 'dark-theme' : ''
   return (
-    <div className="app">
+    <div className={`app ${theme}`}>
       <AppContents {...props} />
     </div>
   )

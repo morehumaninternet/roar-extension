@@ -11,6 +11,8 @@ export function Authenticated({
   tweeting,
   user,
   pickingEmoji,
+  helpOn,
+  darkModeOn,
   addImageDisabled,
   deleteImageDisabled,
   dispatchUserActions,
@@ -46,6 +48,10 @@ export function Authenticated({
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
             toggleHelp={dispatchUserActions.toggleHelp}
+            toggleDarkMode={dispatchUserActions.toggleDarkMode}
+            pickingEmoji={pickingEmoji}
+            helpOn={helpOn}
+            darkModeOn={darkModeOn}
             addImageDisabled={addImageDisabled}
             imageUpload={dispatchUserActions.imageUpload}
             characterLimit={characterLimit}
