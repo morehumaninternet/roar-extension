@@ -1,10 +1,9 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
 import { Mocks } from '../mocks'
-import { whenState } from '../../../redux-utils'
 import { ensureActiveTab } from '../../../selectors'
 
-export function captureFirstScreenshot(mocks: Mocks) {
+export function captureFirstScreenshot(mocks: Mocks): void {
   describe('capturing first screenshot', () => {
     it('renders an image spinner until the screenshot is added', () => {
       const activeTab = ensureActiveTab(mocks.getState())
@@ -15,7 +14,7 @@ export function captureFirstScreenshot(mocks: Mocks) {
 
     it('renders the screenshot and removes the spinner once it is added', async () => {
       mocks.resolveLatestCaptureVisibleTab()
-      const state = await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.addingImages === 0)
+      const state = await mocks.whenState(state => ensureActiveTab(state).feedbackState.addingImages === 0)
       const activeTab = ensureActiveTab(state)
       expect(activeTab.feedbackState.addingImages).to.equal(0)
       expect(activeTab.feedbackState.images).to.have.length(1)

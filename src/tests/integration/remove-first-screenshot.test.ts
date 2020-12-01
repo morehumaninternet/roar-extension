@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { createMocks } from './mocks'
-import { whenState } from '../../redux-utils'
 import { ensureActiveTab } from '../../selectors'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
@@ -25,15 +24,15 @@ describe('removing the first screenshot', () => {
       const firstScreenshotCloseButton = firstImage.querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
       firstScreenshotCloseButton.click()
 
-      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 0)
-      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.addingImages === 1)
+      await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 0)
+      await mocks.whenState(state => ensureActiveTab(state).feedbackState.addingImages === 1)
 
       expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)
     })
 
     it('renders the new image that was taken when captureVisibleTab resolves', async () => {
       mocks.resolveLatestCaptureVisibleTab()
-      await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 1)
+      await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 1)
 
       expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(0)
       const images = mocks.app().querySelectorAll('.image-image')

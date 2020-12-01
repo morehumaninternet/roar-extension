@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { createMocks } from './mocks'
-import { whenState } from '../../redux-utils'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
@@ -24,7 +23,7 @@ describe('screenshotCaptureFailure + clickPost', () => {
 
       mocks.rejectLatestCaptureVisibleTab()
 
-      const state = await whenState(mocks.backgroundWindow.store, state => state.mostRecentAction.type !== 'clickPost')
+      const state = await mocks.whenState(state => state.mostRecentAction.type !== 'clickPost')
 
       expect(state.alert).to.equal('Could not take screenshot')
     })
