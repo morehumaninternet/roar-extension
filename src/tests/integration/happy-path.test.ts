@@ -37,9 +37,9 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
         expect(images).to.have.lengthOf(2)
       })
 
-      it('delete a screenshot when the close-button is clicked', async () => {
-        const images = mocks.app().querySelectorAll('.twitter-interface > .images')!
-        const secondScreenshotCloseButton = images[1].querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
+      it('deletes a screenshot when the close-btn is clicked', async () => {
+        const imageThumbnails = mocks.app().querySelectorAll('.twitter-interface > .images > .image-thumbnail')!
+        const secondScreenshotCloseButton = imageThumbnails[1].querySelector('.close-btn') as HTMLButtonElement
         secondScreenshotCloseButton.click()
         await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 1)
       })
