@@ -4,6 +4,7 @@ import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
+import { UserAvatar } from '../components/user-avatar'
 // import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
@@ -34,7 +35,8 @@ export function Authenticated({
     <div className="authenticated">
       <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
       <main>
-        <img className="profile-img" src={user.photoUrl || '/img/default-avatar.png'} />
+        <UserAvatar src={user.photoUrl || '/img/default-avatar.png'} />
+
         <div className="twitter-interface">
           <FeedbackEditor editorState={feedback.state.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
           <Images
