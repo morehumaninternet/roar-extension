@@ -48,14 +48,29 @@ main {
   display: flex;
 }
 
-.profile-img {
-  flex: 0 0 auto;
-  align-self: flex-start;
-  margin-right: 10px;
-  height: 36px;
-  width: 36px;
-  border-radius: 18px;
-  object-fit: cover;
+.user-avatar {
+  .profile-img {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    margin-right: 10px;
+    height: 36px;
+    width: 36px;
+    border-radius: 18px;
+    object-fit: cover;
+  }
+
+  .dropdown {
+    display: none;
+  }
+
+  .profile-img:hover + .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown:hover + p {
+    display: block;
+  }
 }
 
 .twitter-interface {
