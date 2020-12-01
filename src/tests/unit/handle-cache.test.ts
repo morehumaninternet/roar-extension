@@ -16,10 +16,11 @@ describe('handle-cache', () => {
     } as any)
 
     for (const i of range(51)) {
-      handleCache.set(`domain-${i}`, `@${i}`)
+      await handleCache.set(`domain-${i}`, `@${i}`)
     }
 
     expect(await handleCache.get('domain-0')).to.equal(undefined)
+    expect(await handleCache.get('domain-1')).to.equal('@1')
     expect(await handleCache.get('domain-50')).to.equal('@50')
   })
 })
