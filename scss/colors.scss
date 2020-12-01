@@ -9,7 +9,7 @@ $twitter-blue: #1da1f2;
   --post-btn-background-color: #{$human-blue};
   --post-btn-text-color: white;
   --image-border-color: #{$human-blue};
-  --emoji-picker-border-color: #d9d9d9;
+  --open-emoji-picker-border-right: 1px solid #d9d9d9;
 }
 
 .dark-theme {
@@ -18,5 +18,5 @@ $twitter-blue: #1da1f2;
   --post-btn-background-color: #{$human-pink};
   --post-btn-text-color: #{$human-blue};
   --image-border-color: #{$human-pink};
-  --emoji-picker-border-color: 'transparent';
+  --open-emoji-picker-border-right: none;
 }

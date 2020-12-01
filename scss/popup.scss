@@ -81,12 +81,14 @@ main {
 .emoji-picker-container {
   display: inherit;
   transition: width 0.2s;
-  border-right: 1px solid;
-  border-color: var(--emoji-picker-border-color);
 
   &.closed {
     width: 0;
     overflow: hidden;
+  }
+
+  &.open {
+    border-right: var(--open-emoji-picker-border-right);
   }
 }
 
