@@ -75,6 +75,9 @@ export const responders: Responders<Action> = {
   toggleHelp(state): Partial<StoreState> {
     return { help: { ...state.help, on: !state.help.on } }
   },
+  toggleDarkMode(state): Partial<StoreState> {
+    return { darkModeOn: !state.darkModeOn }
+  },
   emojiPicked(state, { emoji }): Partial<StoreState> {
     return {
       pickingEmoji: false,

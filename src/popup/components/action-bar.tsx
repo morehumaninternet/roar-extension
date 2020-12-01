@@ -8,6 +8,8 @@ type ActionBarProps = {
   clickTakeScreenshot: Dispatchers<UserAction>['clickTakeScreenshot']
   imageUpload: Dispatchers<UserAction>['imageUpload']
   toggleHelp: Dispatchers<UserAction>['toggleHelp']
+  toggleDarkMode: Dispatchers<UserAction>['toggleDarkMode']
+  darkModeOn: boolean
   addImageDisabled: boolean
   characterLimit: CharacterLimit
   postTweetDisabled: boolean
@@ -19,6 +21,8 @@ export const ActionBar = ({
   clickTakeScreenshot,
   imageUpload,
   toggleHelp,
+  toggleDarkMode,
+  darkModeOn,
   addImageDisabled,
   characterLimit,
   postTweetDisabled,
@@ -32,6 +36,7 @@ export const ActionBar = ({
         <ActionButton kind="AddImage" onClick={() => imageRef.current!.click()} disabled={addImageDisabled} />
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} />
         <ActionButton kind="Help" onClick={toggleHelp} />
+        {darkModeOn ? <ActionButton kind="DarkMode" onClick={toggleDarkMode} /> : <ActionButton kind="LightMode" onClick={toggleDarkMode} />}
       </div>
       <input ref={imageRef} type="file" accept=".png" onChange={evt => imageUpload({ file: evt.target.files![0] })} />
       <CharacterCountdown characterLimit={characterLimit} />

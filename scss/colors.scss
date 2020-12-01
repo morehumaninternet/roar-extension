@@ -2,3 +2,11 @@ $human-blue: #164176;
 $human-pink: #fa759e;
 $human-yellow-warning: #7e5e00;
 $twitter-blue: #1da1f2;
+
+:root {
+  --background-color: white;
+  --text-color: #{$human-blue};
+  --post-btn-background-color: #{$human-blue};
+  --post-btn-text-color: white;
+  --image-border-color: #{$human-blue};
+}
