@@ -178,6 +178,7 @@ type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
 }
 
-type TwitterHandleCacheItem = { [key: string]: string }
-
-type TwitterHandleCache = readonly TwitterHandleCacheItem[]
+type TwitterHandleCache = {
+  get(domain: string): Promise<Maybe<string>>
+  set(domain: string, handle: string): Promise<void>
+}

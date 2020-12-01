@@ -23,7 +23,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
 
   describe(description, () => {
     const twitter_handle = opts.handle === 'does not exist' ? null : '@zing'
-    const handleCache = opts.handle === 'cached' ? [{ 'zing.com': twitter_handle }] : []
+    const handleCache = opts.handle === 'cached' ? [{ domain: 'zing.com', twitter_handle }] : []
 
     before(() => mocks.chrome.storage.local.get.callsArgWith(0, { handleCache }))
 
@@ -57,7 +57,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
 
     if (opts.handle === 'exists') {
       it('caches the handle in chrome.storage.local', () => {
-        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ 'zing.com': '@zing' }] })
+        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ domain: 'zing.com', twitter_handle: '@zing' }] })
       })
     } else {
       it('does not cache the handle', () => {
