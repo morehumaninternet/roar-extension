@@ -59,23 +59,25 @@ main {
     object-fit: cover;
   }
 
-  .dropdown {
-    display: inline-block;
-    position: relative;
-  }
-
   .dropdown-content {
     display: none;
     position: obsolute;
+    z-index: 1;
   }
 
-  .profile-img:hover .dropdown-content {
+  .dropdown-content button {
     display: block;
+    color: $twitter-blue;
+    font-weight: bold;
   }
+}
 
-  .dropdown:hover + p {
-    display: block;
-  }
+.user-avatar:hover .dropdown-content {
+  display: block;
+}
+
+.user-avatar button:hover {
+  background-color: $human-pink;
 }
 
 .twitter-interface {
