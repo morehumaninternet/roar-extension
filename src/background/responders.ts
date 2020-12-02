@@ -92,6 +92,10 @@ export const responders: Responders<Action> = {
   clickTakeScreenshot(): Partial<StoreState> {
     return {}
   },
+  clickLogoff(): Partial<StoreState> {
+    console.log('logoff button clicked')
+    return {}
+  },
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },

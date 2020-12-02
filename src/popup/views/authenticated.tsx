@@ -35,7 +35,7 @@ export function Authenticated({
     <div className="authenticated">
       <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
       <main>
-        <UserAvatar src={user.photoUrl || '/img/default-avatar.png'} />
+        <UserAvatar clickLogoff={dispatchUserActions.clickLogoff} src={user.photoUrl || '/img/default-avatar.png'} />
 
         <div className="twitter-interface">
           <FeedbackEditor editorState={feedback.state.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
