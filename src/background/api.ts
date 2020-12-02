@@ -91,3 +91,8 @@ export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { 
     dispatchActions.authenticationFailure({ error: { message: 'Not logged in.' } })
   }
 }
+
+export function makeLogoutRequest(domain: string): Promise<Response> {
+  const requestURL = new URL('v1/logout', window.roarServerUrl)
+  return fetch(requestURL.toString())
+}

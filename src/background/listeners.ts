@@ -1,6 +1,6 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { detectLogin, fetchTwitterHandle, postTweet } from './api'
+import { detectLogin, makeLogoutRequest, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
 import { ensureActiveFeedbackTarget, targetById } from '../selectors'
 
