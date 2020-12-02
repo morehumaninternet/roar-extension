@@ -92,7 +92,7 @@ export const responders: Responders<Action> = {
   clickTakeScreenshot(): Partial<StoreState> {
     return {}
   },
-  clickLogoff(): Partial<StoreState> {
+  clickLogout(): Partial<StoreState> {
     return { auth: { state: 'not_authed' } }
   },
   clickPost(state): Partial<StoreState> {

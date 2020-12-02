@@ -145,7 +145,7 @@ type UserAction =
   | { type: 'toggleDarkMode' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
-  | { type: 'clickLogoff' }
+  | { type: 'clickLogout' }
   | { type: 'clickDeleteImage'; payload: { imageIndex: number } }
   | { type: 'startEditingImage'; payload: { imageIndex: number } }
   | { type: 'imageUpload'; payload: { file: File } }
