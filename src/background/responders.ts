@@ -93,8 +93,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   clickLogoff(): Partial<StoreState> {
-    console.log('logoff button clicked')
-    return {}
+    return { auth: { state: 'not_authed' } }
   },
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
