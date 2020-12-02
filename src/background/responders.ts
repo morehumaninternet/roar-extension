@@ -178,12 +178,13 @@ export const responders: Responders<Action> = {
     })
   },
   startEditingImage(state, { imageIndex }): Partial<StoreState> {
-    return updateActiveFeedback(state, target => ({
-      editingImage: {
-        image: target.feedbackState.images[imageIndex],
-        color: '#fa759e',
-      },
-    }))
+    return {}
+    // return updateActiveFeedback(state, target => ({
+    //   editingImage: {
+    //     image: target.feedbackState.images[imageIndex],
+    //     color: '#fa759e',
+    //   },
+    // }))
   },
   imageUpload(state): Partial<StoreState> {
     return {}

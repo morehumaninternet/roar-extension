@@ -2,7 +2,7 @@ import { AppStore } from './store'
 import * as images from './images'
 import { detectLogin, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
-import { ensureActiveFeedbackTarget, targetById } from '../selectors'
+import { ensureActiveFeedbackTarget, ensureActiveTab, targetById } from '../selectors'
 
 type ListenerDependencies = {
   store: AppStore
@@ -44,6 +44,13 @@ export function clickTakeScreenshot({ store, browser }: ListenerDependencies): v
   store.on('clickTakeScreenshot', state => {
     const target = ensureActiveFeedbackTarget(state)
     images.takeScreenshot(target, browser.tabs, store.dispatchers)
+  })
+}
+
+export function startEditingImage({ store, browser }: ListenerDependencies): void {
+  store.on('startEditingImage', state => {
+    const tabId = ensureActiveTab(state).id
+    browser.tabs.executeScript(tabId, { file: 'bundled/screenshot-content-script.js' })
   })
 }
 

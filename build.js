@@ -27,10 +27,17 @@ assert.oneOf(ENV, ['local', 'stage', 'production'])
 const blue = chalk.hex('#164176')
 const pink = chalk.hex('#fa759e')
 const green = chalk.hex('#6FCF97')
+const orange = chalk.hex('#e49520')
 const gold = chalk.hex('#FFCA00')
 const lightBlue = chalk.hex('#4a81bc')
 const normalText = blue
 const emphasis = pink.bold
+
+const bundle = (script, color) => ({
+  name: color(`bundle:${script}`),
+  command: `npm run rollup -- src/${script}/index.ts ${watchFlag} --file bundled/${script}.js`,
+  env: { ENV, ROAR_SERVER_URL }
+})
 
 // The commands to run, give each a color so that they appear distinct in the terminal
 const commands = [
@@ -38,16 +45,9 @@ const commands = [
     name: green('scss'),
     command: `npm run scss -- ${watchFlag}`
   },
-  {
-    name: gold('bundle:popup'),
-    command: `npm run rollup -- src/popup/index.tsx ${watchFlag} --file bundled/popup.js`,
-    env: { ENV, ROAR_SERVER_URL }
-  },
-  {
-    name: lightBlue('bundle:background'),
-    command: `npm run rollup -- src/background/index.ts ${watchFlag} --file bundled/background.js`,
-    env: { ENV, ROAR_SERVER_URL }
-  },
+  bundle('popup', gold),
+  bundle('background', lightBlue),
+  bundle('screenshot-content-script', orange),
 ]
 
 // Create an output stream that writes to process.stdout
