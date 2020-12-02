@@ -1,24 +1,23 @@
-@import '../../node_modules/spinthatshit/src/loaders';
-@import '../colors';
-@import './images.scss';
-.tweeting-box {
-    display: flex;
-    justify-content: center;
+.tweeting {
+  display: block;
+  justify-content: center;
 }
-.tweeting-roar {
-    padding-top: 5%;
-    padding-bottom: 5%;
+.tweeting-logo-container {
+  display: flex;
+  padding: 10%;
+  justify-content: center;
 }
 
 .tweet-in-progress {
-    display: flex;
-    justify-content: center;
-    color:$human-pink;
-    font-size: 1.8em;
-    padding-bottom: 10%;
-    font-weight: 400;
+  display: flex;
+  justify-content: center;
+  color:$human-pink;
+  font-size: 1.8em;
+  padding-bottom: 15%;
+  font-weight: 400;
 }
 
 .tweeting-spinner {
-    @include loader02($size: 30px, $border-size: 3px, $color: $human-pink, $duration: 1s, $align: middle);;
+  display: flex;
+  @include loader02($size: 30px, $border-size: 3px, $color: $human-pink, $duration: 1s, $align: middle);
 }

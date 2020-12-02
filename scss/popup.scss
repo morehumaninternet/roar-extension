@@ -1,8 +1,8 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
-@use './components/tweeting.scss';
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
+@import './components/tweeting.scss';
 @import './components/images.scss';
 
 $main-padding: 10px;
@@ -184,5 +184,5 @@ main {
 }
 
 .authenticating-spinner {
-  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);;
+  @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);
 }
