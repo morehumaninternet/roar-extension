@@ -2,11 +2,8 @@
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
-<<<<<<< HEAD
 @import './components/tweeting.scss';
-=======
 @import './components/action-bar.scss';
->>>>>>> 1ef7668ae0a1c210ab3ca71666c0197670c8b9dd
 @import './components/images.scss';
 @import './components/sign-in-page.scss';
 
@@ -102,8 +99,4 @@ main {
 
 .authenticating-spinner {
   @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1ef7668ae0a1c210ab3ca71666c0197670c8b9dd
