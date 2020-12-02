@@ -81,6 +81,7 @@ type StoreState = {
     on: boolean
     feedbackState: FeedbackState
   }
+  darkModeOn: boolean
   alert: null | string | { __html: string }
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
@@ -108,6 +109,7 @@ type AuthenticatedState = {
   user: User
   tweeting: null | { at: string }
   helpOn: boolean
+  darkModeOn: boolean
   pickingEmoji: boolean
   addImageDisabled: boolean
   deleteImageDisabled: boolean
@@ -140,6 +142,7 @@ type UserAction =
   | { type: 'clickPost' }
   | { type: 'togglePickingEmoji' }
   | { type: 'toggleHelp' }
+  | { type: 'toggleDarkMode' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
   | { type: 'clickDeleteImage'; payload: { imageIndex: number } }
@@ -176,4 +179,9 @@ type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; pa
 
 type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
+}
+
+type TwitterHandleCache = {
+  get(domain: string): Promise<Maybe<string>>
+  set(domain: string, handle: string): Promise<void>
 }

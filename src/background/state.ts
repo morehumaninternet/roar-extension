@@ -42,6 +42,7 @@ export const newStoreState = (browserInfo: BrowserInfo): StoreState => ({
   auth: { state: 'not_authed' },
   pickingEmoji: false,
   help: emptyHelpState(),
+  darkModeOn: false,
   alert: null,
   mostRecentAction: { type: 'INITIALIZING' },
 })

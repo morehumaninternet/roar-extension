@@ -19,7 +19,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
     const mocks = createMocks(opts)
 
     runBackground(mocks)
-    mountPopup(mocks)
+    mountPopup(mocks, { handle: 'exists' })
     signInViaTwitter(mocks, opts)
     authenticateViaTwitter(mocks, opts)
     onceAuthenticated(mocks)

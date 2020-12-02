@@ -2,8 +2,13 @@
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
+<<<<<<< HEAD
 @import './components/tweeting.scss';
+=======
+@import './components/action-bar.scss';
+>>>>>>> 1ef7668ae0a1c210ab3ca71666c0197670c8b9dd
 @import './components/images.scss';
+@import './components/sign-in-page.scss';
 
 $main-padding: 10px;
 $min-width: 476px;
@@ -11,6 +16,7 @@ $min-height: 380px;
 
 html,
 body {
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -20,7 +26,6 @@ body {
   max-height: 600px;
   min-width: $min-width;
   min-height: $min-height;
-  background-color: $human-blue;
 }
 
 iframe {
@@ -61,117 +66,29 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 .DraftEditor-root {
-  color: white;
+  color: var(--text-color);
   width: 100%;
   font-size: 18px;
   margin-top: 7px;
   min-height: 20px;
-}
-
-.action-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-
-  > .action-buttons {
-    display: flex;
-    align-items: flex-start;
-    flex-grow: 0;
-    margin-right: auto;
-    svg {
-      height: 36px;
-    }
-  }
-
-  > input[type='file'] {
-    display: none;
-  }
-
-  > .circular-chart {
-    height: 36px;
-    width: 36px;
-    display: block;
-    margin-right: 12px;
-
-    > .circle {
-      stroke: $human-pink;
-      fill: none;
-      stroke-width: 2.8;
-      stroke-linecap: round;
-      animation: progress 1s ease-out forwards;
-    }
-
-    > .circle__warning {
-      stroke: $human-yellow-warning;
-      fill: none;
-      stroke-width: 2.8;
-      stroke-linecap: round;
-      animation: progress 1s ease-out forwards;
-    }
-
-    > .inner-text {
-      fill: $human-pink;
-      font-size: 1.2em;
-      text-anchor: middle;
-    }
-
-    > .inner-text__warning {
-      fill: $human-yellow-warning;
-      font-size: 1.2em;
-      text-anchor: middle;
-    }
-
-    @keyframes progress {
-      0% {
-        stroke-dasharray: 0 100;
-      }
-    }
-  }
-
-  > .post-btn {
-    flex-grow: 0;
-    height: 36px;
-    width: 90px;
-    font-size: 16px;
-    font-weight: bold;
-    background-color: $human-pink;
-    color: $human-blue;
-    border: none;
-    border-radius: 50px;
-
-    &:disabled {
-      opacity: 0.65;
-    }
-  }
-}
-
-.svg-btn {
-  border: none;
-  background: none;
-  cursor: pointer;
-
-  svg > path {
-    fill: $human-pink;
-  }
-
-  &:disabled {
-    svg > path {
-      fill: grey;
-    }
-  }
+  overflow-wrap: break-word;
 }
 
 .emoji-picker-container {
   display: inherit;
   transition: width 0.2s;
-  // width: $emoji-container-width;
 
   &.closed {
     width: 0;
     overflow: hidden;
+  }
+
+  &.open {
+    border-right: var(--open-emoji-picker-border-right);
   }
 }
 
@@ -185,4 +102,8 @@ main {
 
 .authenticating-spinner {
   @include loader07($size: 16px, $color: white, $duration: 1s, $align: middle);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1ef7668ae0a1c210ab3ca71666c0197670c8b9dd

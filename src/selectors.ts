@@ -97,6 +97,7 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         feedback: authenticatedStateFeedback(feedbackTarget),
         user: storeState.auth.user,
         tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
+        darkModeOn: storeState.darkModeOn,
         helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),

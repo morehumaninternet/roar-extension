@@ -1,3 +1,24 @@
 $human-blue: #164176;
 $human-pink: #fa759e;
 $human-yellow-warning: #7e5e00;
+$twitter-blue: #1da1f2;
+
+.app {
+  --background-color: white;
+  --text-color: #{$human-blue};
+  --post-btn-background-color: #{$human-blue};
+  --post-btn-text-color: white;
+  --image-border-color: #{$human-blue};
+  --open-emoji-picker-border-right: 1px solid #d9d9d9;
+
+  &.dark-theme {
+    --background-color: #{$human-blue};
+    --text-color: white;
+    --post-btn-background-color: #{$human-pink};
+    --post-btn-text-color: #{$human-blue};
+    --image-border-color: #{$human-pink};
+    --open-emoji-picker-border-right: none;
+  }
+
+  background-color: var(--background-color);
+}
