@@ -60,12 +60,17 @@ main {
   }
 
   .dropdown {
-    display: none;
+    display: inline-block;
+    position: relative;
   }
 
-  .profile-img:hover + .dropdown {
-    position: relative;
-    display: inline-block;
+  .dropdown-content {
+    display: none;
+    position: obsolute;
+  }
+
+  .profile-img:hover .dropdown-content {
+    display: block;
   }
 
   .dropdown:hover + p {
