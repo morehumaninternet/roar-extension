@@ -93,6 +93,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   clickLogout(): Partial<StoreState> {
+    fetch('https://roar-server.herokuapp.com/v1/logout')
     return { auth: { state: 'not_authed' } }
   },
   clickPost(state): Partial<StoreState> {
