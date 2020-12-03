@@ -40,6 +40,14 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
   })
 }
 
+export function clickLogout({ store, browser }: ListenerDependencies): void {
+  store.on('clickLogout', state => {
+    if (state.auth.state === 'not_authed') {
+      makeLogoutRequest
+    }
+  })
+}
+
 export function clickTakeScreenshot({ store, browser }: ListenerDependencies): void {
   store.on('clickTakeScreenshot', state => {
     const target = ensureActiveFeedbackTarget(state)

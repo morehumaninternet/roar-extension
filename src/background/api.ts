@@ -94,7 +94,7 @@ export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { 
 
 export function makeLogoutRequest(): Promise<Response> {
   return fetch(`${window.roarServerUrl}/v1/logout`, {
-    method: 'POST',
+    method: 'GET',
     credentials: 'include',
   })
 }
