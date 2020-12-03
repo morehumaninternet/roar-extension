@@ -49,6 +49,8 @@ main {
 }
 
 .user-avatar {
+  position: relative;
+  z-index: 1;
   .profile-img {
     flex: 0 0 auto;
     align-self: flex-start;
@@ -70,11 +72,13 @@ main {
   .dropdown-content {
     display: none;
     position: obsolute;
-    z-index: 1;
+    margin-right: -46px;
   }
 
   .dropdown-content button {
     display: inline-block;
+    width: 92px;
+    height: 46px;
     border: none;
     color: $twitter-blue;
     background-color: $human-pink;
@@ -87,7 +91,10 @@ main {
 
 .user-avatar button:hover {
   font-weight: bold;
+  text-decoration: underline;
   background-color: $human-pink;
+  width: 92px;
+  height: 46px;
 }
 
 .twitter-interface {
