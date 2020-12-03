@@ -50,7 +50,7 @@ main {
 
 .user-avatar {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   .profile-img {
     flex: 0 0 auto;
     align-self: flex-start;
@@ -64,15 +64,15 @@ main {
   .caret-up {
     width: 0;
     height: 0;
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-bottom: 16px solid $human-pink;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 12px solid $human-pink;
   }
 
   .dropdown-content {
     display: none;
     position: obsolute;
-    margin-right: -46px;
+    margin-right: -58px;
   }
 
   .dropdown-content button {
@@ -80,6 +80,7 @@ main {
     width: 92px;
     height: 46px;
     font-size: 1.2rem;
+    padding: 12px 6px;
     font-weight: bold;
     color: var(--post-btn-text-color);
     background-color: var(--post-btn-background-color);
