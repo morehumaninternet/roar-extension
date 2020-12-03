@@ -39,7 +39,7 @@
       object-fit: cover;
     }
 
-    > .close-button {
+    > .close-btn {
       display: none;
       position: absolute;
       top: 5px;
@@ -67,9 +67,9 @@
 
     // On image hovering, display the edit button
     .image-image:hover ~ .edit-button,
-    .image-image:hover ~ .close-button,
+    .image-image:hover ~ .close-btn,
     .edit-button:hover,
-    .close-button:hover {
+    .close-btn:hover {
       display: inline-block;
     }
   }

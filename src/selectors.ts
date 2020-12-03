@@ -27,15 +27,13 @@ export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
   return ensureActiveTab(state)
 }
 
-export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
-  if (!feedbackTarget) return false
+export function totalImages(feedbackTarget: FeedbackTarget): number {
   const { addingImages, images } = feedbackTarget.feedbackState
-  return addingImages + images.length >= 9
+  return addingImages + images.length
 }
 
-export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
-  if (!feedbackTarget) return false
-  return feedbackTarget.feedbackState.images.length <= 1
+export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+  return feedbackTarget ? totalImages(feedbackTarget) >= 9 : false
 }
 
 export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
@@ -101,7 +99,6 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),
-        deleteImageDisabled: deleteImageDisabled(feedbackTarget),
         postTweetDisabled: postTweetDisabled(feedbackTarget),
         characterLimit: getCharacterLimit(feedbackTarget),
         dispatchUserActions,

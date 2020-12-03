@@ -5,6 +5,7 @@ import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
+import { whenState } from '../../redux-utils'
 
 type MockBrowser = typeof global.browser & {
   tabs: {
@@ -24,6 +25,7 @@ export type Mocks = {
   chrome: typeof chrome
   app(): HTMLDivElement
   getState(): StoreState
+  whenState(cb: (state: StoreState) => boolean): Promise<StoreState>
   resolveLatestCaptureVisibleTab(): void
   rejectLatestCaptureVisibleTab(): void
 }
@@ -104,5 +106,17 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   before(setup)
   after(teardown)
 
-  return { backgroundWindow, popupWindow, browser, chrome, app, getState, resolveLatestCaptureVisibleTab, rejectLatestCaptureVisibleTab }
+  return {
+    backgroundWindow,
+    popupWindow,
+    browser,
+    chrome,
+    app,
+    getState,
+    resolveLatestCaptureVisibleTab,
+    rejectLatestCaptureVisibleTab,
+    whenState(cb) {
+      return whenState(backgroundWindow.store, cb)
+    },
+  }
 }
