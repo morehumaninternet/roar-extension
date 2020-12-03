@@ -1,0 +1,23 @@
+.tweeting {
+  display: block;
+  justify-content: center;
+}
+.tweeting-logo-container {
+  display: flex;
+  padding: 10%;
+  justify-content: center;
+}
+
+.tweet-in-progress {
+  display: flex;
+  justify-content: center;
+  color:$human-pink;
+  font-size: 1.8em;
+  padding-bottom: 15%;
+  font-weight: 400;
+}
+
+.tweeting-spinner {
+  display: flex;
+  @include loader02($size: 30px, $border-size: 3px, $color: $human-pink, $duration: 1s, $align: middle);
+}
