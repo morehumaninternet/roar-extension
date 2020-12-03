@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Editor, EditorState, CompositeDecorator } from 'draft-js'
+import { usePopper } from 'react-popper'
 import { fromText } from '../../draft-js-utils'
 
 type FeedbackEditorProps = {
@@ -13,7 +14,7 @@ const styleMap = {
   },
 }
 
-export function FeedbackEditor({ updateEditorState }: FeedbackEditorProps): JSX.Element {
+export function FeedbackEditor({ editorState, updateEditorState }: FeedbackEditorProps): JSX.Element {
   // const ref: any = React.useRef()
 
   // React.useEffect(() => {
@@ -22,7 +23,7 @@ export function FeedbackEditor({ updateEditorState }: FeedbackEditorProps): JSX.
   //   })
   // }, [])
 
-  const editorState = fromText('@coolbro')
+  // const editorState = fromText('@coolbro')
   const HANDLE_REGEX = /\@[\w]+/g
   const HASHTAG_REGEX = /\#[\w\u0590-\u05ff]+/g
 
@@ -44,17 +45,33 @@ export function FeedbackEditor({ updateEditorState }: FeedbackEditorProps): JSX.
 
   const HandleSpan = props => {
     console.log('IN HANDLE SPAN', props)
+
+    const [referenceElement, setReferenceElement] = React.useState<Maybe<HTMLSpanElement>>(null)
+    const [popperElement, setPopperElement] = React.useState<Maybe<HTMLDivElement>>(null)
+    const [arrowElement, setArrowElement] = React.useState<Maybe<HTMLDivElement>>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+      modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
+    })
+
     const url = 'https://nytimes.com'
     return (
-      <a
-        // href={url}
-        target="_blank"
-        onClick={(event: any) => {
-          chrome.tabs.create({ url, active: true })
-        }}
-      >
-        {props.children}
-      </a>
+      <>
+        <span
+          ref={setReferenceElement}
+          // href={url}
+          // target="_blank"
+          // onClick={(event: any) => {
+          //   chrome.tabs.create({ url, active: true })
+          // }}
+        >
+          {props.children}
+        </span>
+
+        <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+          bla
+          <div ref={setArrowElement} style={styles.arrow} />
+        </div>
+      </>
     )
   }
 
