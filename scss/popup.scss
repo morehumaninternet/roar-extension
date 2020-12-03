@@ -59,6 +59,14 @@ main {
     object-fit: cover;
   }
 
+  .caret-up {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid $human-pink;
+  }
+
   .dropdown-content {
     display: none;
     position: obsolute;
@@ -66,9 +74,11 @@ main {
   }
 
   .dropdown-content button {
-    display: block;
+    display: inline-block;
+    border: none;
     color: $twitter-blue;
     font-weight: bold;
+    background-color: $human-pink;
   }
 }
 
