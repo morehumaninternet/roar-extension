@@ -92,6 +92,9 @@ export const responders: Responders<Action> = {
   clickTakeScreenshot(): Partial<StoreState> {
     return {}
   },
+  clickLogout(): Partial<StoreState> {
+    return { auth: { state: 'not_authed' } }
+  },
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },

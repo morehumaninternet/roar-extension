@@ -1,6 +1,6 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { detectLogin, fetchTwitterHandle, postTweet } from './api'
+import { detectLogin, makeLogoutRequest, fetchTwitterHandle, postTweet } from './api'
 import { whenState } from '../redux-utils'
 import { ensureActiveFeedbackTarget, targetById, totalImages } from '../selectors'
 
@@ -36,6 +36,14 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
     // Take a screenshot if no images currently present for the current feedback target
     if (totalImages(target) < 1) {
       images.takeScreenshot(target, browser.tabs, store.dispatchers)
+    }
+  })
+}
+
+export function clickLogout({ store, browser }: ListenerDependencies): void {
+  store.on('clickLogout', state => {
+    if (state.auth.state === 'not_authed') {
+      makeLogoutRequest()
     }
   })
 }
