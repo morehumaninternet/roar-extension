@@ -77,7 +77,6 @@ main {
     display: inline-block;
     border: none;
     color: $twitter-blue;
-    font-weight: bold;
     background-color: $human-pink;
   }
 }
@@ -87,6 +86,7 @@ main {
 }
 
 .user-avatar button:hover {
+  font-weight: bold;
   background-color: $human-pink;
 }
 
