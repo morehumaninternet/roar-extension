@@ -22,7 +22,7 @@ describe('logout', () => {
 
     it('transitions to a not_authed state and makes a POST to v1/logout when clicked', async () => {
       const logoutButton = mocks.app().querySelector('.logout-btn')! as HTMLButtonElement
-      logoutButton.click()!
+      logoutButton.click()
       await whenState(mocks.backgroundWindow.store, state => state.auth.state === 'not_authed')
     })
   })
