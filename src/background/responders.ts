@@ -60,8 +60,11 @@ export const responders: Responders<Action> = {
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
   },
-  authenticatedViaTwitter(state, { photoUrl }): Partial<StoreState> {
+  authenticationSuccess(state, { photoUrl }): Partial<StoreState> {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
+  },
+  authenticationFailure(state, { error }): Partial<StoreState> {
+    return { alert: error.message, auth: { state: 'auth_failed' } }
   },
   dismissAlert(): Partial<StoreState> {
     return { alert: null }
@@ -71,6 +74,9 @@ export const responders: Responders<Action> = {
   },
   toggleHelp(state): Partial<StoreState> {
     return { help: { ...state.help, on: !state.help.on } }
+  },
+  toggleDarkMode(state): Partial<StoreState> {
+    return { darkModeOn: !state.darkModeOn }
   },
   emojiPicked(state, { emoji }): Partial<StoreState> {
     return {
@@ -98,7 +104,7 @@ export const responders: Responders<Action> = {
     return updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return {
-        editorState: replaceHandle(tab.feedbackState.editorState, handle),
+        editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
         twitterHandle: { status: 'DONE', handle },
       }
     })

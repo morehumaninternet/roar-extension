@@ -1,3 +1,5 @@
+import { getLength } from './draft-js-utils'
+
 export function activeTab(state: StoreState): null | TabInfo {
   for (const tab of state.tabs.values()) {
     if (tab.windowId === state.focusedWindowId && tab.active) return tab
@@ -36,6 +38,18 @@ export function deleteImageDisabled(feedbackTarget: null | FeedbackTarget): bool
   return feedbackTarget.feedbackState.images.length <= 1
 }
 
+export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
+  return getCharacterLimit(feedbackTarget).remaining < 0
+}
+
+export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): CharacterLimit {
+  const maxTweetLength = 280
+  const currentTweetLength = feedbackTarget ? getLength(feedbackTarget.feedbackState.editorState) : 0
+  const remaining = maxTweetLength - currentTweetLength
+  const percentageCompleted = (1 - remaining / maxTweetLength) * 100
+  return { remaining, percentageCompleted }
+}
+
 function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {
   if (!feedbackTarget) {
     return { exists: false, reasonDisabledMessage: null }
@@ -46,18 +60,33 @@ function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): Auth
   return { exists: true, state: feedbackTarget.feedbackState }
 }
 
-export function toAppState(storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
+export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
+  const signInWithTwitter = () => {
+    dispatchUserActions.signInWithTwitter()
+    if (storeState.browserInfo.browser === 'Firefox') {
+      popupWindow.close()
+    }
+  }
+
   switch (storeState.auth.state) {
     case 'not_authed': {
       return {
         view: 'NotAuthed',
-        signInWithTwitter: dispatchUserActions.signInWithTwitter,
+        signInWithTwitter,
+      }
+    }
+    case 'auth_failed': {
+      return {
+        view: 'AuthFailed',
+        signInWithTwitter,
       }
     }
     case 'authenticating': {
       return {
         view: 'Authenticating',
-        authenticatedViaTwitter: dispatchUserActions.authenticatedViaTwitter,
+        browser: storeState.browserInfo.browser,
+        authenticationFailure: dispatchUserActions.authenticationFailure,
+        authenticationSuccess: dispatchUserActions.authenticationSuccess,
       }
     }
     case 'authenticated': {
@@ -68,10 +97,13 @@ export function toAppState(storeState: StoreState, dispatchUserActions: Dispatch
         feedback: authenticatedStateFeedback(feedbackTarget),
         user: storeState.auth.user,
         tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
+        darkModeOn: storeState.darkModeOn,
         helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),
         deleteImageDisabled: deleteImageDisabled(feedbackTarget),
+        postTweetDisabled: postTweetDisabled(feedbackTarget),
+        characterLimit: getCharacterLimit(feedbackTarget),
         dispatchUserActions,
       }
     }

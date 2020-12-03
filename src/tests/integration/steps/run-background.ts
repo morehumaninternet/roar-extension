@@ -1,18 +1,29 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
 import { Map } from 'immutable'
+import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { run } from '../../../background/run'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
 
-export function runBackground(mocks: Mocks, opts: { allowActionFailure: boolean } = { allowActionFailure: false }): void {
+type RunBackgroundOpts = {
+  allowActionFailure?: boolean
+  alreadyAuthenticated?: boolean
+}
+
+export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void {
   let unsubscribe
   after(() => unsubscribe && unsubscribe())
 
-  describe('background:run', () => {
+  describe('run background script', () => {
     before(() => {
-      run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any)
+      const response = opts.alreadyAuthenticated ? { status: 200, body: { photoUrl: 'https://some-image-url.com/123' } } : { status: 401 }
+      fetchMock.mock('https://test-roar-server.com/v1/me', response)
+    })
+
+    before(() => {
+      run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any, mocks.backgroundWindow.navigator)
       // Throw an error if ever a Failure event is dispatched
       unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
         if (opts.allowActionFailure) return
@@ -26,12 +37,17 @@ export function runBackground(mocks: Mocks, opts: { allowActionFailure: boolean 
       })
     })
 
+    after(() => {
+      if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
+      fetchMock.restore()
+    })
+
     it('loads window.store, which starts with an empty state', () => {
       const state = mocks.getState()
+      expect(state.browserInfo).to.have.all.keys('browser', 'majorVersion')
       expect(state.focusedWindowId).to.equal(-1)
       expect(state.tabs).to.be.an.instanceOf(Map)
       expect(state.tabs).to.have.property('size', 0)
-      expect(state.auth).to.eql({ state: 'not_authed' })
       expect(state.pickingEmoji).to.equal(false)
       expect(state.help.on).to.equal(false)
       expect(state.help.feedbackState).to.be.an('object')
@@ -41,8 +57,17 @@ export function runBackground(mocks: Mocks, opts: { allowActionFailure: boolean 
       expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
       expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
       expect(state.alert).to.equal(null)
-      expect(state.mostRecentAction).to.eql({ type: 'INITIALIZING' })
     })
+
+    if (opts.alreadyAuthenticated) {
+      it('is already authenticated', () => {
+        expect(mocks.getState().auth).to.eql({ state: 'authenticated', user: { photoUrl: 'https://some-image-url.com/123' } })
+      })
+    } else {
+      it('is not yet authenticated', () => {
+        expect(mocks.getState().auth).to.eql({ state: 'not_authed' })
+      })
+    }
 
     it('sets the focusedWindowId when chrome.windows.getAll calls back', () => {
       expect(mocks.chrome.windows.getAll).to.have.callCount(1)

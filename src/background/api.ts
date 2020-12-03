@@ -57,13 +57,37 @@ function makeHandleRequest(domain: string): Promise<Response> {
   return fetch(requestURL.toString())
 }
 
-export const fetchTwitterHandle = async (tabId: number, domain: string, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+export const fetchTwitterHandle = async (
+  tabId: number,
+  domain: string,
+  dispatchBackgroundActions: Dispatchers<BackgroundAction>,
+  handleCache: TwitterHandleCache
+) => {
   try {
     dispatchBackgroundActions.fetchHandleStart({ tabId })
+
+    const cachedHandle = await handleCache.get(domain)
+    if (cachedHandle) return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: cachedHandle })
+
+    // If we didn't find the handle in the cache, fetch the request from the server
     const res = await makeHandleRequest(domain)
     const { twitter_handle } = await res.json()
+    if (twitter_handle) handleCache.set(domain, twitter_handle)
+
     return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
   } catch (error) {
     return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
+  }
+}
+
+export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {
+  const requestURL = new URL('v1/me', window.roarServerUrl).toString()
+  const response = await fetch(requestURL, { credentials: 'include' })
+  if (response.status === 200) {
+    const user = await response.json()
+    return dispatchActions.authenticationSuccess(user)
+  }
+  if (opts.failIfNotLoggedIn) {
+    dispatchActions.authenticationFailure({ error: { message: 'Not logged in.' } })
   }
 }

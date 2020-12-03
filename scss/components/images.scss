@@ -1,3 +1,11 @@
+@mixin image-grid-item {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid;
+  border-color: var(--image-border-color);
+}
+
 .images {
   height: 250px;
   display: grid;
@@ -7,9 +15,7 @@
   margin: 15px 0;
 
   .image-spinner {
-    height: 100%;
-    width: 100%;
-    border-radius: 10px;
+    @include image-grid-item;
     background-color: white;
     display: flex;
     justify-content: center;
@@ -29,10 +35,8 @@
     position: relative;
 
     > .image-image {
-      height: 100%;
-      width: 100%;
+      @include image-grid-item;
       object-fit: cover;
-      border-radius: 10px;
     }
 
     > .close-button {

@@ -4,16 +4,20 @@ import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
-import { EditingImage } from '../components/editing-image'
+// import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
   feedback,
   tweeting,
   user,
   pickingEmoji,
+  helpOn,
+  darkModeOn,
   addImageDisabled,
   deleteImageDisabled,
   dispatchUserActions,
+  characterLimit,
+  postTweetDisabled,
 }: AuthenticatedState): JSX.Element | null {
   if (tweeting) {
     return <Tweeting at={tweeting.at} />
@@ -44,8 +48,14 @@ export function Authenticated({
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
             clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
             toggleHelp={dispatchUserActions.toggleHelp}
+            toggleDarkMode={dispatchUserActions.toggleDarkMode}
+            pickingEmoji={pickingEmoji}
+            helpOn={helpOn}
+            darkModeOn={darkModeOn}
             addImageDisabled={addImageDisabled}
             imageUpload={dispatchUserActions.imageUpload}
+            characterLimit={characterLimit}
+            postTweetDisabled={postTweetDisabled}
           />
         </div>
       </main>

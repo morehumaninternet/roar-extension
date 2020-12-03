@@ -35,12 +35,14 @@ export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState
   }
 }
 
-export const emptyStoreState = (): StoreState => ({
+export const newStoreState = (browserInfo: BrowserInfo): StoreState => ({
+  browserInfo,
   focusedWindowId: -1,
   tabs: Map(),
   auth: { state: 'not_authed' },
   pickingEmoji: false,
   help: emptyHelpState(),
+  darkModeOn: false,
   alert: null,
   mostRecentAction: { type: 'INITIALIZING' },
 })
