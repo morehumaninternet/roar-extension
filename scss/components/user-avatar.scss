@@ -6,8 +6,6 @@ $caret-radius: 12px;
   z-index: 2;
 
   .profile-img {
-    flex: 0 0 auto;
-    align-self: flex-start;
     margin-right: 10px;
     height: 2 * $profile-image-radius;
     width: 2 * $profile-image-radius;
