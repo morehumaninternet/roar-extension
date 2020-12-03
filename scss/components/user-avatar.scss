@@ -23,7 +23,7 @@ $caret-radius: 12px;
 
   // Hide the dropdown content whenever not being hovered over
   &:not(:hover) .dropdown-content {
-    opacity: 0;
+    display: none;
   }
 
   .dropdown-content {
