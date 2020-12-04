@@ -1,4 +1,6 @@
-.svg-btn, .post-btn, .close-btn {
+.svg-btn,
+.post-btn,
+.close-btn {
   border: none;
   outline: none;
 }
@@ -36,6 +38,14 @@
       animation: progress 1s ease-out forwards;
     }
 
+    > .circle__remaining {
+      stroke: #ebeef0;
+      fill: none;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      animation: progress 1s ease-out forwards;
+    }
+
     > .circle__warning {
       stroke: $human-yellow-warning;
       fill: none;
@@ -58,7 +68,9 @@
 
     @keyframes progress {
       0% {
-        stroke-dasharray: 0 100;
+        // stroke-dasharray: 0 100;
+        stroke-dashoffset: 53.5193;
+        stroke-dasharray: 56.5487;
       }
     }
   }
