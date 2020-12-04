@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { Editor, EditorState, CompositeDecorator } from 'draft-js'
-import { usePopper } from 'react-popper'
 import { fromText } from '../../draft-js-utils'
+import Tippy from '@tippyjs/react'
 
 type FeedbackEditorProps = {
   editorState: EditorState
+  hovering: FeedbackState['hovering']
   updateEditorState: Dispatchers<UserAction>['updateEditorState']
+  hoverOver: Dispatchers<UserAction>['hoverOver']
 }
 
 const styleMap = {
@@ -14,26 +16,30 @@ const styleMap = {
   },
 }
 
-export function FeedbackEditor({ editorState, updateEditorState }: FeedbackEditorProps): JSX.Element {
-  // const ref: any = React.useRef()
+function hasParent(possibleChild: HTMLElement, possibleParent: HTMLElement | string): boolean {
+  let test: null | HTMLElement = possibleChild // tslint:disable-line:no-let
 
-  // React.useEffect(() => {
-  //   ref.current.editor.addEventListener('click', event => {
-  //     debugger
-  //   })
-  // }, [])
+  while (test) {
+    if (typeof possibleParent === 'string') {
+      if (test.matches(possibleParent)) return true
+    } else {
+      if (test === possibleParent) return true
+    }
 
-  // const editorState = fromText('@coolbro')
-  const HANDLE_REGEX = /\@[\w]+/g
-  const HASHTAG_REGEX = /\#[\w\u0590-\u05ff]+/g
+    test = test.parentElement // tslint:disable-line:no-expression-statement
+  }
+
+  return false
+}
+
+export function FeedbackEditor({ editorState, hovering, updateEditorState, hoverOver }: FeedbackEditorProps): JSX.Element {
+  const HANDLE_REGEX = /\@[\w\.\-]+/g
 
   function findWithRegex(regex: any, contentBlock: any, callback: any): any {
     const text = contentBlock.getText()
-    console.log('here', text)
     let matchArr: any // tslint:disable-line
     let start: any // tslint:disable-line
     while ((matchArr = regex.exec(text)) !== null) {
-      console.log('matchArr', matchArr)
       start = matchArr.index
       callback(start, start + matchArr[0].length)
     }
@@ -43,54 +49,65 @@ export function FeedbackEditor({ editorState, updateEditorState }: FeedbackEdito
     findWithRegex(HANDLE_REGEX, contentBlock, callback)
   }
 
-  const HandleSpan = props => {
-    console.log('IN HANDLE SPAN', props)
-
-    const [referenceElement, setReferenceElement] = React.useState<Maybe<HTMLSpanElement>>(null)
-    const [popperElement, setPopperElement] = React.useState<Maybe<HTMLDivElement>>(null)
-    const [arrowElement, setArrowElement] = React.useState<Maybe<HTMLDivElement>>(null)
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
-      modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
-    })
-
-    const url = 'https://nytimes.com'
+  const TwitterLink = ({ url }: { url: string }): JSX.Element => {
     return (
-      <>
-        <span
-          ref={setReferenceElement}
-          // href={url}
-          // target="_blank"
-          // onClick={(event: any) => {
-          //   chrome.tabs.create({ url, active: true })
-          // }}
-        >
-          {props.children}
-        </span>
-
-        <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-          bla
-          <div ref={setArrowElement} style={styles.arrow} />
-        </div>
-      </>
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        Take me to Twitter
+      </a>
     )
   }
 
-  const onlyHashtags = new CompositeDecorator([
-    {
-      strategy: handleStrategy,
-      component: HandleSpan,
-    },
-  ])
+  React.useEffect(() => {
+    const listener = event => {
+      if (hasParent(event.target, '.foo')) {
+        const hoverElement = event.target as HTMLElement
+        const { height, width, top, left } = hoverElement.getBoundingClientRect()
+        hoverOver({ hovering: { active: true, height, width, top, left } })
+      } else if (!hasParent(event.target, '.awesome-tippy')) {
+        hoverOver({ hovering: { active: false } })
+      }
+    }
+
+    window.addEventListener('mouseover', listener)
+    return () => window.removeEventListener('mouseover', listener)
+  })
+
+  const HandleSpan = props => {
+    const url = 'https://nytimes.com'
+    return <span className="foo">{props.children}</span>
+  }
+
+  const onlyHashtags = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
 
   const nextEditorState = EditorState.set(editorState, { decorator: onlyHashtags })
 
   return (
-    <Editor
-      // ref={ref as any}
-      placeholder="What's your feedback?"
-      editorState={nextEditorState}
-      onChange={editorState => updateEditorState({ editorState })}
-      // customStyleMap={styleMap}
-    />
+    <>
+      <Editor
+        placeholder="What's your feedback?"
+        editorState={nextEditorState}
+        onChange={editorState => updateEditorState({ editorState })}
+        // customStyleMap={styleMap}
+      />
+      <Tippy
+        className="awesome-tippy"
+        visible={hovering.active}
+        theme="light"
+        interactive
+        arrow={false}
+        offset={[0, 0]}
+        content={<TwitterLink url="https://google.com" />}
+      >
+        <div
+          className="link-tooltip-positioner"
+          style={{
+            height: hovering.height,
+            width: hovering.width,
+            top: hovering.top,
+            left: hovering.left,
+          }}
+        />
+      </Tippy>
+    </>
   )
 }

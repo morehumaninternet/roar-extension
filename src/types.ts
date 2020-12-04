@@ -40,6 +40,13 @@ type FeedbackState = {
   addingImages: number
   images: ReadonlyArray<Image>
   editorState: Draft.EditorState
+  hovering: {
+    active: boolean
+    top: number
+    left: number
+    height: number
+    width: number
+  }
   twitterHandle: {
     status: 'NEW' | 'IN_PROGRESS' | 'DONE'
     handle: string | null
@@ -138,6 +145,7 @@ type UserAction =
   | { type: 'authenticationSuccess'; payload: { photoUrl?: string } }
   | { type: 'authenticationFailure'; payload: { error: any } }
   | { type: 'dismissAlert' }
+  | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
   | { type: 'updateEditorState'; payload: { editorState: any } }
   | { type: 'clickPost' }
   | { type: 'togglePickingEmoji' }

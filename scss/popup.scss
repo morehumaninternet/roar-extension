@@ -1,10 +1,13 @@
 @use '../node_modules/draft-js/dist/Draft.css';
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
 @import '../node_modules/spinthatshit/src/loaders.scss';
+@import '../node_modules/tippy.js/dist/tippy.css';
+@import '../node_modules/tippy.js/themes/light.css';
 @import './colors';
 @import './components/action-bar.scss';
 @import './components/images.scss';
 @import './components/sign-in-page.scss';
+@import './components/feedback-editor.scss';
 
 $main-padding: 10px;
 $min-width: 476px;
@@ -63,15 +66,6 @@ main {
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-}
-
-.DraftEditor-root {
-  color: var(--text-color);
-  width: 100%;
-  font-size: 18px;
-  margin-top: 7px;
-  min-height: 20px;
-  overflow-wrap: break-word;
 }
 
 .emoji-picker-container {

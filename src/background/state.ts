@@ -9,6 +9,13 @@ export const emptyFeedbackState = (): FeedbackState => ({
   addingImages: 0,
   editingImage: null,
   images: [],
+  hovering: {
+    active: false,
+    top: 0,
+    left: 0,
+    height: 0,
+    width: 0,
+  },
   editorState: EditorState.createEmpty(),
   twitterHandle: { status: 'NEW', handle: null },
 })

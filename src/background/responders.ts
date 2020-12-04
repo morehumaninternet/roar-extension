@@ -86,6 +86,9 @@ export const responders: Responders<Action> = {
       })),
     }
   },
+  hoverOver(state, { hovering }): Partial<StoreState> {
+    return updateActiveFeedback(state, target => ({ hovering: { ...target.feedbackState.hovering, ...hovering } }))
+  },
   updateEditorState(state, { editorState }): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ editorState }))
   },
