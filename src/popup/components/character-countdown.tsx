@@ -25,21 +25,21 @@ export const CharacterCountdown = ({ characterLimit }: { characterLimit: Charact
       <svg viewBox={`0 0 ${diameter} ${diameter}`} className={`circular-chart ${drawWarningCircle ? 'warning' : ''}`}>
         {drawCircle && (
           <>
-            <circle cx="50%" cy="50%" stroke-width={strokeWidth} r={radius}></circle>
+            <circle cx="50%" cy="50%" strokeWidth={strokeWidth} r={radius}></circle>
             <circle
               className="progress"
               cx="50%"
               cy="50%"
-              stroke-width={strokeWidth}
+              strokeWidth={strokeWidth}
               r={radius}
               transform-origin="center"
-              stroke-linecap="round"
+              strokeLinecap="round"
               style={{ strokeDashoffset, strokeDasharray, transform: 'rotate(-90deg)' }}
             ></circle>
           </>
         )}
         {drawCountdown && (
-          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" className={drawWarningCountDown ? 'inner-text__warning' : 'inner-text'}>
+          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className={drawWarningCountDown ? 'inner-text__warning' : 'inner-text'}>
             {Math.abs(remaining)}
           </text>
         )}
