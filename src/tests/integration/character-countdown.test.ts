@@ -73,6 +73,7 @@ describe.only('character countdown', () => {
 
     it('renders the number of characters remaining as a text element', () => {
       // TODO: Hank to write this test
+      expect(mocks.app().querySelectorAll('.warning > text')).to.have.length(1)
     })
 
     it('does not disable posting', () => {
