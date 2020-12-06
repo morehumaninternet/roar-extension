@@ -56,10 +56,19 @@ describe.only('character countdown', () => {
 
     it('renders a more full progress circle', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      const circle = characterCountdown.querySelector('svg > circle')
+      // console.log(circle)
+      expect(circle?.getAttribute('cx')).to.equal('50%')
+      expect(circle?.getAttribute('cy')).to.equal('50%')
+      // expect(circle?.getAttribute("r")).to.be.true
     })
 
     it('has a .warning class', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+
+      expect(characterCountdown.querySelectorAll('.warning')).to.have.length(1)
     })
 
     it('renders the number of characters remaining as a text element', () => {
