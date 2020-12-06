@@ -83,7 +83,7 @@ describe.only('character countdown', () => {
   })
 
   describe('when exactly at the character limit', () => {
-    const exactly280Chars = '@zing.com ' + 'x'.repeat(270)
+    const exactly280Chars = '@zing.com ' + 'x'.repeat(271) //add one char
     before(() => {
       mocks.backgroundWindow.store.dispatchers.updateEditorState({
         editorState: fromText(exactly280Chars),
@@ -92,6 +92,8 @@ describe.only('character countdown', () => {
 
     it('renders no circles', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      expect(characterCountdown.querySelectorAll('circle')).to.have.length(0)
     })
 
     it('has an aria-valuenow equal to 100', () => {
