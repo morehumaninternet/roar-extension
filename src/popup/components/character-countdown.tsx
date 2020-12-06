@@ -15,31 +15,25 @@ export const CharacterCountdown = ({ characterLimit }: { characterLimit: Charact
   const strokeWidth = 2
   const diameter = 2 * radius + strokeWidth
   return (
-    <div
-      className="character-countdown"
-      role="progressbar"
-      aria-valuemax={100}
-      aria-valuemin={0}
-      aria-valuenow={Math.max(100, Math.floor(percentageCompleted))}
-    >
+    <div className="character-countdown" role="progressbar" aria-valuemax={100} aria-valuemin={0} aria-valuenow={Math.round(percentageCompleted)}>
       <svg viewBox={`0 0 ${diameter} ${diameter}`} className={`circular-chart ${drawWarningCircle ? 'warning' : ''}`}>
         {drawCircle && (
           <>
-            <circle cx="50%" cy="50%" strokeWidth={strokeWidth} r={radius}></circle>
+            <circle cx="50%" cy="50%" stroke-width={strokeWidth} r={radius}></circle>
             <circle
               className="progress"
               cx="50%"
               cy="50%"
-              strokeWidth={strokeWidth}
+              stroke-width={strokeWidth}
               r={radius}
               transform-origin="center"
-              strokeLinecap="round"
+              stroke-linecap="round"
               style={{ strokeDashoffset, strokeDasharray, transform: 'rotate(-90deg)' }}
             ></circle>
           </>
         )}
         {drawCountdown && (
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className={drawWarningCountDown ? 'inner-text__warning' : 'inner-text'}>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" className={drawWarningCountDown ? 'inner-text__warning' : 'inner-text'}>
             {Math.abs(remaining)}
           </text>
         )}

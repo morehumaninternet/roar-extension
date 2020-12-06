@@ -33,7 +33,11 @@ describe.only('character countdown', () => {
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const numCharacters = getPlainText(ensureActiveTab(mocks.getState()).feedbackState.editorState).length
       const filledInRatio = numCharacters / 280
-      expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(Math.floor(filledInRatio))
+
+      // console.log(`aria-valuenow: ${Number(characterCountdown.getAttribute('aria-valuenow'))}`)
+      // console.log(`filledInRatio: ${filledInRatio}`)
+
+      expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(Math.round(filledInRatio * 100))
     })
 
     it('does not disable posting', () => {
