@@ -10,6 +10,8 @@ $twitter-blue: #1da1f2;
   --post-btn-text-color: white;
   --image-border-color: #{$human-blue};
   --open-emoji-picker-border-right: 1px solid #d9d9d9;
+  --twitter-link-background-color: #{$human-blue};
+  --twitter-link-text-color: white;
 
   &.dark-theme {
     --background-color: #{$human-blue};
@@ -18,6 +20,8 @@ $twitter-blue: #1da1f2;
     --post-btn-text-color: #{$human-blue};
     --image-border-color: #{$human-pink};
     --open-emoji-picker-border-right: none;
+    --twitter-link-background-color: #{$human-pink};
+    --twitter-link-text-color: #{$human-blue};
   }
 
   background-color: var(--background-color);
