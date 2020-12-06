@@ -67,7 +67,6 @@ describe.only('character countdown', () => {
     it('has a .warning class', () => {
       // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-
       expect(characterCountdown.querySelectorAll('.warning')).to.have.length(1)
     })
 
@@ -83,17 +82,18 @@ describe.only('character countdown', () => {
   })
 
   describe('when exactly at the character limit', () => {
-    const exactly280Chars = '@zing.com ' + 'x'.repeat(271) //add one char
+    const exactly280Chars = '@zing.com ' + 'x'.repeat(270)
+    console.log('exactly280Chars', exactly280Chars.length)
     before(() => {
       mocks.backgroundWindow.store.dispatchers.updateEditorState({
         editorState: fromText(exactly280Chars),
       })
     })
 
-    it('renders no circles', () => {
-      // TODO: Hank to write this test
-      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-      expect(characterCountdown.querySelectorAll('circle')).to.have.length(0)
+    it('renders a full progress circle', () => {
+      const progressCircle = mocks.app().querySelector('.character-countdown circle.progress')! as SVGCircleElement
+      const remainingRatio = Number(progressCircle.style.strokeDashoffset) / Number(progressCircle.style.strokeDasharray)
+      expect(remainingRatio).to.equal(0)
     })
 
     it('has an aria-valuenow equal to 100', () => {
@@ -124,6 +124,8 @@ describe.only('character countdown', () => {
 
     it('renders no circles', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      expect(characterCountdown.querySelectorAll('circle')).to.have.length(0)
     })
 
     it('has an aria-valuenow equal to 100', () => {
