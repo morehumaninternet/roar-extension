@@ -83,7 +83,6 @@ describe.only('character countdown', () => {
 
   describe('when exactly at the character limit', () => {
     const exactly280Chars = '@zing.com ' + 'x'.repeat(270)
-    console.log('exactly280Chars', exactly280Chars.length)
     before(() => {
       mocks.backgroundWindow.store.dispatchers.updateEditorState({
         editorState: fromText(exactly280Chars),
