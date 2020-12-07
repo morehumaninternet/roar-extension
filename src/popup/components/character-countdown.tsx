@@ -21,7 +21,7 @@ export const CharacterCountdown = ({ characterLimit }: { characterLimit: Charact
       role="progressbar"
       aria-valuemax={100}
       aria-valuemin={0}
-      aria-valuenow={Math.round(percentageCompleted) >= 100 ? 100 : Math.round(percentageCompleted)}
+      aria-valuenow={Math.min(100, Math.round(percentageCompleted))}
     >
       <svg viewBox={`0 0 ${diameter} ${diameter}`} className={`circular-chart ${drawWarningCircle ? 'warning' : ''}`}>
         {drawCircle && (

@@ -5,8 +5,7 @@ import { mountPopup } from './steps/mount-popup'
 import { ensureActiveTab } from '../../selectors'
 import { fromText, getPlainText } from '../../draft-js-utils'
 
-// TODO: Hank to remove this .only when done writing these tests
-describe.only('character countdown', () => {
+describe('character countdown', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
@@ -28,7 +27,6 @@ describe.only('character countdown', () => {
       expect(text).to.equal(null)
     })
 
-    // TODO: Hank to fix bug in code
     it('is a progressbar with the an aria-valuenow equal to the filledInRatio', () => {
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const numCharacters = getPlainText(ensureActiveTab(mocks.getState()).feedbackState.editorState).length
@@ -52,7 +50,6 @@ describe.only('character countdown', () => {
     })
 
     it('renders a more full progress circle', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const progressCircle = characterCountdown.querySelector('circle.progress')! as SVGCircleElement
       const remainingRatio = Number(progressCircle.style.strokeDashoffset) / Number(progressCircle.style.strokeDasharray)
@@ -63,14 +60,13 @@ describe.only('character countdown', () => {
     })
 
     it('has a .warning class', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       expect(characterCountdown.querySelectorAll('svg.warning')).to.have.length(1)
     })
 
     it('renders the number of characters remaining as a text element', () => {
-      // TODO: Hank to write this test
-      expect(mocks.app().querySelectorAll('.warning > text')).to.have.length(1)
+      const text = mocks.app().querySelector('.character-countdown text')!
+      expect(text.innerHTML).to.equal('10')
     })
 
     it('does not disable posting', () => {
@@ -94,21 +90,18 @@ describe.only('character countdown', () => {
     })
 
     it('has an aria-valuenow equal to 100', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(100)
     })
 
     it('has a .warning class', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       expect(characterCountdown.querySelectorAll('svg.warning')).to.have.length(1)
     })
 
     it('renders zero as the number of characters remaining in a text element', () => {
-      // TODO: Hank to write this test
-      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-      expect(characterCountdown.querySelector('text')?.innerHTML).to.equal('0')
+      const text = mocks.app().querySelector('.character-countdown text')! as HTMLDivElement
+      expect(text.innerHTML).to.equal('0')
     })
 
     it('does not disable posting', () => {
@@ -126,27 +119,23 @@ describe.only('character countdown', () => {
     })
 
     it('renders no circles', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       expect(characterCountdown.querySelectorAll('circle')).to.have.length(0)
     })
 
     it('has an aria-valuenow equal to 100', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const variaValuenow = Number(characterCountdown.getAttribute('aria-valuenow'))
       expect(variaValuenow).to.equal(100)
     })
 
     it('renders the number of characters over the limit in a text element', () => {
-      // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const overLimitCount = Number(characterCountdown.querySelector('text')?.innerHTML)
       expect(overLimitCount).to.be.above(0)
     })
 
     it('disables posting', () => {
-      // TODO: Hank to write this test
       const postButton = mocks.app().querySelector('.post-btn')! as HTMLButtonElement
       expect(postButton.disabled).to.equal(true)
     })
