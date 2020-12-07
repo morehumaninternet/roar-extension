@@ -101,10 +101,14 @@ describe.only('character countdown', () => {
 
     it('has a .warning class', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      expect(characterCountdown.querySelectorAll('svg.warning')).to.have.length(1)
     })
 
     it('renders zero as the number of characters remaining in a text element', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      expect(characterCountdown.querySelector('text')?.innerHTML).to.equal('0')
     })
 
     it('does not disable posting', () => {
