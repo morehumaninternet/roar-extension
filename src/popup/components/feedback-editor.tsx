@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Editor, EditorState, CompositeDecorator } from 'draft-js'
-import Tippy from '@tippyjs/react'
 
 type FeedbackEditorProps = {
   editorState: EditorState
@@ -69,7 +68,7 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
 
   React.useEffect(() => {
     const listener = event => {
-      if (hasParent(event.target, '.link-tooltip__wrapper')) {
+      if (hasParent(event.target, '.tooltip-hover-element')) {
         const hoverElement = event.target as HTMLElement
         const { height, width, top, left } = hoverElement.getBoundingClientRect()
         hoverOver({ hovering: { active: true, height, width, top, left } })
@@ -83,7 +82,7 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
   })
 
   const HandleSpan = props => {
-    return <span className="link-tooltip__wrapper">{props.children}</span>
+    return <span className="tooltip-hover-element">{props.children}</span>
   }
 
   const onlyHashtags = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
@@ -98,25 +97,19 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
         onChange={editorState => updateEditorState({ editorState })}
         customStyleMap={styleMap}
       />
-      <Tippy
-        className="link-tooltip"
-        visible={hovering.active && !!handle}
-        theme="tippy-roar"
-        interactive
-        arrow={false}
-        offset={[0, 0]}
-        content={<TwitterLink handle={handle!} />}
-      >
+      {hovering.active && !!handle && (
         <div
-          className="link-tooltip__positioner"
+          className="link-tooltip"
           style={{
             height: hovering.height,
             width: hovering.width,
             top: hovering.top,
             left: hovering.left,
           }}
-        />
-      </Tippy>
+        >
+          <TwitterLink handle={handle!} />
+        </div>
+      )}
     </>
   )
 }
