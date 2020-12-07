@@ -34,9 +34,6 @@ describe.only('character countdown', () => {
       const numCharacters = getPlainText(ensureActiveTab(mocks.getState()).feedbackState.editorState).length
       const filledInRatio = numCharacters / 280
 
-      // console.log(`aria-valuenow: ${Number(characterCountdown.getAttribute('aria-valuenow'))}`)
-      // console.log(`filledInRatio: ${filledInRatio}`)
-
       expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(Math.round(filledInRatio * 100))
     })
 
@@ -98,6 +95,8 @@ describe.only('character countdown', () => {
 
     it('has an aria-valuenow equal to 100', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(100)
     })
 
     it('has a .warning class', () => {
