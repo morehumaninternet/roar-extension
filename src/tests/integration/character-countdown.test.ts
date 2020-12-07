@@ -67,7 +67,7 @@ describe.only('character countdown', () => {
     it('has a .warning class', () => {
       // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-      expect(characterCountdown.querySelectorAll('.warning')).to.have.length(1)
+      expect(characterCountdown.querySelectorAll('circle.warning')).to.have.length(1)
     })
 
     it('renders the number of characters remaining as a text element', () => {
