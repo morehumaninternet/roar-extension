@@ -133,7 +133,13 @@ describe.only('character countdown', () => {
 
     it('has an aria-valuenow equal to 100', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      const variaValuenow = Number(characterCountdown.getAttribute('aria-valuenow'))
+      // console.log(`variaValue: ${variaValuenow}`)
+      expect(variaValuenow).to.equal(100)
     })
+
+    // expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(Math.round(filledInRatio * 100))
 
     it('renders the number of characters over the limit in a text element', () => {
       // TODO: Hank to write this test

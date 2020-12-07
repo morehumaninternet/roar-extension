@@ -16,7 +16,13 @@ export const CharacterCountdown = ({ characterLimit }: { characterLimit: Charact
   const strokeWidth = 2
   const diameter = 2 * radius + strokeWidth
   return (
-    <div className="character-countdown" role="progressbar" aria-valuemax={100} aria-valuemin={0} aria-valuenow={Math.round(percentageCompleted)}>
+    <div
+      className="character-countdown"
+      role="progressbar"
+      aria-valuemax={100}
+      aria-valuemin={0}
+      aria-valuenow={Math.round(percentageCompleted) >= 100 ? 100 : Math.round(percentageCompleted)}
+    >
       <svg viewBox={`0 0 ${diameter} ${diameter}`} className={`circular-chart ${drawWarningCircle ? 'warning' : ''}`}>
         {drawCircle && (
           <>
