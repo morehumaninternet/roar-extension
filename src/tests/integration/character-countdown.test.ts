@@ -135,18 +135,20 @@ describe.only('character countdown', () => {
       // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
       const variaValuenow = Number(characterCountdown.getAttribute('aria-valuenow'))
-      // console.log(`variaValue: ${variaValuenow}`)
       expect(variaValuenow).to.equal(100)
     })
 
-    // expect(Number(characterCountdown.getAttribute('aria-valuenow'))).to.equal(Math.round(filledInRatio * 100))
-
     it('renders the number of characters over the limit in a text element', () => {
       // TODO: Hank to write this test
+      const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
+      const overLimitCount = Number(characterCountdown.querySelector('text')?.innerHTML)
+      expect(overLimitCount).to.be.above(0)
     })
 
     it('disables posting', () => {
       // TODO: Hank to write this test
+      const postButton = mocks.app().querySelector('.post-btn')! as HTMLButtonElement
+      expect(postButton.disabled).to.equal(true)
     })
   })
 })
