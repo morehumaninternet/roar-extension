@@ -114,8 +114,6 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
   )
 }
 
-// TODO - change the design of the tooltip?
 // TODO - write tests
 // TODO - test the we don't show the tooltip if we can't find a handle and we only have a domain
 // TODO - test what happens when the handle doesn't exist yet (the status is IN_PROGRESS)
-// TODO - clean code
