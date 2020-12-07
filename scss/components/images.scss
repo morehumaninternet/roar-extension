@@ -10,8 +10,6 @@
   height: 250px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  grid-row-gap: 2px;
-  grid-column-gap: 4px;
   margin: 15px 0;
 
   .image-spinner {
@@ -33,6 +31,8 @@
 
   .image-thumbnail {
     position: relative;
+    overflow: hidden;
+    padding: 2px;
 
     > .image-image {
       @include image-grid-item;

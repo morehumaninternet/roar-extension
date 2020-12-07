@@ -49,9 +49,11 @@ export function ImageThumbnail({ image, startEditingImage, clickDeleteImage }: I
 
 function ImageSpinner() {
   return (
-    <div className="image-spinner">
-      <div className="spinner-container">
-        <div className="spinner" />
+    <div className="image-thumbnail">
+      <div className="image-spinner">
+        <div className="spinner-container">
+          <div className="spinner" />
+        </div>
       </div>
     </div>
   )
