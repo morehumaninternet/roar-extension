@@ -55,8 +55,7 @@ describe('character countdown', () => {
       const remainingRatio = Number(progressCircle.style.strokeDashoffset) / Number(progressCircle.style.strokeDasharray)
       const numCharacters = getPlainText(ensureActiveTab(mocks.getState()).feedbackState.editorState).length
       const filledInRatio = numCharacters / 280
-      expect(remainingRatio).to.closeTo(0, 0.1)
-      expect(filledInRatio).to.closeTo(1, 0.1)
+      expect(remainingRatio + filledInRatio).to.closeTo(1, 0.00000000000001)
     })
 
     it('has a .warning class', () => {
