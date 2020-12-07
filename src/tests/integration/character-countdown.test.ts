@@ -57,17 +57,18 @@ describe.only('character countdown', () => {
     it('renders a more full progress circle', () => {
       // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-      const circle = characterCountdown.querySelector('svg > circle')
-      // console.log(circle)
-      expect(circle?.getAttribute('cx')).to.equal('50%')
-      expect(circle?.getAttribute('cy')).to.equal('50%')
-      // expect(circle?.getAttribute("r")).to.be.true
+      const progressCircle = characterCountdown.querySelector('circle.progress')! as SVGCircleElement
+      const remainingRatio = Number(progressCircle.style.strokeDashoffset) / Number(progressCircle.style.strokeDasharray)
+      const numCharacters = getPlainText(ensureActiveTab(mocks.getState()).feedbackState.editorState).length
+      const filledInRatio = numCharacters / 280
+      expect(remainingRatio).to.closeTo(0, 0.1)
+      expect(filledInRatio).to.closeTo(1, 0.1)
     })
 
     it('has a .warning class', () => {
       // TODO: Hank to write this test
       const characterCountdown = mocks.app().querySelector('.character-countdown')! as HTMLDivElement
-      expect(characterCountdown.querySelectorAll('circle.warning')).to.have.length(1)
+      expect(characterCountdown.querySelectorAll('svg.warning')).to.have.length(1)
     })
 
     it('renders the number of characters remaining as a text element', () => {
