@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Editor, EditorState, CompositeDecorator } from 'draft-js'
+import { Editor, EditorState } from 'draft-js'
+import { hasParent } from '../../utils'
+import { addTooltip } from '../../draft-js-utils'
 
 type FeedbackEditorProps = {
   editorState: EditorState
@@ -24,47 +26,18 @@ const LaunchIcon = (): JSX.Element => {
 }
 
 const TwitterLink = ({ handle }: { handle: string }): JSX.Element => {
-  const url = `https://twitter.com/${handle}`
+  const url = `twitter.com/${handle.slice(1)}`
+  const withProtocol = `https://${url}`
   return (
-    <a className="link-tooltip__anchor" href={url} target="_blank" rel="noopener noreferrer">
+    <a className="link-tooltip__anchor" href={withProtocol} target="_blank" rel="noopener noreferrer">
       {url}
       <LaunchIcon />
     </a>
   )
 }
 
-function hasParent(possibleChild: HTMLElement, possibleParent: HTMLElement | string): boolean {
-  let test: null | HTMLElement = possibleChild // tslint:disable-line:no-let
-
-  while (test) {
-    if (typeof possibleParent === 'string') {
-      if (test.matches(possibleParent)) return true
-    } else {
-      if (test === possibleParent) return true
-    }
-
-    test = test.parentElement // tslint:disable-line:no-expression-statement
-  }
-
-  return false
-}
-
 export function FeedbackEditor({ editorState, hovering, updateEditorState, hoverOver, handle }: FeedbackEditorProps): JSX.Element {
   const HANDLE_REGEX = /\@[\w\.\-]+/g
-
-  function findWithRegex(regex: any, contentBlock: any, callback: any): any {
-    const text = contentBlock.getText()
-    let matchArr: any // tslint:disable-line
-    let start: any // tslint:disable-line
-    while ((matchArr = regex.exec(text)) !== null) {
-      start = matchArr.index
-      callback(start, start + matchArr[0].length)
-    }
-  }
-
-  function handleStrategy(contentBlock, callback, contentState): any {
-    findWithRegex(HANDLE_REGEX, contentBlock, callback)
-  }
 
   React.useEffect(() => {
     const listener = event => {
@@ -81,13 +54,7 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
     return () => window.removeEventListener('mouseover', listener)
   })
 
-  const HandleSpan = props => {
-    return <span className="tooltip-hover-element">{props.children}</span>
-  }
-
-  const onlyHashtags = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
-
-  const nextEditorState = EditorState.set(editorState, { decorator: onlyHashtags })
+  const nextEditorState = addTooltip(editorState, HANDLE_REGEX)
 
   return (
     <>
