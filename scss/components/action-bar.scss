@@ -34,9 +34,9 @@
         fill: none;
         stroke-linecap: round;
         animation: progress 1s ease-out forwards;
-        stroke: #ebeef0;
-        &.progress {
-          stroke: $human-pink;
+        stroke: $human-pink;
+        &:not(.progress) {
+          opacity: 0.4;
         }
       }
       text {
@@ -45,7 +45,7 @@
         fill: $human-pink;
       }
       &.warning {
-        circle.progress {
+        circle {
           stroke: $human-yellow-warning;
         }
         text {
