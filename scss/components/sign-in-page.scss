@@ -12,12 +12,13 @@
     border: none;
     outline: none;
     border-radius: 25px;
-    background-color: white;
-    color: $twitter-blue;
+    background-color: var(--twitter-button-background-color);
+    color: var(--twitter-button-text-color);
     padding: 6px 16px 6px 6px;
     font-weight: bold;
     display: flex;
     align-items: center;
+    cursor: pointer;
   }
 
   p,
@@ -30,12 +31,13 @@
   svg.roar-logo {
     height: 128px;
   }
+
   svg.twitter-logo {
     padding: 3px;
     height: 25px;
 
     path {
-      fill: $twitter-blue;
+      fill: var(--twitter-button-text-color);
     }
   }
 }
