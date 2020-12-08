@@ -5,19 +5,17 @@ type ImagesProps = {
   feedback: FeedbackState
   startEditingImage(payload: { imageIndex: number }): void
   clickDeleteImage(payload: { imageIndex: number }): void
-  deleteImageDisabled: boolean
 }
 
 type ImageThumbnailProps = {
   image: Image
   startEditingImage(): void
   clickDeleteImage(): void
-  deleteImageDisabled: boolean
 }
 
 function CloseButton({ onClick }: { onClick: () => void }): JSX.Element {
   return (
-    <button className="close-button" onClick={onClick}>
+    <button className="close-btn" onClick={onClick}>
       <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="Close Button">
           <circle id="Ellipse 1" cx="13" cy="13" r="13" fill="black" />
@@ -37,11 +35,11 @@ function CloseButton({ onClick }: { onClick: () => void }): JSX.Element {
   )
 }
 
-export function ImageThumbnail({ image, startEditingImage, clickDeleteImage, deleteImageDisabled }: ImageThumbnailProps): JSX.Element {
+export function ImageThumbnail({ image, startEditingImage, clickDeleteImage }: ImageThumbnailProps): JSX.Element {
   return (
     <div className="image-thumbnail">
       <img className="image-image" src={image.uri} />
-      {!deleteImageDisabled && <CloseButton onClick={clickDeleteImage} />}
+      {<CloseButton onClick={clickDeleteImage} />}
       {/* <button className="edit-button" onClick={startEditingImage}>
         Edit
       </button> */}
@@ -51,15 +49,17 @@ export function ImageThumbnail({ image, startEditingImage, clickDeleteImage, del
 
 function ImageSpinner() {
   return (
-    <div className="image-spinner">
-      <div className="spinner-container">
-        <div className="spinner" />
+    <div className="image-thumbnail">
+      <div className="image-spinner">
+        <div className="spinner-container">
+          <div className="spinner" />
+        </div>
       </div>
     </div>
   )
 }
 
-export function Images({ feedback, startEditingImage, clickDeleteImage, deleteImageDisabled }: ImagesProps): null | JSX.Element {
+export function Images({ feedback, startEditingImage, clickDeleteImage }: ImagesProps): null | JSX.Element {
   if (!feedback.images.length && !feedback.addingImages) return null
 
   return (
@@ -73,7 +73,6 @@ export function Images({ feedback, startEditingImage, clickDeleteImage, deleteIm
           image={image}
           startEditingImage={() => startEditingImage({ imageIndex: index })}
           clickDeleteImage={() => clickDeleteImage({ imageIndex: index })}
-          deleteImageDisabled={deleteImageDisabled}
         />
       ))}
     </div>

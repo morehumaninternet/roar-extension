@@ -2,10 +2,12 @@
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
+@import './components/tweeting.scss';
 @import './components/action-bar.scss';
 @import './components/images.scss';
 @import './components/sign-in-page.scss';
 @import './components/feedback-editor.scss';
+@import './components/user-avatar.scss';
 
 $main-padding: 10px;
 $min-width: 476px;
@@ -49,21 +51,12 @@ main {
   display: flex;
 }
 
-.profile-img {
-  flex: 0 0 auto;
-  align-self: flex-start;
-  margin-right: 10px;
-  height: 36px;
-  width: 36px;
-  border-radius: 18px;
-  object-fit: cover;
-}
-
 .twitter-interface {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  flex-grow: 1;
 }
 
 .emoji-picker-container {

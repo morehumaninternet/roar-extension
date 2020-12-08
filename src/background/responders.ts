@@ -95,6 +95,9 @@ export const responders: Responders<Action> = {
   clickTakeScreenshot(): Partial<StoreState> {
     return {}
   },
+  clickLogout(): Partial<StoreState> {
+    return { auth: { state: 'not_authed' } }
+  },
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
@@ -170,10 +173,6 @@ export const responders: Responders<Action> = {
   },
   clickDeleteImage(state, { imageIndex }): Partial<StoreState> {
     return updateActiveFeedback(state, target => {
-      // The image array can't be empty
-      if (target.feedbackState.images.length === 1) return {}
-
-      // Removing the image
       // tslint:disable-next-line: readonly-array
       const nextImages = [...target.feedbackState.images]
       nextImages.splice(imageIndex, 1)

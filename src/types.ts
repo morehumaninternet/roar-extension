@@ -119,7 +119,6 @@ type AuthenticatedState = {
   darkModeOn: boolean
   pickingEmoji: boolean
   addImageDisabled: boolean
-  deleteImageDisabled: boolean
   postTweetDisabled: boolean
   characterLimit: CharacterLimit
   dispatchUserActions: Dispatchers<UserAction>
@@ -153,6 +152,7 @@ type UserAction =
   | { type: 'toggleDarkMode' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }
+  | { type: 'clickLogout' }
   | { type: 'clickDeleteImage'; payload: { imageIndex: number } }
   | { type: 'startEditingImage'; payload: { imageIndex: number } }
   | { type: 'imageUpload'; payload: { file: File } }

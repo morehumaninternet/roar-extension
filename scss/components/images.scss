@@ -10,8 +10,6 @@
   height: 250px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  grid-row-gap: 2px;
-  grid-column-gap: 4px;
   margin: 15px 0;
 
   .image-spinner {
@@ -33,13 +31,15 @@
 
   .image-thumbnail {
     position: relative;
+    overflow: hidden;
+    padding: 2px;
 
     > .image-image {
       @include image-grid-item;
       object-fit: cover;
     }
 
-    > .close-button {
+    > .close-btn {
       display: none;
       position: absolute;
       top: 5px;
@@ -67,9 +67,9 @@
 
     // On image hovering, display the edit button
     .image-image:hover ~ .edit-button,
-    .image-image:hover ~ .close-button,
+    .image-image:hover ~ .close-btn,
     .edit-button:hover,
-    .close-button:hover {
+    .close-btn:hover {
       display: inline-block;
     }
   }

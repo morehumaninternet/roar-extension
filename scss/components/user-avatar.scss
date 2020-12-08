@@ -1,0 +1,49 @@
+$profile-image-radius: 18px;
+$caret-radius: 12px;
+
+.user-avatar {
+  position: relative;
+  z-index: 2;
+
+  .profile-img {
+    margin-right: 10px;
+    height: 2 * $profile-image-radius;
+    width: 2 * $profile-image-radius;
+    border-radius: $profile-image-radius;
+    object-fit: cover;
+  }
+
+  .caret-up {
+    width: 0;
+    height: 0;
+    border-left: #{$caret-radius} solid transparent;
+    border-right: #{$caret-radius} solid transparent;
+    border-bottom: #{$caret-radius} solid var(--post-btn-background-color);
+  }
+
+  // Hide the dropdown content whenever not being hovered over
+  &:not(:hover) .dropdown-content {
+    display: none;
+  }
+
+  .dropdown-content {
+    position: absolute;
+    margin-left: $profile-image-radius - $caret-radius;
+
+    .logout-btn {
+      display: inline-block;
+      width: 92px;
+      height: 46px;
+      font-size: 1.2rem;
+      padding: 12px 6px;
+      font-weight: bold;
+      color: var(--post-btn-text-color);
+      background-color: var(--post-btn-background-color);
+      border: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

@@ -1,4 +1,6 @@
-.svg-btn, .post-btn {
+.svg-btn,
+.post-btn,
+.close-btn {
   border: none;
   outline: none;
 }
@@ -22,43 +24,38 @@
     display: none;
   }
 
-  > .circular-chart {
-    height: 36px;
-    width: 36px;
-    display: block;
-    margin-right: 12px;
-
-    > .circle {
-      stroke: $human-pink;
-      fill: none;
-      stroke-width: 2.8;
-      stroke-linecap: round;
-      animation: progress 1s ease-out forwards;
-    }
-
-    > .circle__warning {
-      stroke: $human-yellow-warning;
-      fill: none;
-      stroke-width: 2.8;
-      stroke-linecap: round;
-      animation: progress 1s ease-out forwards;
-    }
-
-    > .inner-text {
-      fill: $human-pink;
-      font-size: 1.2em;
-      text-anchor: middle;
-    }
-
-    > .inner-text__warning {
-      fill: $human-yellow-warning;
-      font-size: 1.2em;
-      text-anchor: middle;
-    }
-
-    @keyframes progress {
-      0% {
-        stroke-dasharray: 0 100;
+  .character-countdown {
+    svg.circular-chart {
+      height: 36px;
+      width: 36px;
+      display: block;
+      margin-right: 12px;
+      circle {
+        fill: none;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+        stroke: #ebeef0;
+        &.progress {
+          stroke: $human-pink;
+        }
+      }
+      text {
+        font-size: 0.6em;
+        text-anchor: middle;
+        fill: $human-pink;
+      }
+      &.warning {
+        circle.progress {
+          stroke: $human-yellow-warning;
+        }
+        text {
+          fill: $human-yellow-warning;
+        }
+      }
+      @keyframes progress {
+        0% {
+          stroke-dasharray: 0 100;
+        }
       }
     }
   }

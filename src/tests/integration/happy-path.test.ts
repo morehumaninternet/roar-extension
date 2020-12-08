@@ -2,7 +2,6 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { createMocks } from './mocks'
-import { whenState } from '../../redux-utils'
 import { activeTab, ensureActiveFeedbackTarget, ensureActiveTab } from '../../selectors'
 import { appendEntity } from '../../draft-js-utils'
 import { runBackground } from './steps/run-background'
@@ -10,6 +9,7 @@ import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
 import { onceAuthenticated } from './steps/once-authenticated'
 import { signInViaTwitter } from './steps/sign-in-via-twitter'
+import { captureFirstScreenshot } from './steps/capture-first-screenshot'
 
 happyPath({ browser: 'Chrome' })
 happyPath({ browser: 'Firefox' })
@@ -23,58 +23,25 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
     signInViaTwitter(mocks, opts)
     authenticateViaTwitter(mocks, opts)
     onceAuthenticated(mocks)
+    captureFirstScreenshot(mocks)
 
-    describe('images', () => {
-      it('renders an image spinner until the screenshot is added', () => {
-        const activeTab = ensureActiveTab(mocks.getState())
-        expect(activeTab.feedbackState.addingImages).to.equal(1)
-        expect(activeTab.feedbackState.images).to.have.length(0)
-        expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)
-      })
-
-      it('renders the screenshot and removes the spinner once it is added', async () => {
-        mocks.resolveLatestCaptureVisibleTab()
-        const state = await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.addingImages === 0)
-        const activeTab = ensureActiveTab(state)
-        expect(activeTab.feedbackState.addingImages).to.equal(0)
-        expect(activeTab.feedbackState.images).to.have.length(1)
-        const [image] = activeTab.feedbackState.images
-        if (image.type === 'imageupload') throw new Error('Expected screenshot')
-        expect(image.tab.id).to.equal(activeTab.id)
-        expect(image.tab.url).to.equal(activeTab.url)
-        expect(image.tab.width).to.equal(1200)
-        expect(image.tab.height).to.equal(900)
-        expect(image.blob).to.be.an.instanceof(Blob)
-
-        expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(0)
-        const imageThumbnail = mocks.app().querySelector('.twitter-interface > .images > .image-thumbnail')
-
-        const imageImage = imageThumbnail?.querySelector('.image-image')
-        expect(imageImage).to.have.property('src', image.uri)
-
-        // User can't remove images if there's only one
-        const closeButton = imageThumbnail?.querySelector('.close-button')
-        expect(closeButton).to.equal(null)
-      })
-
+    describe('taking screenshots', () => {
       it('takes a screenshot when the TakeScreenshot button is clicked', async () => {
         const tab = activeTab(mocks.getState())!
         expect(tab.feedbackState.images).to.have.lengthOf(1)
         const takeScreenshotButton = mocks.app().querySelector('.TakeScreenshot')! as HTMLButtonElement
         takeScreenshotButton.click()
         mocks.resolveLatestCaptureVisibleTab()
-        await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 2)
+        await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 2)
         const images = mocks.app().querySelectorAll('.image-image')
         expect(images).to.have.lengthOf(2)
       })
 
-      it('delete a screenshot when the close-button is clicked', async () => {
-        const images = mocks.app().querySelectorAll('.twitter-interface > .images')!
-        const secondScreenshotCloseButton = images[0].querySelector('.image-thumbnail > .close-button') as HTMLButtonElement
-
-        // If there are two images, the close button should exist
+      it('deletes a screenshot when the close-btn is clicked', async () => {
+        const imageThumbnails = mocks.app().querySelectorAll('.twitter-interface > .images > .image-thumbnail')!
+        const secondScreenshotCloseButton = imageThumbnails[1].querySelector('.close-btn') as HTMLButtonElement
         secondScreenshotCloseButton.click()
-        await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === 1)
+        await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 1)
       })
 
       it('disable the take screenshot button when there are 9 images', async () => {
@@ -84,7 +51,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
           takeScreenshotButton.click()
           expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)
           mocks.resolveLatestCaptureVisibleTab()
-          await whenState(mocks.backgroundWindow.store, state => ensureActiveTab(state).feedbackState.images.length === imagesLength + 1)
+          await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === imagesLength + 1)
           expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(0)
           const images = mocks.app().querySelectorAll('.image-image')
           expect(images).to.have.lengthOf(imagesLength + 1)
@@ -184,7 +151,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
         postButton.click()
 
         expect(mocks.getState().mostRecentAction.type).to.equal('clickPost')
-        await whenState(mocks.backgroundWindow.store, state => ensureActiveFeedbackTarget(state).feedbackState.isTweeting)
+        await mocks.whenState(state => ensureActiveFeedbackTarget(state).feedbackState.isTweeting)
 
         const [url, opts] = fetchMock.lastCall()!
         expect(url).to.equal('https://test-roar-server.com/v1/feedback')
@@ -204,7 +171,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
       })
 
       it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-        await whenState(mocks.backgroundWindow.store, state => !ensureActiveTab(state).feedbackState.isTweeting)
+        await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
         expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
           url: 'https://t.co/sometweethash',
           active: true,
