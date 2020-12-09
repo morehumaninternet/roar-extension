@@ -1,7 +1,7 @@
 import { AppStore, create } from './store'
 import { detectBrowser } from './browser-detection'
 import * as listeners from './listeners'
-import { detectLogin } from './api'
+import { detectLogin } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
 

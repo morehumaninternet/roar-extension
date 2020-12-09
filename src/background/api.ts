@@ -1,95 +1,97 @@
-function tweetFormData(target: FeedbackTarget): FormData {
-  const tweetData = new FormData()
+import { JsonDecoder } from 'ts.data.json'
 
-  const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
-  tweetData.append('status', status)
+export type FetchRoarResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; reason: 'response not json'; text: string; details: string }
+  | { ok: false; reason: 'response not expected data type'; text: string; details: string }
+  | { ok: false; reason: 'bad request'; details: string }
+  | { ok: false; reason: 'unauthorized'; details: string }
+  | { ok: false; reason: 'service down'; details: string }
+  | { ok: false; reason: 'server down'; details: string }
+  | { ok: false; reason: 'unknown status'; details: string; status: number }
+  | { ok: false; reason: 'timeout'; details: string }
+  | { ok: false; reason: 'network down'; details: string }
 
-  if (target.feedbackTargetType === 'tab') {
-    tweetData.append('domain', target.domain!)
-  } else {
-    tweetData.append('help', 'true')
-  }
-
-  // Adding all the screenshot files under the same form key - 'images'.
-  target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
-
-  return tweetData
-}
-
-function makeTweetRequest(formData: FormData): Promise<Response> {
-  return fetch(`${window.roarServerUrl}/v1/feedback`, {
-    method: 'POST',
-    credentials: 'include',
-    body: formData,
-  })
-}
-
-export const postTweet = async (target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
-  const targetId: FeedbackTargetId = target.id
-
+export async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
   try {
-    dispatchBackgroundActions.postTweetStart({ targetId })
-    const res = await makeTweetRequest(tweetFormData(target))
-    if (res.status !== 201) {
-      return dispatchBackgroundActions.postTweetFailure({
-        targetId,
-        error: { message: await res.text() },
-      })
+    const controller = new window.AbortController()
+    const promisedResponse = fetch(`${window.roarServerUrl}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
+
+    controller.signal.addEventListener('abort', () => controller.abort())
+    const timeout = setTimeout(() => controller.abort(), 10000)
+    promisedResponse.finally(() => clearTimeout(timeout))
+
+    const response = await promisedResponse
+
+    if (response.status >= 200 && response.status < 300) {
+      const text = await response.text()
+      try {
+        const json = JSON.parse(text)
+        const decoded = decoder.decode(json)
+        if (decoded.isOk()) {
+          return { ok: true, data: decoded.value }
+        } else {
+          return { ok: false, reason: 'response not expected data type', text, details: decoded.error }
+        }
+      } catch (error) {
+        return { ok: false, reason: 'response not json', details: error.message, text }
+      }
     }
-    const tweetResult = await res.json()
-    if (!tweetResult.url) {
-      return dispatchBackgroundActions.postTweetFailure({
-        targetId,
-        error: { message: 'Response must include a url' },
-      })
+    if (response.status === 400) {
+      const details = await response.text()
+      return { ok: false, reason: 'bad request', details }
     }
-    chrome.tabs.create({ url: tweetResult.url, active: true })
-    return dispatchBackgroundActions.postTweetSuccess({ targetId })
+    if (response.status === 401) {
+      return { ok: false, reason: 'unauthorized', details: '401 received' }
+    }
+    if (response.status === 503) {
+      const details = await response.text()
+      return { ok: false, reason: 'service down', details }
+    }
+    if (response.status >= 500) {
+      const details = await response.text()
+      return { ok: false, reason: 'server down', details }
+    }
+    const details = await response.text()
+    return { ok: false, reason: 'unknown status', details, status: response.status }
   } catch (error) {
-    return dispatchBackgroundActions.postTweetFailure({ targetId, error })
+    if (error.name === 'AbortError') {
+      return { ok: false, reason: 'timeout', details: error.message }
+    } else {
+      return { ok: false, reason: 'network down', details: error.message }
+    }
   }
 }
 
-function makeHandleRequest(domain: string): Promise<Response> {
-  const params = { domain }
-  const requestURL = new URL('v1/website', window.roarServerUrl)
-  requestURL.search = new URLSearchParams(params).toString()
-  return fetch(requestURL.toString())
+type FeedbackResponseData = {
+  url: string
 }
 
-export const fetchTwitterHandle = async (
-  tabId: number,
-  domain: string,
-  dispatchBackgroundActions: Dispatchers<BackgroundAction>,
-  handleCache: TwitterHandleCache
-) => {
-  try {
-    dispatchBackgroundActions.fetchHandleStart({ tabId })
+const FeedbackResponseDataDecoder = JsonDecoder.object<FeedbackResponseData>({ url: JsonDecoder.string }, 'FeedbackResponseData')
 
-    const cachedHandle = await handleCache.get(domain)
-    if (cachedHandle) return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: cachedHandle })
-
-    // If we didn't find the handle in the cache, fetch the request from the server
-    const res = await makeHandleRequest(domain)
-    const { twitter_handle } = await res.json()
-    if (twitter_handle) handleCache.set(domain, twitter_handle)
-
-    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: twitter_handle })
-  } catch (error) {
-    return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error })
-  }
+export function postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>> {
+  return fetchRoar('v1/feedback', { method: 'POST', body: formData }, FeedbackResponseDataDecoder)
 }
 
-export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {
-  const requestURL = new URL('v1/me', window.roarServerUrl).toString()
-  const response = await fetch(requestURL, { credentials: 'include' })
-  if (response.status === 200) {
-    const user = await response.json()
-    return dispatchActions.authenticationSuccess(user)
-  }
-  if (opts.failIfNotLoggedIn) {
-    dispatchActions.authenticationFailure({ error: { message: 'Not logged in.' } })
-  }
+type WebsiteResponseData = {
+  domain: string
+  twitter_handle: null | string
+}
+
+const WebsiteResponseDataDecoder = JsonDecoder.object<WebsiteResponseData>(
+  { domain: JsonDecoder.string, twitter_handle: JsonDecoder.nullable(JsonDecoder.string) },
+  'WebsiteResponseData'
+)
+
+export function getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>> {
+  const search = new URLSearchParams({ domain })
+  return fetchRoar(`v1/website?${search}`, {}, WebsiteResponseDataDecoder)
+}
+
+const UserDecoder = JsonDecoder.object<User>({ photoUrl: JsonDecoder.nullable(JsonDecoder.string) }, 'User')
+
+export function getMe(): Promise<FetchRoarResult<User>> {
+  return fetchRoar('v1/me', {}, UserDecoder)
 }
 
 export function makeLogoutRequest(): Promise<Response> {

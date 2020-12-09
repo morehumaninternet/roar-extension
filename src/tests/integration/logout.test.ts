@@ -15,11 +15,6 @@ describe('logout', () => {
       fetchMock.mock({ url: 'https://test-roar-server.com/v1/logout', method: 'POST' }, 'OK')
     })
 
-    after(() => {
-      if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
-      fetchMock.restore()
-    })
-
     it('transitions to a not_authed state and makes a POST to v1/logout when clicked', async () => {
       const logoutButton = mocks.app().querySelector('.logout-btn')! as HTMLButtonElement
       logoutButton.click()

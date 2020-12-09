@@ -35,6 +35,7 @@
     "react-konva": "17.0.0-0",
     "redux": "4.0.1",
     "spinthatshit": "1.0.4",
+    "ts.data.json": "^1.5.0",
     "urijs": "1.19.1",
     "webextension-polyfill": "0.3.1"
   },

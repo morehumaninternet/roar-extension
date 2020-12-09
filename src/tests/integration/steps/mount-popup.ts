@@ -22,24 +22,21 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
   const description = `popup mount ${authDescription} and the twitter handle ${handleDescription}`
 
   describe(description, () => {
+    const domain = 'zing.com'
     const twitter_handle = opts.handle === 'does not exist' ? null : '@zing'
-    const handleCache = opts.handle === 'cached' ? [{ domain: 'zing.com', twitter_handle }] : []
+    const handleCache = opts.handle === 'cached' ? [{ domain, twitter_handle }] : []
 
     before(() => mocks.chrome.storage.local.get.callsArgWith(0, { handleCache }))
 
     // Expect an API call if the handle is not cached
     if (opts.handle !== 'cached') {
       before(() => {
-        fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle } })
+        fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle, domain } })
       })
     }
 
     before(() => mocks.browser.tabs.get.withArgs(14).resolves({ width: 1200, height: 900 }))
     before(() => mount(mocks.chrome as any, mocks.popupWindow as any))
-    after(() => {
-      if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
-      fetchMock.restore()
-    })
 
     if (!opts.alreadyAuthenticated) {
       it('mounts the app with a button to sign in with twitter', () => {
@@ -57,7 +54,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
 
     if (opts.handle === 'exists') {
       it('caches the handle in chrome.storage.local', () => {
-        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ domain: 'zing.com', twitter_handle: '@zing' }] })
+        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ domain, twitter_handle: '@zing' }] })
       })
     } else {
       it('does not cache the handle', () => {
@@ -68,7 +65,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
     it('has the appropriate handle in the editor state', () => {
       const activeTab = ensureActiveTab(mocks.getState())
       const plainText = getPlainText(activeTab.feedbackState.editorState)
-      const expectedPlainText = twitter_handle || '@zing.com'
+      const expectedPlainText = twitter_handle || `@${domain}`
       expect(plainText).to.equal(expectedPlainText + ' ')
     })
 
