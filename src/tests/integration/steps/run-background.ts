@@ -37,11 +37,6 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
       })
     })
 
-    after(() => {
-      if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
-      fetchMock.restore()
-    })
-
     it('loads window.store, which starts with an empty state', () => {
       const state = mocks.getState()
       expect(state.browserInfo).to.have.all.keys('browser', 'majorVersion')

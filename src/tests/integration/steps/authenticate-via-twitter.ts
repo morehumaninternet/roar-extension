@@ -25,11 +25,6 @@ function authenticateViaTwitterFirefox(mocks: Mocks): void {
     })
 
     after(() => {
-      if (!fetchMock.done()) throw new Error('Fetch not called the expected number of times')
-      fetchMock.restore()
-    })
-
-    after(() => {
       mocks.chrome.tabs.create.reset()
     })
 

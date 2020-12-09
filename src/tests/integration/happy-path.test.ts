@@ -142,9 +142,6 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
       before(() => {
         fetchMock.mock('https://test-roar-server.com/v1/feedback', { status: 201, body: { url: 'https://t.co/sometweethash' } })
       })
-      after(() => {
-        fetchMock.restore()
-      })
 
       it('posts feedback upon clicking the post button', async () => {
         const postButton = mocks.app().querySelector('.twitter-interface button.post-btn')! as HTMLButtonElement
@@ -155,7 +152,7 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
 
         const [url, opts] = fetchMock.lastCall()!
         expect(url).to.equal('https://test-roar-server.com/v1/feedback')
-        expect(opts).to.have.all.keys('method', 'credentials', 'body')
+        expect(opts).to.have.all.keys('method', 'credentials', 'body', 'signal')
         expect(opts).to.have.property('method', 'POST')
         expect(opts).to.have.property('credentials', 'include')
 
