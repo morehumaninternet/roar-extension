@@ -18,6 +18,8 @@ export function EmojiPicker({ pickingEmoji, dispatchUserActions }: EmojiPickerPr
     // explicitly increase its height that distance
     function listener() {
       const emojiMartScroll = ref.current!.querySelector('.emoji-mart-scroll')! as HTMLDivElement
+      // Set the height to 0px so that the .emoji-mart isn't the element making the page long
+      emojiMartScroll.style.height = '0px'
 
       const bodyBottom = window.document.body.getBoundingClientRect().bottom
       const emojiMartScrollBottom = emojiMartScroll.getBoundingClientRect().bottom
