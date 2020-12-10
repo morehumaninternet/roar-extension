@@ -8,9 +8,7 @@
   flex-direction: column;
   position: relative;
 
-  button {
-    border: none;
-    outline: none;
+  .sign-in-btn {
     border-radius: 25px;
     background-color: var(--twitter-button-background-color);
     color: var(--twitter-button-text-color);
@@ -18,7 +16,10 @@
     font-weight: bold;
     display: flex;
     align-items: center;
-    cursor: pointer;
+  }
+
+  p {
+    text-align: center;
   }
 
   p {
