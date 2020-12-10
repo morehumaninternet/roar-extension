@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import * as fetchMock from 'fetch-mock'
 import { last } from 'lodash'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
@@ -32,6 +33,8 @@ export type Mocks = {
 
 const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: 'utf-8' })
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
+
+fetchMock.config.overwriteRoutes = true
 
 export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   const userAgent =
@@ -98,6 +101,9 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
       delete (global as any)[key]
     }
     chrome.reset()
+    const err = !fetchMock.done() && new Error('Fetch not called the expected number of times')
+    fetchMock.restore()
+    if (err) throw err
   }
 
   const app = () => popupWindow.document.querySelector('#app-container > .app') as HTMLDivElement

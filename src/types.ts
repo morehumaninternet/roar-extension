@@ -58,7 +58,7 @@ type CharacterLimit = {
   percentageCompleted: number
 }
 
-type User = { photoUrl?: string }
+type User = { photoUrl: null | string }
 
 type Auth = { state: 'not_authed' } | { state: 'auth_failed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
@@ -141,7 +141,7 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'authenticationSuccess'; payload: { photoUrl?: string } }
+  | { type: 'authenticationSuccess'; payload: { photoUrl: null | string } }
   | { type: 'authenticationFailure'; payload: { error: any } }
   | { type: 'dismissAlert' }
   | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
@@ -159,7 +159,7 @@ type UserAction =
 
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: string } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
