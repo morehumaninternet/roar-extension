@@ -42,7 +42,7 @@ export function Authenticated({
             hovering={feedback.state.hovering}
             updateEditorState={dispatchUserActions.updateEditorState}
             hoverOver={dispatchUserActions.hoverOver}
-            handle={feedback.state.twitterHandle.handle}
+            twitterHandle={feedback.state.twitterHandle}
           />
           <Images feedback={feedback.state} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
           <ActionBar

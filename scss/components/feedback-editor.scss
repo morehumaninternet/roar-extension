@@ -11,7 +11,8 @@
   position: fixed;
   z-index: 2;
 
-  > .link-tooltip__anchor {
+  > .link-tooltip__anchor,
+  .link-tooltip__error {
     position: absolute;
     width: max-content;
 
