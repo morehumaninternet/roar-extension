@@ -5,7 +5,7 @@ export function Authenticating({ browser, authenticationSuccess, authenticationF
   // On Firefox authentication takes place outside the popup, so this state occurs
   // when the extension is actively running detectLogin to determine whether the user
   // is logged in, which will transition them into either an authenticated state or an
-  // auth_failed state.
+  // not_authed state.
   if (browser === 'Firefox') {
     return <div className="authenticating-spinner" />
   }

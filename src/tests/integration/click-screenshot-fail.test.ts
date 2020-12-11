@@ -25,7 +25,9 @@ describe('screenshotCaptureFailure + clickPost', () => {
 
       const state = await mocks.whenState(state => state.mostRecentAction.type !== 'clickPost')
 
-      expect(state.alertHtml).to.equal('Could not take screenshot')
+      expect(state.alertHtml).to.equal(
+        'Something went wrong. Please try again. If this error persists, please contact <a href="mailto:support@morehumaninternet.org">support@morehumaninternet.org</a>'
+      )
     })
   })
 })

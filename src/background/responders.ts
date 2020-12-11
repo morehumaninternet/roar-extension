@@ -50,6 +50,45 @@ function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: Feed
   return updateFeedback(state, target, callback(target))
 }
 
+const standardAlertEnding =
+  'Please try again. If this error persists, please contact <a href="mailto:support@morehumaninternet.org">support@morehumaninternet.org</a>'
+const standardAlert = `Something went wrong. ${standardAlertEnding}`
+
+function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial<StoreState> {
+  switch (failure.reason) {
+    case 'response not json': {
+      return { alertHtml: standardAlert }
+    }
+    case 'response not expected data type': {
+      return { alertHtml: standardAlert }
+    }
+    case 'bad request': {
+      return { alertHtml: standardAlert }
+    }
+    case 'unauthorized': {
+      return {
+        auth: { state: 'not_authed' },
+        alertHtml: 'Your session ended. Please log in to try again.',
+      }
+    }
+    case 'service down': {
+      return { alertHtml: 'Twitter appears to be down. Please try again later.' }
+    }
+    case 'server error': {
+      return { alertHtml: 'It looks like our se Please try again later.' }
+    }
+    case 'unknown status': {
+      return { alertHtml: standardAlert }
+    }
+    case 'timeout': {
+      return { alertHtml: `That took too long. ${standardAlertEnding}` }
+    }
+    case 'network down': {
+      return { alertHtml: 'You are offline. Please check your network connection and try again.' }
+    }
+  }
+}
+
 export const responders: Responders<Action> = {
   popupConnect(): Partial<StoreState> {
     return {}
@@ -64,7 +103,7 @@ export const responders: Responders<Action> = {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
   authenticationFailure(state, { error }): Partial<StoreState> {
-    return { alertHtml: error.message, auth: { state: 'auth_failed' } }
+    return { alertHtml: error.message, auth: { state: 'not_authed' } }
   },
   dismissAlert(): Partial<StoreState> {
     return { alertHtml: null }
@@ -115,9 +154,9 @@ export const responders: Responders<Action> = {
       }
     })
   },
-  fetchHandleFailure(state, { tabId, domain, error }): Partial<StoreState> {
+  fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
     return {
-      alertHtml: `Failed to set handle: ${error}`,
+      ...handleFailure(failure),
       ...updateTabFeedbackIfExists(state, tabId, tab => {
         if (tab.domain !== domain) return {}
         return { twitterHandle: { status: 'DONE', handle: null } }
@@ -136,9 +175,8 @@ export const responders: Responders<Action> = {
     }))
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
-    const alertHtml = typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE'
     return {
-      alertHtml,
+      alertHtml: standardAlert,
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
@@ -162,13 +200,13 @@ export const responders: Responders<Action> = {
       }
     })
   },
-  postTweetFailure(state, { targetId, error }): Partial<StoreState> {
+  postTweetFailure(state, { targetId, failure }): Partial<StoreState> {
     const target = targetById(state, targetId)
-    if (!target) return {}
+    const feedbackUpdates = target ? updateFeedback(state, target, { isTweeting: false }) : {}
 
     return {
-      alertHtml: error.message,
-      ...updateFeedback(state, target, { isTweeting: false }),
+      ...handleFailure(failure),
+      ...feedbackUpdates,
     }
   },
   clickDeleteImage(state, { imageIndex }): Partial<StoreState> {

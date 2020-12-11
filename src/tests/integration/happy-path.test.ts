@@ -24,6 +24,6 @@ function happyPath(opts: { browser: SupportedBrowser }): void {
     captureFirstScreenshot(mocks)
     takingScreenshots(mocks)
     feedbackEditing(mocks)
-    postingFeedback(mocks)
+    postingFeedback(mocks, { result: 'success' })
   })
 }

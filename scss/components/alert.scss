@@ -1,0 +1,20 @@
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+
+  background-color: $human-yellow-warning-background;
+  color: $human-yellow-warning;
+
+  > .close-btn {
+    circle {
+      fill: transparent;
+    }
+    path {
+      fill: $human-yellow-warning;
+    }
+  }
+
+}

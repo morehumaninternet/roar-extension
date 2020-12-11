@@ -61,7 +61,7 @@ type CharacterLimit = {
 
 type User = { photoUrl: null | string }
 
-type Auth = { state: 'not_authed' } | { state: 'auth_failed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
+type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
@@ -106,11 +106,6 @@ type AuthenticatingState = {
   authenticationSuccess: Dispatchers<UserAction>['authenticationSuccess']
 }
 
-type AuthFailedState = {
-  view: 'AuthFailed'
-  signInWithTwitter(): void
-}
-
 type AuthenticatedState = {
   view: 'Authenticated'
   feedback: { exists: true; state: FeedbackState } | { exists: false; reasonDisabledMessage: null | string }
@@ -125,7 +120,7 @@ type AuthenticatedState = {
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-type AppState = NotAuthedState | AuthenticatingState | AuthFailedState | AuthenticatedState
+type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
 
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive
@@ -161,10 +156,10 @@ type UserAction =
 type BackgroundAction =
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; error: any } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
-  | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; error: any } }
+  | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; failure: FetchRoarFailure | { reason: 'timeout' } } }
   | { type: 'imageCaptureStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
   | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; error: any } }
@@ -195,3 +190,16 @@ type TwitterHandleCache = {
   get(domain: string): Promise<Maybe<string>>
   set(domain: string, handle: string): Promise<void>
 }
+
+type FetchRoarFailure =
+  | { ok: false; reason: 'response not json'; text: string; details: string }
+  | { ok: false; reason: 'response not expected data type'; text: string; details: string }
+  | { ok: false; reason: 'bad request'; details: string }
+  | { ok: false; reason: 'unauthorized'; details: string }
+  | { ok: false; reason: 'service down'; details: string }
+  | { ok: false; reason: 'server error'; details: string }
+  | { ok: false; reason: 'unknown status'; details: string; status: number }
+  | { ok: false; reason: 'timeout'; details: string }
+  | { ok: false; reason: 'network down'; details: string }
+
+type FetchRoarResult<T> = { ok: true; data: T } | FetchRoarFailure

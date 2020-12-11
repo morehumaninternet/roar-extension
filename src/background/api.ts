@@ -1,24 +1,12 @@
 import { JsonDecoder } from 'ts.data.json'
 
-export type FetchRoarResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; reason: 'response not json'; text: string; details: string }
-  | { ok: false; reason: 'response not expected data type'; text: string; details: string }
-  | { ok: false; reason: 'bad request'; details: string }
-  | { ok: false; reason: 'unauthorized'; details: string }
-  | { ok: false; reason: 'service down'; details: string }
-  | { ok: false; reason: 'server down'; details: string }
-  | { ok: false; reason: 'unknown status'; details: string; status: number }
-  | { ok: false; reason: 'timeout'; details: string }
-  | { ok: false; reason: 'network down'; details: string }
-
 export async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
   try {
     const controller = new window.AbortController()
     const promisedResponse = fetch(`${window.roarServerUrl}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
 
     controller.signal.addEventListener('abort', () => controller.abort())
-    const timeout = setTimeout(() => controller.abort(), 10000)
+    const timeout = setTimeout(() => controller.abort(), 5000)
     promisedResponse.finally(() => clearTimeout(timeout))
 
     const response = await promisedResponse
@@ -50,7 +38,7 @@ export async function fetchRoar<T extends object>(path: string, init: RequestIni
     }
     if (response.status >= 500) {
       const details = await response.text()
-      return { ok: false, reason: 'server down', details }
+      return { ok: false, reason: 'server error', details }
     }
     const details = await response.text()
     return { ok: false, reason: 'unknown status', details, status: response.status }

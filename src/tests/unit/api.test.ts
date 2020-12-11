@@ -8,7 +8,7 @@ describe('api', () => {
   createMocks()
 
   describe('fetchRoar', () => {
-    async function mockPost(status: number, body: any): Promise<api.FetchRoarResult<{ nice: string }>> {
+    async function mockPost(status: number, body: any): Promise<FetchRoarResult<{ nice: string }>> {
       fetchMock.mock({ url: 'https://test-roar-server.com/v1/my-cool-route', method: 'POST' }, { status, body })
 
       return api.fetchRoar(
@@ -63,10 +63,10 @@ describe('api', () => {
       expect(result).to.have.property('details', 'Twitter down')
     })
 
-    it('resolves ok: false, reason: "server down" when the response is in the 500 range', async () => {
+    it('resolves ok: false, reason: "server error" when the response is in the 500 range', async () => {
       const result = await mockPost(500, 'uh oh')
       expect(result).to.have.property('ok', false)
-      expect(result).to.have.property('reason', 'server down')
+      expect(result).to.have.property('reason', 'server error')
       expect(result).to.have.property('details', 'uh oh')
     })
 

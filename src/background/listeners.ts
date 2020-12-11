@@ -90,7 +90,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
       return imagesReady && twitterHandleReady
     }
 
-    whenState(store, ready, 3000)
+    whenState(store, ready, 5000)
       .then(state => {
         const target = targetById(state, targetId)
         if (!state.alertHtml && target) {
@@ -98,9 +98,8 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
         }
       })
       .catch(error => {
-        console.error(error)
         if (error.message === 'timeout') {
-          store.dispatchers.postTweetFailure({ targetId, error: { message: 'Timed out. Please try again later' } })
+          store.dispatchers.postTweetFailure({ targetId, failure: { reason: 'timeout' } })
         }
       })
   })

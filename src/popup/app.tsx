@@ -1,5 +1,6 @@
 import * as React from 'react'
 import views from './views'
+import { Alert } from './components/alert'
 import { toAppState } from '../selectors'
 
 type AppProps = {
@@ -16,8 +17,6 @@ export function AppContents({ popupWindow, storeState, dispatchUserActions }: Ap
       return <views.NotAuthed {...appState} />
     case 'Authenticating':
       return <views.Authenticating {...appState} />
-    case 'AuthFailed':
-      return <views.AuthFailed {...appState} />
     case 'Authenticated':
       return <views.Authenticated {...appState} />
   }
@@ -28,6 +27,7 @@ export function App(props: AppProps): JSX.Element {
   return (
     <div className={`app ${theme}`}>
       <AppContents {...props} />
+      {props.storeState.alertHtml && <Alert alertHtml={props.storeState.alertHtml} onClose={props.dispatchUserActions.dismissAlert} />}
     </div>
   )
 }
