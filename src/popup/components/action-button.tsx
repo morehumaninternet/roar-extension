@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { startCase } from 'lodash'
 import * as svgs from './action-svgs'
 
 type ActionButtonKind = keyof typeof svgs
@@ -13,7 +14,7 @@ type ActionButtonProps = {
 export function ActionButton({ kind, onClick, disabled, additionalClassNames }: ActionButtonProps): JSX.Element {
   return (
     <div className="svg-btn-container">
-      <button className={`svg-btn ${kind} ${additionalClassNames || ''}`} onClick={onClick} disabled={disabled}>
+      <button title={startCase(kind)} className={`svg-btn ${kind} ${additionalClassNames || ''}`} onClick={onClick} disabled={disabled}>
         {svgs[kind]}
       </button>
     </div>
