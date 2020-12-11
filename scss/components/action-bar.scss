@@ -6,6 +6,7 @@ $svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
 .action-bar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 6px 0;
 
   > .action-buttons {
@@ -58,7 +59,7 @@ $svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
 
   > .post-btn {
     flex-grow: 0;
-    height: $standard-btn-height;
+    height: 48px;
     width: 90px;
     font-size: 16px;
     font-weight: bold;
