@@ -24,6 +24,11 @@ export function mount(chrome: typeof global.chrome, popupWindow: Window) {
     unsubscribe = store.subscribe(onStateChange)
 
     dispatchUserActions.popupConnect()
+
+    // Only allow one popup to be open at once. When another window is focused on, close this popup
+    store.on('chrome.windows.onFocusChanged', () => {
+      popupWindow.close()
+    })
   })
 
   popupWindow.addEventListener('unload', () => {
