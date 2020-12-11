@@ -1,0 +1,35 @@
+.DraftEditor-root {
+  color: var(--text-color);
+  width: 100%;
+  font-size: 18px;
+  margin-top: 7px;
+  min-height: 20px;
+  overflow-wrap: break-word;
+}
+
+.link-tooltip {
+  position: fixed;
+  z-index: 2;
+
+  > .link-tooltip__anchor,
+  .link-tooltip__error {
+    position: absolute;
+    width: max-content;
+
+    background-color: var(--twitter-link-background-color);
+    color: var(--twitter-link-text-color);
+    fill: var(--twitter-link-text-color);
+
+    padding: 5px;
+    top: 22px;
+    border-radius: 2px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
+
+    > .link-tooltip__launch-icon {
+      vertical-align: middle;
+      width: 1em;
+      margin-left: 4px;
+      margin-bottom: 2px;
+    }
+  }
+}

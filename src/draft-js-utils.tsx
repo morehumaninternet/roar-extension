@@ -1,5 +1,6 @@
 // Adapted from https://github.com/davidsemakula/draft-js-emoji-plugin/blob/master/src/modifiers/addEmoji.js
-import { Modifier, ContentState, EditorState } from 'draft-js'
+import * as React from 'react'
+import { Modifier, ContentState, EditorState, CompositeDecorator, ContentBlock } from 'draft-js'
 
 export function getPlainText(editorState: EditorState): string {
   return editorState.getCurrentContent().getPlainText('\u0001')
@@ -84,4 +85,30 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
   const restOfTheText: string = text.split(' ').slice(1).join(' ')
 
   return prependHandle(fromText(restOfTheText), handle)
+}
+
+export function addTooltip(editorState: EditorState, regex: RegExp): EditorState {
+  function findWithRegex(regex: RegExp, contentBlock: ContentBlock, callback: (start: number, end: number) => void): any {
+    const text = contentBlock.getText()
+    // tslint:disable: no-let
+    let matchArr: Maybe<RegExpExecArray>
+    let start: number
+    // tslint:enable: no-let
+    while ((matchArr = regex.exec(text)) !== null) {
+      start = matchArr.index
+      callback(start, start + matchArr[0].length)
+    }
+  }
+
+  function handleStrategy(contentBlock: ContentBlock, callback: (start: number, end: number) => void): any {
+    findWithRegex(regex, contentBlock, callback)
+  }
+
+  const HandleSpan = ({ children }): JSX.Element => {
+    return <span className="tooltip-hover-element"> {children} </span>
+  }
+
+  const tooltipDecorator = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
+
+  return EditorState.set(editorState, { decorator: tooltipDecorator })
 }
