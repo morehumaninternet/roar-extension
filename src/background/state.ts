@@ -51,6 +51,6 @@ export const newStoreState = (browserInfo: BrowserInfo): StoreState => ({
   pickingEmoji: false,
   help: emptyHelpState(),
   darkModeOn: false,
-  alert: null,
+  alertHtml: null,
   mostRecentAction: { type: 'INITIALIZING' },
 })

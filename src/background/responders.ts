@@ -55,7 +55,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   popupDisconnect(): Partial<StoreState> {
-    return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
+    return { pickingEmoji: false, alertHtml: null } // closing the popup dismisses any alert
   },
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
@@ -64,10 +64,10 @@ export const responders: Responders<Action> = {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
   authenticationFailure(state, { error }): Partial<StoreState> {
-    return { alert: error.message, auth: { state: 'auth_failed' } }
+    return { alertHtml: error.message, auth: { state: 'auth_failed' } }
   },
   dismissAlert(): Partial<StoreState> {
-    return { alert: null }
+    return { alertHtml: null }
   },
   togglePickingEmoji(state): Partial<StoreState> {
     return { pickingEmoji: !state.pickingEmoji }
@@ -117,7 +117,7 @@ export const responders: Responders<Action> = {
   },
   fetchHandleFailure(state, { tabId, domain, error }): Partial<StoreState> {
     return {
-      alert: `Failed to set handle: ${error}`,
+      alertHtml: `Failed to set handle: ${error}`,
       ...updateTabFeedbackIfExists(state, tabId, tab => {
         if (tab.domain !== domain) return {}
         return { twitterHandle: { status: 'DONE', handle: null } }
@@ -136,9 +136,9 @@ export const responders: Responders<Action> = {
     }))
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
-    const alert = typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE'
+    const alertHtml = typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE'
     return {
-      alert,
+      alertHtml,
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
@@ -167,7 +167,7 @@ export const responders: Responders<Action> = {
     if (!target) return {}
 
     return {
-      alert: error.message,
+      alertHtml: error.message,
       ...updateFeedback(state, target, { isTweeting: false }),
     }
   },

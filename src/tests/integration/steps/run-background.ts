@@ -50,7 +50,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
       expect(state.help.feedbackState.images).to.eql([])
       expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
       expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi' })
-      expect(state.alert).to.equal(null)
+      expect(state.alertHtml).to.equal(null)
     })
 
     if (opts.alreadyAuthenticated) {

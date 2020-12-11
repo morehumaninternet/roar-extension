@@ -90,7 +90,7 @@ type StoreState = {
     feedbackState: FeedbackState
   }
   darkModeOn: boolean
-  alert: null | string | { __html: string }
+  alertHtml: null | string
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
 
