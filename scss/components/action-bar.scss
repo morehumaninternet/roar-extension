@@ -1,3 +1,5 @@
+$svg-btn-height: 40px;
+
 .svg-btn,
 .post-btn,
 .close-btn {
@@ -15,9 +17,6 @@
     align-items: flex-start;
     flex-grow: 0;
     margin-right: auto;
-    svg {
-      height: 36px;
-    }
   }
 
   > input[type='file'] {
@@ -77,10 +76,23 @@
   }
 }
 
+.svg-btn-container {
+  width: 48px;
+  height: $svg-btn-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .svg-btn {
   border: none;
   background: none;
   cursor: pointer;
+
+  svg {
+    height: $svg-btn-height - 4px;
+    transition: height .3s;
+  }
 
   svg > path:not(.circle-outline) {
     fill: $human-pink;
@@ -123,5 +135,11 @@
 
   &:first-child {
     padding-left: 0;
+  }
+
+  &:hover {
+    svg {
+      height: $svg-btn-height ;
+    }
   }
 }
