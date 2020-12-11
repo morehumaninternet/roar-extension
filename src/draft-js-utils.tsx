@@ -45,34 +45,44 @@ export function appendEntity(editorState: EditorState, text: string, type: 'text
   return EditorState.forceSelection(newEditorState, addedContent.getSelectionAfter())
 }
 
+// A twitter-handle component that wraps around the span passed to it
+const HandleSpan = ({ children }): JSX.Element => <span className="twitter-handle">{children}</span>
+
+// Adds the provided handle as an immutable entity at the start of the provided editorState.
+// Sets a handle decorator which wraps handle entities in a span.twitter-handle so that we may
+// Style them and provide associated tooltips
 export function prependHandle(editorState: EditorState, handle: string): EditorState {
   if (!handle.startsWith('@')) {
     throw new Error('handle must start with @')
   }
 
-  const currentContent = editorState.getCurrentContent()
-
-  // Select position 0 (anchor) of the first line (block)
-  const firstBlockKey = currentContent.getFirstBlock().getKey()
+  const startingContentState = editorState.getCurrentContent()
+  const contentStateWithEntity = startingContentState.createEntity('handle', 'IMMUTABLE', {})
+  const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
   const currentSelection = editorState.getSelection()
-  const startSelection = currentSelection.merge({
-    anchorOffset: 0,
-    anchorKey: firstBlockKey,
+  const firstBlockKey = startingContentState.getFirstBlock().getKey()
+  const startSelection = currentSelection.merge({ anchorOffset: 0, anchorKey: firstBlockKey })
+
+  // Insert the handle with the specified entity key
+  const contentStateWithHandle = Modifier.insertText(startingContentState, startSelection, handle, undefined, entityKey)
+  const contentStateWithTrailingSpace = Modifier.insertText(contentStateWithHandle, contentStateWithHandle.getSelectionAfter(), ' ')
+  const editorStateWithLatestContent = EditorState.moveSelectionToEnd(EditorState.createWithContent(contentStateWithTrailingSpace))
+
+  // Find the 'handle' entities of the content block, calling each back
+  function handleStrategy(contentBlock: ContentBlock, callback: (start: number, end: number) => void): any {
+    contentBlock.findEntityRanges(characterMetadata => {
+      const entityKey = characterMetadata.getEntity()
+      if (!entityKey) return false
+      const entity = contentStateWithTrailingSpace.getEntity(entityKey)
+      return entity.getType() === 'handle'
+    }, callback)
+  }
+
+  const handleDecorator = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
+
+  return EditorState.set(editorStateWithLatestContent, {
+    decorator: handleDecorator,
   })
-
-  // Insert the handle to the Tweet
-  const handleContentState = Modifier.insertText(currentContent, startSelection, `${handle} `)
-
-  // Select the handle and color it
-  // Twitter handle limit is 15 so we can safely assume that the handle is still in the first block
-  const handleSelection = startSelection.merge({
-    focusOffset: handle.length,
-    focusKey: firstBlockKey,
-  })
-
-  const coloredContentState = Modifier.applyInlineStyle(handleContentState, handleSelection, 'HUMAN-PINK')
-
-  return EditorState.moveSelectionToEnd(EditorState.createWithContent(coloredContentState))
 }
 
 export function replaceHandle(editorState: EditorState, handle: string): EditorState {
@@ -85,30 +95,4 @@ export function replaceHandle(editorState: EditorState, handle: string): EditorS
   const restOfTheText: string = text.split(' ').slice(1).join(' ')
 
   return prependHandle(fromText(restOfTheText), handle)
-}
-
-export function addTooltip(editorState: EditorState, regex: RegExp): EditorState {
-  function findWithRegex(regex: RegExp, contentBlock: ContentBlock, callback: (start: number, end: number) => void): any {
-    const text = contentBlock.getText()
-    // tslint:disable: no-let
-    let matchArr: Maybe<RegExpExecArray>
-    let start: number
-    // tslint:enable: no-let
-    while ((matchArr = regex.exec(text)) !== null) {
-      start = matchArr.index
-      callback(start, start + matchArr[0].length)
-    }
-  }
-
-  function handleStrategy(contentBlock: ContentBlock, callback: (start: number, end: number) => void): any {
-    findWithRegex(regex, contentBlock, callback)
-  }
-
-  const HandleSpan = ({ children }): JSX.Element => {
-    return <span className="tooltip-hover-element"> {children} </span>
-  }
-
-  const tooltipDecorator = new CompositeDecorator([{ strategy: handleStrategy, component: HandleSpan }])
-
-  return EditorState.set(editorState, { decorator: tooltipDecorator })
 }

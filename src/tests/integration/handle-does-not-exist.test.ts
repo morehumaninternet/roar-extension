@@ -11,7 +11,7 @@ describe('twitter handle does not exist for the domain', () => {
 
   describe('when we are hovering over the handle', () => {
     it('does not render the tooltip to the screen', () => {
-      const handle = mocks.app().querySelector('.tooltip-hover-element')! as HTMLDivElement
+      const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
       const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
       handle.dispatchEvent(event)
 

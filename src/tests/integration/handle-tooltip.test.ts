@@ -18,7 +18,7 @@ describe('handle tooltip', () => {
 
   describe('when we are hovering over the handle', () => {
     it('renders a tooltip', () => {
-      const handle = mocks.app().querySelector('.tooltip-hover-element')! as HTMLDivElement
+      const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
       const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
       handle.dispatchEvent(event)
 
