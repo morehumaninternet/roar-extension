@@ -3,7 +3,8 @@ export function monitorTabs(dispatch: Dispatchers<BackgroundAction>, chrome: typ
   chrome.tabs.query({}, tabs => dispatch['chrome.tabs.query']({ tabs }))
   chrome.tabs.onCreated.addListener(tab => dispatch['chrome.tabs.onCreated']({ tab }))
   chrome.tabs.onRemoved.addListener((tabId, removeInfo) => dispatch['chrome.tabs.onRemoved']({ tabId, removeInfo }))
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => dispatch['chrome.tabs.onUpdated']({ tabId, changeInfo }))
+  // Tabs trigger onUpdate events constantly. We want to listen only when the URL changes.
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => changeInfo.url && dispatch['chrome.tabs.onUpdated']({ tabId, changeInfo }))
   chrome.tabs.onAttached.addListener((tabId, attachInfo) => dispatch['chrome.tabs.onAttached']({ tabId, attachInfo }))
   chrome.tabs.onActivated.addListener(activeInfo => dispatch['chrome.tabs.onActivated']({ activeInfo }))
   chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => dispatch['chrome.tabs.onReplaced']({ addedTabId, removedTabId }))

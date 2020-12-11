@@ -9,6 +9,7 @@ const handleDescriptions = {
   cached: 'is cached',
   exists: 'exists for the domain',
   'does not exist': 'does not exist for the domain',
+  'resolves later': 'is resolved later',
 }
 
 type MountPopupOpts = {
@@ -16,14 +17,24 @@ type MountPopupOpts = {
   handle: keyof typeof handleDescriptions
 }
 
-export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
+type MountPopupReturn = {
+  resolveHandle(): void
+}
+
+export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn {
   const authDescription = opts.alreadyAuthenticated ? 'when already authed' : 'when not yet authed'
   const handleDescription = handleDescriptions[opts.handle]
   const description = `popup mount ${authDescription} and the twitter handle ${handleDescription}`
 
+  // Use indirection here so we may pass a resolveHandle callback immediatedly
+  // as handleResolver is created later
+  let handleResolver // tslint:disable-line:no-let
+  const resolveHandle = () => handleResolver()
+
   describe(description, () => {
     const domain = 'zing.com'
     const twitter_handle = opts.handle === 'does not exist' ? null : '@zing'
+    const expectedEditorHandle = ['cached', 'exists'].includes(opts.handle) ? twitter_handle : `@${domain}`
     const handleCache = opts.handle === 'cached' ? [{ domain, twitter_handle }] : []
 
     before(() => mocks.chrome.storage.local.get.callsArgWith(0, { handleCache }))
@@ -31,7 +42,14 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
     // Expect an API call if the handle is not cached
     if (opts.handle !== 'cached') {
       before(() => {
-        fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', { status: 200, body: { twitter_handle, domain } })
+        const response = { status: 200, body: { twitter_handle, domain } }
+
+        // We either provide the response directly or return a promise that resolves with the
+        // respnose when the caller calls the handleResolver directly
+        const mockResponse: fetchMock.MockResponse | fetchMock.MockResponseFunction =
+          opts.handle !== 'resolves later' ? response : new Promise(resolve => (handleResolver = () => resolve(response)))
+
+        fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', mockResponse)
       })
     }
 
@@ -48,8 +66,10 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
 
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
       const activeTab = ensureActiveTab(mocks.getState())
-      expect(activeTab.feedbackState.twitterHandle.handle).to.equal(twitter_handle)
       expect(activeTab.feedbackState.addingImages).to.equal(1)
+      if (opts.handle !== 'resolves later') {
+        expect(activeTab.feedbackState.twitterHandle.handle).to.equal(twitter_handle)
+      }
     })
 
     if (opts.handle === 'exists') {
@@ -65,8 +85,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
     it('has the appropriate handle in the editor state', () => {
       const activeTab = ensureActiveTab(mocks.getState())
       const plainText = getPlainText(activeTab.feedbackState.editorState)
-      const expectedPlainText = twitter_handle || `@${domain}`
-      expect(plainText).to.equal(expectedPlainText + ' ')
+      expect(plainText).to.equal(expectedEditorHandle + ' ')
     })
 
     it('adds an event listener for when the window unloads', () => {
@@ -76,4 +95,8 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): void {
       expect(callback).to.be.a('function')
     })
   })
+
+  return {
+    resolveHandle,
+  }
 }

@@ -2,9 +2,11 @@
 @use '../node_modules/emoji-mart/css/emoji-mart.css';
 @import '../node_modules/spinthatshit/src/loaders.scss';
 @import './colors';
+@import './components/btn.scss';
 @import './components/tweeting.scss';
 @import './components/action-bar.scss';
 @import './components/images.scss';
+@import './components/feedback-editor.scss';
 @import './components/not-authed.scss';
 @import './components/user-avatar.scss';
 
@@ -56,15 +58,6 @@ main {
   justify-content: space-between;
   overflow: hidden;
   flex-grow: 1;
-}
-
-.DraftEditor-root {
-  color: var(--text-color);
-  width: 100%;
-  font-size: 18px;
-  margin-top: 7px;
-  min-height: 20px;
-  overflow-wrap: break-word;
 }
 
 .emoji-picker-container {

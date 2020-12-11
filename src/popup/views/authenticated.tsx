@@ -37,7 +37,13 @@ export function Authenticated({
         <UserAvatar clickLogout={dispatchUserActions.clickLogout} src={user.photoUrl || '/img/default-avatar.png'} />
 
         <div className="twitter-interface">
-          <FeedbackEditor editorState={feedback.state.editorState} updateEditorState={dispatchUserActions.updateEditorState} />
+          <FeedbackEditor
+            editorState={feedback.state.editorState}
+            hovering={feedback.state.hovering}
+            updateEditorState={dispatchUserActions.updateEditorState}
+            hoverOver={dispatchUserActions.hoverOver}
+            twitterHandle={feedback.state.twitterHandle}
+          />
           <Images feedback={feedback.state} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
