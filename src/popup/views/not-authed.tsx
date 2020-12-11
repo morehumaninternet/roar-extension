@@ -13,7 +13,7 @@ export function NotAuthed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, '
   return (
     <div className="not-authed">
       <RoarLogo />
-      <button onClick={signInWithTwitter}>
+      <button className="sign-in-btn" onClick={signInWithTwitter}>
         <TwitterLogo />
         Log in with Twitter
       </button>

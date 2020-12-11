@@ -5,7 +5,9 @@ export function AuthFailed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, 
   return (
     <div>
       Auth Failed
-      <button onClick={signInWithTwitter}>Sign in with twitter</button>
+      <button className="sign-in-btn" onClick={signInWithTwitter}>
+        Sign in with twitter
+      </button>
     </div>
   )
 }

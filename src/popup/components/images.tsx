@@ -40,7 +40,7 @@ export function ImageThumbnail({ image, startEditingImage, clickDeleteImage }: I
     <div className="image-thumbnail">
       <img className="image-image" src={image.uri} />
       {<CloseButton onClick={clickDeleteImage} />}
-      {/* <button className="edit-button" onClick={startEditingImage}>
+      {/* <button className="edit-btn" onClick={startEditingImage}>
         Edit
       </button> */}
     </div>
