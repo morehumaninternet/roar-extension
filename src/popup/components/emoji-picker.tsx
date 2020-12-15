@@ -10,13 +10,13 @@ function getPixels(el: Element, prop: 'height' | 'width'): number {
   return Number(getComputedStyle(el)[prop].match(/^(\d+)px$/)![1])
 }
 
-export function EmojiPicker({ pickingEmoji, dispatchUserActions }: EmojiPickerProps) {
+export function EmojiPicker({ pickingEmoji, dispatchUserActions }: EmojiPickerProps): JSX.Element {
   const ref = React.useRef<HTMLDivElement>()
 
   React.useEffect(() => {
     // On resize, calculate the distance to the bottom for .emoji-mart-scroll and
     // explicitly increase its height that distance
-    function listener() {
+    function listener(): void {
       const emojiMartScroll = ref.current!.querySelector('.emoji-mart-scroll')! as HTMLDivElement
       // Set the height to 0px so that the .emoji-mart isn't the element making the page long
       emojiMartScroll.style.height = '0px'

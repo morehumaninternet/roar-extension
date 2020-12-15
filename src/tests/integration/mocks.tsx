@@ -1,3 +1,4 @@
+// tslint:disable:no-let readonly-array
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as fetchMock from 'fetch-mock'
@@ -64,7 +65,7 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   const browser: MockBrowser = {
     tabs: {
       get: sinon.stub().throws(),
-      captureVisibleTab() {
+      captureVisibleTab(): Promise<any> {
         return new Promise((resolve, reject) => {
           captureVisibleTabResolvers.push(resolve)
           captureVisibleTabRejecters.push(reject)
@@ -121,7 +122,7 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     getState,
     resolveLatestCaptureVisibleTab,
     rejectLatestCaptureVisibleTab,
-    whenState(cb) {
+    whenState(cb): Promise<StoreState> {
       return whenState(backgroundWindow.store, cb)
     },
   }

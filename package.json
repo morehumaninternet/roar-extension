@@ -6,7 +6,7 @@
     "build": "npm run clear && node build.js",
     "build:watch": "npm run build -- --watch",
     "clear": "rimraf bundled",
-    "lint": "{ find src -name '*.ts' | xargs tslint --project tsconfig.json --config tslint.json ; } && { find src -name '*.ts' -o -name '*.tsx' -exec grep '\\.only' {} + | { ! grep '^'; } }",
+    "lint": "{ find src -name '*.ts' -o -name '*.tsx' | xargs tslint --project tsconfig.json --config tslint.json ; } && { find src -name '*.ts' -o -name '*.tsx' -exec grep '\\.only' {} + | { ! grep '^'; } }",
     "publish": "./publish.sh",
     "scss": "sass scss/popup.scss bundled/popup.css",
     "rollup": "rollup --config rollup.config.js",

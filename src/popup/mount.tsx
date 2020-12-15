@@ -3,17 +3,17 @@ import * as ReactDOM from 'react-dom'
 import { AppStore } from '../background/store'
 import { App } from './app'
 
-function render(popupWindow: Window, dispatchUserActions: Dispatchers<UserAction>, storeState: StoreState, appContainer: HTMLElement) {
+function render(popupWindow: Window, dispatchUserActions: Dispatchers<UserAction>, storeState: StoreState, appContainer: HTMLElement): any {
   return ReactDOM.render(<App popupWindow={popupWindow} storeState={storeState} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
-export function mount(chrome: typeof global.chrome, popupWindow: Window) {
+export function mount(chrome: typeof global.chrome, popupWindow: Window): void {
   const appContainer = popupWindow.document.getElementById('app-container')!
 
-  let dispatchUserActions: Dispatchers<UserAction>
-  let unsubscribe: () => void
+  let dispatchUserActions: Dispatchers<UserAction> // tslint:disable-line:no-let
+  let unsubscribe: () => void // tslint:disable-line:no-let
 
-  chrome.runtime.getBackgroundPage(function (backgroundWindow: Window) {
+  chrome.runtime.getBackgroundPage((backgroundWindow: Window) => {
     Object.assign(popupWindow, { backgroundWindow })
     const store: AppStore = backgroundWindow.store
     dispatchUserActions = store.dispatchers
