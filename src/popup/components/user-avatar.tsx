@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export function UserAvatar({ src, clickLogout }) {
+export function UserAvatar({ src, clickLogout }): JSX.Element {
   return (
     <div>
       <div className="user-avatar">
