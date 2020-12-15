@@ -1,4 +1,3 @@
-// tslint:disable:no-let
 import { expect } from 'chai'
 import { Map } from 'immutable'
 import * as fetchMock from 'fetch-mock'
@@ -13,7 +12,7 @@ type RunBackgroundOpts = {
 }
 
 export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void {
-  let unsubscribe
+  let unsubscribe // tslint:disable-line:no-let
   after(() => unsubscribe && unsubscribe())
 
   describe('run background script', () => {

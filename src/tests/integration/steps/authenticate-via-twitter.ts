@@ -1,6 +1,4 @@
-// tslint:disable:no-let
 import { expect } from 'chai'
-import * as sinon from 'sinon'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { mount } from '../../../popup/mount'

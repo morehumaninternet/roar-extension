@@ -1,4 +1,3 @@
-// tslint:disable:no-let
 import { expect } from 'chai'
 import { Mocks } from '../mocks'
 import { ensureActiveTab } from '../../../selectors'

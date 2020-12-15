@@ -1,4 +1,3 @@
-// tslint:disable:no-let
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import { Mocks } from '../mocks'
@@ -7,7 +6,7 @@ type SignInViaTwitterOpts = { browser?: SupportedBrowser }
 
 export function signInViaTwitter(mocks: Mocks, opts: SignInViaTwitterOpts = {}): void {
   describe('sign in via twitter', () => {
-    let windowClose: sinon.SinonStub
+    let windowClose: sinon.SinonStub // tslint:disable-line:no-let
 
     before(() => (windowClose = sinon.stub(mocks.popupWindow, 'close')))
     after(() => windowClose.restore())
