@@ -70,6 +70,7 @@ TODO!
 
 ```bash
 npm test
+NYC_OPTS='--reporter=lcov' npm test # Generate code coverage as HTML
 ```
 
 ### Publishing the Staging Extension
