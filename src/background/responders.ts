@@ -260,7 +260,6 @@ export const responders: Responders<Action> = {
     return { tabs, focusedWindowId }
   },
   'chrome.windows.onFocusChanged'(state, { windowId }): Partial<StoreState> {
-    if (windowId === -1) return {}
     return { focusedWindowId: windowId }
   },
 }
