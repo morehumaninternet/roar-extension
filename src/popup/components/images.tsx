@@ -47,7 +47,7 @@ export function ImageThumbnail({ image, startEditingImage, clickDeleteImage }: I
   )
 }
 
-function ImageSpinner() {
+function ImageSpinner(): JSX.Element {
   return (
     <div className="image-thumbnail">
       <div className="image-spinner">

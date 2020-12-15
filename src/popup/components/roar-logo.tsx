@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export function RoarLogo() {
+export function RoarLogo(): JSX.Element {
   return (
     <svg className="roar-logo" viewBox="0 0 128 121" fill="none">
       <path

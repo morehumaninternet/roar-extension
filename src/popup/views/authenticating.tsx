@@ -45,14 +45,14 @@ export function Authenticating({ browser, authenticationSuccess, authenticationF
   // The first page load is the iframe initially rendering.
   // The next page load is when either we are on the twitter/auth/success page or on a page where auth has failed.
   // So we set a timeout so that if the above listener hasn't fired in 50ms then we consider authentication to have failed.
-  function onNextPageLoad() {
+  function onNextPageLoad(): void {
     iframeRef.current!.style.display = 'none'
     timeout = setTimeout(() => {
       return authenticationFailure({ error: { message: 'Authentication failed. Please try again.' } })
     }, 50)
   }
 
-  function onLoad() {
+  function onLoad(): void {
     if (initialLoadComplete) return onNextPageLoad()
     initialLoadComplete = true
   }
