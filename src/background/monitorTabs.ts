@@ -10,5 +10,5 @@ export function monitorTabs(dispatch: Dispatchers<BackgroundAction>, chrome: typ
   chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => dispatch['chrome.tabs.onReplaced']({ addedTabId, removedTabId }))
   chrome.windows.onCreated.addListener(win => dispatch['chrome.windows.onCreated']({ win }))
   chrome.windows.onRemoved.addListener(windowId => dispatch['chrome.windows.onRemoved']({ windowId }))
-  chrome.windows.onFocusChanged.addListener(windowId => dispatch['chrome.windows.onFocusChanged']({ windowId }))
+  chrome.windows.onFocusChanged.addListener(windowId => windowId !== -1 && dispatch['chrome.windows.onFocusChanged']({ windowId }))
 }

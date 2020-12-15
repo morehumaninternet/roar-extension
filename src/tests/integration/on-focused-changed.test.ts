@@ -15,6 +15,13 @@ describe('another window is opened', () => {
     before(() => (popupWindowClose = sinon.stub(mocks.popupWindow, 'close')))
     after(() => popupWindowClose.restore())
 
+    it('does not close the popup if the window ID is -1', () => {
+      const [callback] = mocks.chrome.windows.onFocusChanged.addListener.firstCall.args
+      const anotherWindowId = -1
+      callback(anotherWindowId)
+      expect(popupWindowClose).to.have.callCount(0)
+    })
+
     it('closes the popup', () => {
       const [callback] = mocks.chrome.windows.onFocusChanged.addListener.firstCall.args
       const anotherWindowId = 3
