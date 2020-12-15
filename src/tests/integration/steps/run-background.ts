@@ -84,7 +84,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
         { id: 13, windowId: 1, active: false, url: 'https://quux.com/abc' },
         { id: 14, windowId: 2, active: true, url: 'https://zing.com/abc' },
         { id: 15, windowId: 2, active: false, url: 'https://slam.com/abc' },
-        { id: 16, windowId: 3, active: true, url: 'https://mop.com/abc' },
+        { id: 16, windowId: 3, active: false, url: 'https://mop.com/abc' },
         { id: 17, windowId: 3, active: true, url: 'chrome://extensions' },
       ])
       const state = mocks.getState()
