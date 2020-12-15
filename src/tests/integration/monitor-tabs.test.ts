@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { createMocks } from './mocks'
 import { runBackground } from './steps/run-background'
 
-describe.only('monitor tabs', () => {
+describe('monitor tabs', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
