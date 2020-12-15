@@ -19,24 +19,15 @@ describe('removing the first screenshot', () => {
   captureFirstScreenshot(mocks)
 
   describe('removing first screenshot', () => {
-    it('deletes the first screenshot and immediately has a spinner because the other screenshot is being taken', async () => {
+    it('deletes the first screenshot and does not take a new one', async () => {
       const firstImage = mocks.app().querySelector('.twitter-interface > .images')!
       const firstScreenshotCloseButton = firstImage.querySelector('.image-thumbnail > .close-btn') as HTMLButtonElement
       firstScreenshotCloseButton.click()
 
-      await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 0)
-      await mocks.whenState(state => ensureActiveTab(state).feedbackState.addingImages === 1)
-
-      expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)
-    })
-
-    it('renders the new image that was taken when captureVisibleTab resolves', async () => {
-      mocks.resolveLatestCaptureVisibleTab()
-      await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 1)
-
+      const state = await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 0)
+      const activeTab = ensureActiveTab(state)
+      expect(activeTab.feedbackState.addingImages).to.equal(0)
       expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(0)
-      const images = mocks.app().querySelectorAll('.image-image')
-      expect(images).to.have.lengthOf(1)
     })
   })
 })
