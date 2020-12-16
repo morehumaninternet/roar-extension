@@ -30,7 +30,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
         const { mostRecentAction } = mocks.getState()
 
         if (mostRecentAction.type.endsWith('Failure')) {
-          console.error((mostRecentAction as any).payload.error)
+          console.error((mostRecentAction as any).payload.failure)
           process.exit(1)
         }
       })

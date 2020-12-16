@@ -25,7 +25,10 @@ describe('screenshotCaptureFailure + clickPost', () => {
 
       const state = await mocks.whenState(state => state.mostRecentAction.type !== 'clickPost')
 
-      expect(state.alert).to.equal('Could not take screenshot')
+      expect(state.alert).to.eql({
+        message: 'Something went wrong. Please try again.',
+        contactSupport: true,
+      })
     })
   })
 })

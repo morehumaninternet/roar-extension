@@ -73,12 +73,6 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         signInWithTwitter,
       }
     }
-    case 'auth_failed': {
-      return {
-        view: 'AuthFailed',
-        signInWithTwitter,
-      }
-    }
     case 'authenticating': {
       return {
         view: 'Authenticating',

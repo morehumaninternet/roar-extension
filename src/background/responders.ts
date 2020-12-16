@@ -4,6 +4,7 @@ import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpState } from './state'
 import { targetById, ensureActiveFeedbackTarget } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
+import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const domain = domainOf(tab.url)
@@ -50,6 +51,43 @@ function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: Feed
   return updateFeedback(state, target, callback(target))
 }
 
+const standardAlert = `Something went wrong. Please try again.`
+
+function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial<StoreState> {
+  switch (failure.reason) {
+    case 'response not json': {
+      return { alert: { message: standardAlert, contactSupport: true } }
+    }
+    case 'response not expected data type': {
+      return { alert: { message: standardAlert, contactSupport: true } }
+    }
+    case 'bad request': {
+      return { alert: { message: standardAlert, contactSupport: true } }
+    }
+    case 'unauthorized': {
+      return {
+        auth: { state: 'not_authed' },
+        alert: { message: 'Your session ended. Please log in to try again.' },
+      }
+    }
+    case 'service down': {
+      return { alert: { message: 'Twitter appears to be down. Please try again later.', contactSupport: true } }
+    }
+    case 'server error': {
+      return { alert: { message: 'We encountered a problem on our end. Please try again later.', contactSupport: true } }
+    }
+    case 'unknown status': {
+      return { alert: { message: standardAlert, contactSupport: true } }
+    }
+    case 'timeout': {
+      return { alert: { message: `That took too long. Please try again.`, contactSupport: true } }
+    }
+    case 'network down': {
+      return { alert: { message: 'You are offline. Please check your network connection and try again.' } }
+    }
+  }
+}
+
 export const responders: Responders<Action> = {
   popupConnect(): Partial<StoreState> {
     return {}
@@ -64,7 +102,7 @@ export const responders: Responders<Action> = {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
   authenticationFailure(state, { error }): Partial<StoreState> {
-    return { alert: error.message, auth: { state: 'auth_failed' } }
+    return { alert: { message: error.message }, auth: { state: 'not_authed' } }
   },
   dismissAlert(): Partial<StoreState> {
     return { alert: null }
@@ -115,13 +153,20 @@ export const responders: Responders<Action> = {
       }
     })
   },
-  fetchHandleFailure(state, { tabId, domain, error }): Partial<StoreState> {
+  fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
+    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
+      if (tab.domain !== domain) return {}
+      return { twitterHandle: { status: 'DONE', handle: null } }
+    })
+    if (isEmpty(tabUpdates)) {
+      return {}
+    }
     return {
-      alert: `Failed to set handle: ${error}`,
-      ...updateTabFeedbackIfExists(state, tabId, tab => {
-        if (tab.domain !== domain) return {}
-        return { twitterHandle: { status: 'DONE', handle: null } }
-      }),
+      alert: {
+        message: `We tried to fetch the twitter handle for ${domain} but something went wrong.`,
+        contactSupport: true,
+      },
+      ...tabUpdates,
     }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
@@ -136,9 +181,8 @@ export const responders: Responders<Action> = {
     }))
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
-    const alert = typeof error === 'string' ? error : error.message || 'SCREENSHOT FAILURE'
     return {
-      alert,
+      alert: { message: standardAlert, contactSupport: true },
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
@@ -162,13 +206,13 @@ export const responders: Responders<Action> = {
       }
     })
   },
-  postTweetFailure(state, { targetId, error }): Partial<StoreState> {
+  postTweetFailure(state, { targetId, failure }): Partial<StoreState> {
     const target = targetById(state, targetId)
-    if (!target) return {}
+    const feedbackUpdates = target ? updateFeedback(state, target, { isTweeting: false }) : {}
 
     return {
-      alert: error.message,
-      ...updateFeedback(state, target, { isTweeting: false }),
+      ...handleFailure(failure),
+      ...feedbackUpdates,
     }
   },
   clickDeleteImage(state, { imageIndex }): Partial<StoreState> {

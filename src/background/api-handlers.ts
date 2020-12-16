@@ -28,13 +28,7 @@ export const postTweet = async (target: FeedbackTarget, chrome: typeof global.ch
     return dispatchBackgroundActions.postTweetSuccess({ targetId })
   }
 
-  // TODO: handle different types of errors differently with a common function
-  return dispatchBackgroundActions.postTweetFailure({
-    targetId,
-    error: {
-      message: `${result.reason} ${result.details}`,
-    },
-  })
+  return dispatchBackgroundActions.postTweetFailure({ targetId, failure: result })
 }
 
 export const fetchTwitterHandle = async (
@@ -56,7 +50,7 @@ export const fetchTwitterHandle = async (
   }
 
   // TODO: handle different types of errors differently with a common function
-  return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, error: { message: `${result.reason} ${result.details}` } })
+  return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, failure: result })
 }
 
 export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {

@@ -9,6 +9,7 @@ const handleDescriptions = {
   cached: 'is cached',
   exists: 'exists for the domain',
   'does not exist': 'does not exist for the domain',
+  '500': 'cannot be fetched due to a server error',
   'resolves later': 'is resolved later',
 }
 
@@ -42,7 +43,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
     // Expect an API call if the handle is not cached
     if (opts.handle !== 'cached') {
       before(() => {
-        const response = { status: 200, body: { twitter_handle, domain } }
+        const response = opts.handle === '500' ? { status: 500, body: 'I made a huge mistake' } : { status: 200, body: { twitter_handle, domain } }
 
         // We either provide the response directly or return a promise that resolves with the
         // respnose when the caller calls the handleResolver directly
@@ -67,7 +68,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
       const activeTab = ensureActiveTab(mocks.getState())
       expect(activeTab.feedbackState.addingImages).to.equal(1)
-      if (opts.handle !== 'resolves later') {
+      if (opts.handle !== 'resolves later' && opts.handle !== '500') {
         expect(activeTab.feedbackState.twitterHandle.handle).to.equal(twitter_handle)
       }
     })
