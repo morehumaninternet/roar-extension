@@ -4,6 +4,7 @@ import { domainOf } from './domain'
 import { newFeedbackState, emptyHelpState } from './state'
 import { targetById, ensureActiveFeedbackTarget } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
+import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const domain = domainOf(tab.url)
@@ -153,12 +154,19 @@ export const responders: Responders<Action> = {
     })
   },
   fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
+    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
+      if (tab.domain !== domain) return {}
+      return { twitterHandle: { status: 'DONE', handle: null } }
+    })
+    if (isEmpty(tabUpdates)) {
+      return {}
+    }
     return {
-      ...handleFailure(failure),
-      ...updateTabFeedbackIfExists(state, tabId, tab => {
-        if (tab.domain !== domain) return {}
-        return { twitterHandle: { status: 'DONE', handle: null } }
-      }),
+      alert: {
+        message: `We tried to fetch the twitter handle for ${domain} but something went wrong.`,
+        contactSupport: true,
+      },
+      ...tabUpdates,
     }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
