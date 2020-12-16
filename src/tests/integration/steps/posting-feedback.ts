@@ -3,10 +3,23 @@ import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { ensureActiveTab, ensureActiveFeedbackTarget } from '../../../selectors'
 
-export function postingFeedback(mocks: Mocks, opts: { result: 'success' | 'unauthorized' }): void {
+type PostFeedbackResult = 'success' | 'unauthorized' | '500'
+
+const mockResponse = (result: PostFeedbackResult): fetchMock.MockResponse => {
+  switch (result) {
+    case 'success':
+      return { status: 201, body: { url: 'https://t.co/sometweethash' } }
+    case 'unauthorized':
+      return { status: 401, body: 'Unauthorized' }
+    case '500':
+      return { status: 500, body: 'Oh no!' }
+  }
+}
+
+export function postingFeedback(mocks: Mocks, opts: { result: PostFeedbackResult }): void {
   describe(`post feedback (${opts.result})`, () => {
     before(() => {
-      const response = opts.result === 'success' ? { status: 201, body: { url: 'https://t.co/sometweethash' } } : { status: 401, body: 'Unauthorized' }
+      const response = mockResponse(opts.result)
       fetchMock.mock('https://test-roar-server.com/v1/feedback', response)
     })
 
@@ -47,12 +60,21 @@ export function postingFeedback(mocks: Mocks, opts: { result: 'success' | 'unaut
         expect(spans[0]).to.have.property('innerHTML', '@zing')
         expect(spans[1]).to.have.property('innerHTML', ' ')
       })
-    } else {
+    } else if (opts.result === 'unauthorized') {
       it('transitions to an unauthed state with a dismissable alert explaining what happened', async () => {
         const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
+        expect(mocks.chrome.tabs.create).to.have.callCount(0)
         expect(state.auth.state).to.equal('not_authed')
         const alertMessage = mocks.app().querySelector('.alert .alert-message')! as HTMLDivElement
         expect(alertMessage.innerHTML).to.equal('Your session ended. Please log in to try again.')
+      })
+    } else {
+      it('stays authenticated and displays an alert', async () => {
+        const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
+        expect(mocks.chrome.tabs.create).to.have.callCount(0)
+        expect(state.auth.state).to.equal('authenticated')
+        const alertMessage = mocks.app().querySelector('.alert-message')?.innerHTML
+        expect(alertMessage).to.include('We encountered a problem on our end. Please try again later.')
       })
     }
   })

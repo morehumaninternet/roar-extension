@@ -50,41 +50,39 @@ function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: Feed
   return updateFeedback(state, target, callback(target))
 }
 
-const standardAlertEnding =
-  'Please try again. If this error persists, please contact <a href="mailto:support@morehumaninternet.org">support@morehumaninternet.org</a>'
-const standardAlert = `Something went wrong. ${standardAlertEnding}`
+const standardAlert = `Something went wrong. Please try again.`
 
 function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial<StoreState> {
   switch (failure.reason) {
     case 'response not json': {
-      return { alertHtml: standardAlert }
+      return { alert: { message: standardAlert, contactSupport: true } }
     }
     case 'response not expected data type': {
-      return { alertHtml: standardAlert }
+      return { alert: { message: standardAlert, contactSupport: true } }
     }
     case 'bad request': {
-      return { alertHtml: standardAlert }
+      return { alert: { message: standardAlert, contactSupport: true } }
     }
     case 'unauthorized': {
       return {
         auth: { state: 'not_authed' },
-        alertHtml: 'Your session ended. Please log in to try again.',
+        alert: { message: 'Your session ended. Please log in to try again.' },
       }
     }
     case 'service down': {
-      return { alertHtml: 'Twitter appears to be down. Please try again later.' }
+      return { alert: { message: 'Twitter appears to be down. Please try again later.', contactSupport: true } }
     }
     case 'server error': {
-      return { alertHtml: 'It looks like our se Please try again later.' }
+      return { alert: { message: 'We encountered a problem on our end. Please try again later.', contactSupport: true } }
     }
     case 'unknown status': {
-      return { alertHtml: standardAlert }
+      return { alert: { message: standardAlert, contactSupport: true } }
     }
     case 'timeout': {
-      return { alertHtml: `That took too long. ${standardAlertEnding}` }
+      return { alert: { message: `That took too long. Please try again.`, contactSupport: true } }
     }
     case 'network down': {
-      return { alertHtml: 'You are offline. Please check your network connection and try again.' }
+      return { alert: { message: 'You are offline. Please check your network connection and try again.' } }
     }
   }
 }
@@ -94,7 +92,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   popupDisconnect(): Partial<StoreState> {
-    return { pickingEmoji: false, alertHtml: null } // closing the popup dismisses any alert
+    return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
@@ -103,10 +101,10 @@ export const responders: Responders<Action> = {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
   authenticationFailure(state, { error }): Partial<StoreState> {
-    return { alertHtml: error.message, auth: { state: 'not_authed' } }
+    return { alert: { message: error.message }, auth: { state: 'not_authed' } }
   },
   dismissAlert(): Partial<StoreState> {
-    return { alertHtml: null }
+    return { alert: null }
   },
   togglePickingEmoji(state): Partial<StoreState> {
     return { pickingEmoji: !state.pickingEmoji }
@@ -176,7 +174,7 @@ export const responders: Responders<Action> = {
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
     return {
-      alertHtml: standardAlert,
+      alert: { message: standardAlert, contactSupport: true },
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),

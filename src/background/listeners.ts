@@ -75,7 +75,7 @@ export function signInWithTwitter({ store, chrome }: ListenerDependencies): void
 
 // Even if the post button is clicked we may not be ready to tweet yet.
 // We have to wait for any in-flight images to be added and for the twitter
-// handle to have been fetched. While waiting an alertHtml my fire or we may lose
+// handle to have been fetched. While waiting an alert my fire or we may lose
 // the target (perhaps the tab closed). If that happens we say we are ready even
 // though we won't actually post the tweet.
 export function clickPost({ store, chrome }: ListenerDependencies): void {
@@ -84,7 +84,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
 
     function ready(state: StoreState): boolean {
       const target = targetById(state, targetId)
-      if (state.alertHtml || !target) return true
+      if (state.alert || !target) return true
       const imagesReady = !target.feedbackState.addingImages
       const twitterHandleReady = target.feedbackState.twitterHandle.status === 'DONE'
       return imagesReady && twitterHandleReady
@@ -93,7 +93,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
     whenState(store, ready, 5000)
       .then(state => {
         const target = targetById(state, targetId)
-        if (!state.alertHtml && target) {
+        if (!state.alert && target) {
           postTweet(target, chrome, store.dispatchers)
         }
       })

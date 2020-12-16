@@ -27,7 +27,13 @@ export function App(props: AppProps): JSX.Element {
   return (
     <div className={`app ${theme}`}>
       <AppContents {...props} />
-      {props.storeState.alertHtml && <Alert alertHtml={props.storeState.alertHtml} onClose={props.dispatchUserActions.dismissAlert} />}
+      {props.storeState.alert && (
+        <Alert
+          alertMessage={props.storeState.alert.message}
+          contactSupport={props.storeState.alert.contactSupport}
+          onClose={props.dispatchUserActions.dismissAlert}
+        />
+      )}
     </div>
   )
 }
