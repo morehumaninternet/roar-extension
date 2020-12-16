@@ -89,8 +89,16 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
     }
     case 'authenticated': {
       const feedbackTarget = activeFeedbackTarget(storeState)!
-      const hostWithoutHandle = '@site.com'
-      const transitionHandle = feedbackTarget.feedbackState.twitterHandle.handle ? feedbackTarget.feedbackState.twitterHandle.handle : hostWithoutHandle
+
+      const allTabs = storeState.tabs
+      let activeTabId: number = 0
+      for (let [id, tab] of allTabs) {
+        if (tab.active === true) {
+          activeTabId = id
+        }
+      }
+      const domain = '@' + `${allTabs.get(activeTabId)?.domain!}`
+      const transitionHandle = feedbackTarget.feedbackState.twitterHandle.handle ? feedbackTarget.feedbackState.twitterHandle.handle : domain
 
       return {
         view: 'Authenticated',
