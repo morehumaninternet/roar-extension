@@ -88,13 +88,15 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
       }
     }
     case 'authenticated': {
-      const feedbackTarget = activeFeedbackTarget(storeState)
+      const feedbackTarget = activeFeedbackTarget(storeState)!
+      const hostWithoutHandle = '@site.com'
+      const transitionHandle = feedbackTarget.feedbackState.twitterHandle.handle ? feedbackTarget.feedbackState.twitterHandle.handle : hostWithoutHandle
 
       return {
         view: 'Authenticated',
         feedback: authenticatedStateFeedback(feedbackTarget),
         user: storeState.auth.user,
-        tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
+        tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: transitionHandle } : null,
         darkModeOn: storeState.darkModeOn,
         helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
