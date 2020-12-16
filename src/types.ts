@@ -36,6 +36,7 @@ type EditingImageState = {
 
 type FeedbackState = {
   isTweeting: boolean
+  takeAutoSnapshot: boolean
   editingImage: null | EditingImageState
   addingImages: number
   images: ReadonlyArray<Image>
@@ -167,6 +168,7 @@ type BackgroundAction =
   | { type: 'imageCaptureStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
   | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; error: any } }
+  | { type: 'disableAutoSnapshot'; payload: { targetId: FeedbackTargetId } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }

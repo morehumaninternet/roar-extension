@@ -6,6 +6,7 @@ const roarTwitterHandle = '@roarmhi'
 
 export const emptyFeedbackState = (): FeedbackState => ({
   isTweeting: false,
+  takeAutoSnapshot: true,
   addingImages: 0,
   editingImage: null,
   images: [],

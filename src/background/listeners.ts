@@ -34,9 +34,10 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
       }
     }
 
-    // Take a screenshot if no images currently present for the current feedback target
-    if (totalImages(target) < 1) {
+    // Take an automatic screenshot if we didn't take one before
+    if (target.feedbackState.takeAutoSnapshot) {
       images.takeScreenshot(target, browser.tabs, store.dispatchers)
+      store.dispatchers.disableAutoSnapshot({ targetId: target.id })
     }
   })
 }
@@ -68,15 +69,6 @@ export function signInWithTwitter({ store, chrome }: ListenerDependencies): void
   store.on('signInWithTwitter', state => {
     if (state.browserInfo.browser === 'Firefox') {
       chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
-    }
-  })
-}
-
-export function clickDeleteImage({ store, browser }: ListenerDependencies): void {
-  store.on('clickDeleteImage', state => {
-    const target = ensureActiveFeedbackTarget(state)
-    if (totalImages(target) < 1) {
-      images.takeScreenshot(target, browser.tabs, store.dispatchers)
     }
   })
 }

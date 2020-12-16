@@ -17,6 +17,7 @@ export function captureFirstScreenshot(mocks: Mocks): void {
       const activeTab = ensureActiveTab(state)
       expect(activeTab.feedbackState.addingImages).to.equal(0)
       expect(activeTab.feedbackState.images).to.have.length(1)
+      expect(activeTab.feedbackState.takeAutoSnapshot).to.equal(false)
       const [image] = activeTab.feedbackState.images
       if (image.type === 'imageupload') throw new Error('Expected screenshot')
       expect(image.tab.id).to.equal(activeTab.id)

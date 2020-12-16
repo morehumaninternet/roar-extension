@@ -190,6 +190,9 @@ export const responders: Responders<Action> = {
   imageUpload(state): Partial<StoreState> {
     return {}
   },
+  disableAutoSnapshot(state, { targetId }): Partial<StoreState> {
+    return updateFeedbackByTargetId(state, targetId, () => ({ takeAutoSnapshot: false }))
+  },
   'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
     const focusedWindow = windows.find(win => win.focused)
     if (!focusedWindow) return {}
