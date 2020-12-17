@@ -9,8 +9,8 @@ export function RoarLogo(): JSX.Element {
       />
       <path
         className="tongue"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M1.49316 8.76258C1.71286 7.10936 3.57295 5.81836 5.83509 5.81836C8.09722 5.81836 9.95732 7.10936 10.177 8.76258C9.11151 10.5262 7.56106 11.6366 5.83509 11.6366C4.10911 11.6366 2.55867 10.5262 1.49316 8.76258Z"
       />
     </svg>

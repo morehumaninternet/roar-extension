@@ -1,8 +1,8 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
-import { newFeedbackState, emptyHelpState } from './state'
-import { targetById, ensureActiveFeedbackTarget } from '../selectors'
+import { newFeedbackState } from './state'
+import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import { isEmpty } from 'lodash'
 
@@ -27,7 +27,7 @@ function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
 function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdates: Partial<FeedbackState>): Partial<StoreState> {
   const nextFeedbackState = { ...target.feedbackState, ...feedbackUpdates }
   const nextTarget: FeedbackTarget = { ...target, feedbackState: nextFeedbackState }
-  return nextTarget.feedbackTargetType === 'help' ? { help: nextTarget } : setTab(state, nextTarget)
+  return setTab(state, nextTarget)
 }
 
 function updateFeedbackByTargetId(
@@ -35,7 +35,7 @@ function updateFeedbackByTargetId(
   targetId: FeedbackTargetId,
   callback: (target: FeedbackTarget) => Partial<FeedbackState>
 ): Partial<StoreState> {
-  const target = targetById(state, targetId)
+  const target = tabById(state, targetId)
   if (!target) return {}
   return updateFeedback(state, target, callback(target))
 }
@@ -47,7 +47,7 @@ function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (
 }
 
 function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: FeedbackTarget) => Partial<FeedbackState>): Partial<StoreState> {
-  const target = ensureActiveFeedbackTarget(state)
+  const target = ensureActiveTab(state)
   return updateFeedback(state, target, callback(target))
 }
 
@@ -109,9 +109,6 @@ export const responders: Responders<Action> = {
   },
   togglePickingEmoji(state): Partial<StoreState> {
     return { pickingEmoji: !state.pickingEmoji }
-  },
-  toggleHelp(state): Partial<StoreState> {
-    return { help: { ...state.help, on: !state.help.on } }
   },
   toggleDarkMode(state): Partial<StoreState> {
     return { darkModeOn: !state.darkModeOn }
@@ -192,10 +189,6 @@ export const responders: Responders<Action> = {
     return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
-    if (targetId === 'help') {
-      return { help: emptyHelpState() }
-    }
-
     return updateTabFeedbackIfExists(state, targetId, tab => {
       const { handle } = tab.feedbackState.twitterHandle
       return {
@@ -207,7 +200,7 @@ export const responders: Responders<Action> = {
     })
   },
   postTweetFailure(state, { targetId, failure }): Partial<StoreState> {
-    const target = targetById(state, targetId)
+    const target = tabById(state, targetId)
     const feedbackUpdates = target ? updateFeedback(state, target, { isTweeting: false }) : {}
 
     return {

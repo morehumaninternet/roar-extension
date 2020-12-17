@@ -73,7 +73,7 @@ type TabInfo = {
   feedbackState: FeedbackState
 }
 
-type FeedbackTarget = TabInfo | StoreState['help']
+type FeedbackTarget = TabInfo
 
 type FeedbackTargetId = FeedbackTarget['id']
 
@@ -83,12 +83,6 @@ type StoreState = {
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth
   pickingEmoji: boolean
-  help: {
-    feedbackTargetType: 'help'
-    id: 'help'
-    on: boolean
-    feedbackState: FeedbackState
-  }
   darkModeOn: boolean
   alert: null | {
     message: string
@@ -114,7 +108,6 @@ type AuthenticatedState = {
   feedback: { exists: true; state: FeedbackState } | { exists: false; reasonDisabledMessage: null | string }
   user: User
   tweeting: null | { at: string }
-  helpOn: boolean
   darkModeOn: boolean
   pickingEmoji: boolean
   addImageDisabled: boolean
@@ -147,7 +140,6 @@ type UserAction =
   | { type: 'updateEditorState'; payload: { editorState: any } }
   | { type: 'clickPost' }
   | { type: 'togglePickingEmoji' }
-  | { type: 'toggleHelp' }
   | { type: 'toggleDarkMode' }
   | { type: 'emojiPicked'; payload: { emoji: string } }
   | { type: 'clickTakeScreenshot' }

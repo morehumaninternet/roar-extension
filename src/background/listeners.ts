@@ -3,7 +3,7 @@ import * as images from './images'
 import { makeLogoutRequest } from './api'
 import { detectLogin, fetchTwitterHandle, postTweet } from './api-handlers'
 import { whenState } from '../redux-utils'
-import { ensureActiveFeedbackTarget, targetById, totalImages } from '../selectors'
+import { ensureActiveTab, tabById, totalImages } from '../selectors'
 
 type ListenerDependencies = {
   store: AppStore
@@ -21,7 +21,7 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
       detectLogin(store.dispatchers, { failIfNotLoggedIn: true })
     }
 
-    const target = ensureActiveFeedbackTarget(state)
+    const target = ensureActiveTab(state)
     if (target.feedbackState.isTweeting) return
 
     if (target.feedbackTargetType === 'tab') {
@@ -52,14 +52,14 @@ export function clickLogout({ store, browser }: ListenerDependencies): void {
 
 export function clickTakeScreenshot({ store, browser }: ListenerDependencies): void {
   store.on('clickTakeScreenshot', state => {
-    const target = ensureActiveFeedbackTarget(state)
+    const target = ensureActiveTab(state)
     images.takeScreenshot(target, browser.tabs, store.dispatchers)
   })
 }
 
 export function imageUpload({ store }: ListenerDependencies): void {
   store.on('imageUpload', state => {
-    const target = ensureActiveFeedbackTarget(state)
+    const target = ensureActiveTab(state)
     const { file } = state.mostRecentAction.payload
     images.imageUpload(target.id, file, store.dispatchers)
   })
@@ -78,10 +78,10 @@ export function signInWithTwitter({ store, chrome }: ListenerDependencies): void
 // though we won't actually post the tweet.
 export function clickPost({ store, chrome }: ListenerDependencies): void {
   store.on('clickPost', state => {
-    const targetId = ensureActiveFeedbackTarget(state).id
+    const targetId = ensureActiveTab(state).id
 
     function ready(state: StoreState): boolean {
-      const target = targetById(state, targetId)
+      const target = tabById(state, targetId)
       if (state.alert || !target) return true
       const imagesReady = !target.feedbackState.addingImages
       const twitterHandleReady = target.feedbackState.twitterHandle.status === 'DONE'
@@ -90,7 +90,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
 
     whenState(store, ready, 5000)
       .then(state => {
-        const target = targetById(state, targetId)
+        const target = tabById(state, targetId)
         if (!state.alert && target) {
           postTweet(target, chrome, store.dispatchers)
         }
