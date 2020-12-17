@@ -37,7 +37,7 @@ export const ActionBar = ({
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} additionalClassNames={pickingEmoji ? 'on' : 'off'} />
         <ActionButton kind={darkModeOn ? 'DarkMode' : 'LightMode'} onClick={toggleDarkMode} />
       </div>
-      <input ref={imageRef} type="file" accept=".png" onChange={evt => imageUpload({ file: evt.target.files![0] })} />
+      <input ref={imageRef} type="file" accept="image/*" onChange={evt => imageUpload({ file: evt.target.files![0] })} />
       <CharacterCountdown characterLimit={characterLimit} />
       <button className="post-btn" onClick={clickPost} disabled={postTweetDisabled}>
         Post
