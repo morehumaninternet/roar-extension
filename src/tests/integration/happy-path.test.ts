@@ -9,21 +9,16 @@ import { takingScreenshots } from './steps/taking-screenshots'
 import { postingFeedback } from './steps/posting-feedback'
 import { feedbackEditing } from './steps/feedback-editing'
 
-happyPath({ browser: 'Chrome' })
-happyPath({ browser: 'Firefox' })
+describe('happy path', () => {
+  const mocks = createMocks()
 
-function happyPath(opts: { browser: SupportedBrowser }): void {
-  describe('happy path for ' + opts.browser, () => {
-    const mocks = createMocks(opts)
-
-    runBackground(mocks)
-    mountPopup(mocks, { handle: 'exists' })
-    signInViaTwitter(mocks, opts)
-    authenticateViaTwitter(mocks, opts)
-    onceAuthenticated(mocks)
-    captureFirstScreenshot(mocks)
-    takingScreenshots(mocks)
-    feedbackEditing(mocks)
-    postingFeedback(mocks, { result: 'success' })
-  })
-}
+  runBackground(mocks)
+  mountPopup(mocks, { handle: 'exists' })
+  signInViaTwitter(mocks)
+  authenticateViaTwitter(mocks)
+  onceAuthenticated(mocks)
+  captureFirstScreenshot(mocks)
+  takingScreenshots(mocks)
+  feedbackEditing(mocks)
+  postingFeedback(mocks, { result: 'success' })
+})

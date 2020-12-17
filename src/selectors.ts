@@ -61,9 +61,7 @@ function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): Auth
 export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
   const signInWithTwitter = () => {
     dispatchUserActions.signInWithTwitter()
-    if (storeState.browserInfo.browser === 'Firefox') {
-      popupWindow.close()
-    }
+    popupWindow.close()
   }
 
   switch (storeState.auth.state) {

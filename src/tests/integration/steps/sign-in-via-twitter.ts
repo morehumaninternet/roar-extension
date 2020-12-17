@@ -18,14 +18,8 @@ export function signInViaTwitter(mocks: Mocks, opts: SignInViaTwitterOpts = {}):
       await new Promise(resolve => setTimeout(resolve, 0))
     })
 
-    if (opts.browser === 'Firefox') {
-      it('closes the popup window', () => {
-        expect(windowClose).to.have.callCount(1)
-      })
-    } else {
-      it('does not close the popup window', () => {
-        expect(windowClose).to.have.callCount(0)
-      })
-    }
+    it('closes the popup window', () => {
+      expect(windowClose).to.have.callCount(1)
+    })
   })
 }
