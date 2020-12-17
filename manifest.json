@@ -24,10 +24,7 @@
     "notifications",
     "tabs",
     "webNavigation",
-    "webRequest",
-    "debugger",
-    "tabCapture",
-    "desktopCapture"
+    "webRequest"
   ],
   "externally_connectable": {
     "matches": ["https://roar-server.herokuapp.com/*", "https://localhost:5004/*"]
