@@ -14,10 +14,10 @@ type ListenerDependencies = {
 
 export function popupConnect({ store, browser, handleCache }: ListenerDependencies): void {
   store.on('popupConnect', state => {
-    // For firefox, we open a separate tab that the user authenticatess with. So if they open the popup back up
+    // We open a separate tab that the user authenticates with. So if they open the popup back up
     // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
     // aren't logged in
-    if (state.browserInfo.browser === 'Firefox' && state.auth.state === 'authenticating') {
+    if (state.auth.state === 'authenticating') {
       detectLogin(store.dispatchers, { failIfNotLoggedIn: true })
     }
 
@@ -67,9 +67,7 @@ export function imageUpload({ store }: ListenerDependencies): void {
 
 export function signInWithTwitter({ store, chrome }: ListenerDependencies): void {
   store.on('signInWithTwitter', state => {
-    if (state.browserInfo.browser === 'Firefox') {
-      chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
-    }
+    chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
   })
 }
 
