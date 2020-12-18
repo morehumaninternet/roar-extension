@@ -88,7 +88,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
       return imagesReady && twitterHandleReady
     }
 
-    whenState(store, ready, 5000)
+    whenState(store, ready, 10000)
       .then(state => {
         const target = targetById(state, targetId)
         if (!state.alert && target) {
