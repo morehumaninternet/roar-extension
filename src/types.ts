@@ -157,7 +157,7 @@ type BackgroundAction =
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; failure: FetchRoarFailure | { reason: 'timeout' } } }
   | { type: 'imageCaptureStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
-  | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; error: any } }
+  | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; failure: ImageCaptureFailure } }
   | { type: 'disableAutoSnapshot'; payload: { targetId: FeedbackTargetId } }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
@@ -198,3 +198,5 @@ type FetchRoarFailure =
   | { ok: false; reason: 'network down'; details: string }
 
 type FetchRoarResult<T> = { ok: true; data: T } | FetchRoarFailure
+
+type ImageCaptureFailure = { reason: 'file size limit exceeded'; message: string } | { reason: 'unknown'; message: string }

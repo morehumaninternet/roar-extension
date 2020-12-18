@@ -51,7 +51,14 @@ export async function takeScreenshot(
       targetId: tab.id,
     })
   } catch (error) {
-    dispatchBackgroundActions.imageCaptureFailure({ targetId: target.id, error })
+    console.error(error)
+    dispatchBackgroundActions.imageCaptureFailure({
+      targetId: target.id,
+      failure: {
+        reason: 'unknown',
+        message: error.message,
+      },
+    })
   }
 }
 
@@ -67,6 +74,16 @@ function readFileUri(file: File): Promise<string> {
 export async function imageUpload(targetId: FeedbackTargetId, file: File, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
   try {
     dispatchBackgroundActions.imageCaptureStart({ targetId })
+    const fiveMegabytes = 5 * Math.pow(2, 20)
+    if (file.size > fiveMegabytes) {
+      return dispatchBackgroundActions.imageCaptureFailure({
+        targetId,
+        failure: {
+          reason: 'file size limit exceeded',
+          message: 'Image is greater than five megabyte limit. Please choose a smaller image and try again',
+        },
+      })
+    }
     const uri = await readFileUri(file)
     const blob = dataURItoBlob(uri)
 
@@ -75,6 +92,13 @@ export async function imageUpload(targetId: FeedbackTargetId, file: File, dispat
       image: { type: 'imageupload', name: file.name, uri, blob },
     })
   } catch (error) {
-    dispatchBackgroundActions.imageCaptureFailure({ targetId, error })
+    console.error(error)
+    dispatchBackgroundActions.imageCaptureFailure({
+      targetId,
+      failure: {
+        reason: 'unknown',
+        message: error.message,
+      },
+    })
   }
 }

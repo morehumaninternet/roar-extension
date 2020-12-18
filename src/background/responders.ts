@@ -163,9 +163,11 @@ export const responders: Responders<Action> = {
       images: target.feedbackState.images.concat([image]),
     }))
   },
-  imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
+  imageCaptureFailure(state, { targetId, failure }): Partial<StoreState> {
+    const alert: StoreState['alert'] =
+      failure.reason === 'file size limit exceeded' ? { message: failure.message } : { message: copy.alerts.standard, contactSupport: true }
     return {
-      alert: { message: copy.alerts.standard, contactSupport: true },
+      alert,
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
@@ -210,7 +212,7 @@ export const responders: Responders<Action> = {
       },
     }))
   },
-  imageUpload(state): Partial<StoreState> {
+  imageUpload(state, { file }): Partial<StoreState> {
     return {}
   },
   disableAutoSnapshot(state, { targetId }): Partial<StoreState> {
