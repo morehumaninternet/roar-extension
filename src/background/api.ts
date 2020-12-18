@@ -6,7 +6,7 @@ export async function fetchRoar<T extends object>(path: string, init: RequestIni
     const promisedResponse = fetch(`${window.roarServerUrl}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
 
     controller.signal.addEventListener('abort', () => controller.abort())
-    const timeout = setTimeout(() => controller.abort(), 5000)
+    const timeout = setTimeout(() => controller.abort(), 10000)
     promisedResponse.finally(() => clearTimeout(timeout))
 
     const response = await promisedResponse
