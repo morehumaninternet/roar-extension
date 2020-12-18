@@ -17,6 +17,6 @@ describe('post feedback 500', () => {
   authenticateViaTwitter(mocks)
   onceAuthenticated(mocks)
   captureFirstScreenshot(mocks)
-  feedbackEditing(mocks)
-  postingFeedback(mocks, { result: '500' })
+  feedbackEditing(mocks, { handle: '@zing' })
+  postingFeedback(mocks, { handle: '@zing', result: '500' })
 })

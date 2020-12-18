@@ -68,9 +68,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
     it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
       const activeTab = ensureActiveTab(mocks.getState())
       expect(activeTab.feedbackState.addingImages).to.equal(1)
-      if (opts.handle !== 'resolves later' && opts.handle !== '500') {
-        expect(activeTab.feedbackState.twitterHandle.handle).to.equal(twitter_handle)
-      }
+      expect(activeTab.feedbackState.twitterHandle.handle).to.equal(expectedEditorHandle)
     })
 
     if (opts.handle === 'exists') {

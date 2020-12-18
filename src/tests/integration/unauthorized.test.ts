@@ -17,6 +17,6 @@ describe('unauthorized', () => {
   authenticateViaTwitter(mocks)
   onceAuthenticated(mocks)
   captureFirstScreenshot(mocks)
-  feedbackEditing(mocks)
-  postingFeedback(mocks, { result: 'unauthorized' })
+  feedbackEditing(mocks, { handle: '@zing' })
+  postingFeedback(mocks, { handle: '@zing', result: 'unauthorized' })
 })

@@ -50,7 +50,8 @@ type FeedbackState = {
   }
   twitterHandle: {
     status: 'NEW' | 'IN_PROGRESS' | 'DONE'
-    handle: string | null
+    handle: string
+    isActualAccount: boolean
   }
 }
 

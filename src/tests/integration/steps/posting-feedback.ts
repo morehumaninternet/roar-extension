@@ -16,7 +16,7 @@ const mockResponse = (result: PostFeedbackResult): fetchMock.MockResponse => {
   }
 }
 
-export function postingFeedback(mocks: Mocks, opts: { result: PostFeedbackResult }): void {
+export function postingFeedback(mocks: Mocks, opts: { handle: string; result: PostFeedbackResult }): void {
   describe(`post feedback (${opts.result})`, () => {
     before(() => {
       const response = mockResponse(opts.result)
@@ -30,21 +30,21 @@ export function postingFeedback(mocks: Mocks, opts: { result: PostFeedbackResult
       expect(mocks.getState().mostRecentAction.type).to.equal('clickPost')
       await mocks.whenState(state => ensureActiveFeedbackTarget(state).feedbackState.isTweeting)
 
-      const [url, opts] = fetchMock.lastCall()!
+      const [url, initOpts] = fetchMock.lastCall()!
       expect(url).to.equal('https://test-roar-server.com/v1/feedback')
-      expect(opts).to.have.all.keys('method', 'credentials', 'body', 'signal')
-      expect(opts).to.have.property('method', 'POST')
-      expect(opts).to.have.property('credentials', 'include')
+      expect(initOpts).to.have.all.keys('method', 'credentials', 'body', 'signal')
+      expect(initOpts).to.have.property('method', 'POST')
+      expect(initOpts).to.have.property('credentials', 'include')
 
-      const body: FormData = opts!.body! as any
-      expect(body.get('status')).to.equal('@zing This is some feedback')
+      const body: FormData = initOpts!.body! as any
+      expect(body.get('status')).to.equal(`${opts.handle} This is some feedback`)
       expect(body.get('domain')).to.equal('zing.com')
       const screenshot: any = body.get('images') as any
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const tweetInProgress = mocks.app().querySelector('.tweet-in-progress')!
-      expect(tweetInProgress).to.have.property('innerHTML', 'Tweeting your feedback to @zing')
+      expect(tweetInProgress).to.have.property('innerHTML', `Tweeting your feedback to ${opts.handle}`)
     })
 
     if (opts.result === 'success') {
@@ -56,8 +56,9 @@ export function postingFeedback(mocks: Mocks, opts: { result: PostFeedbackResult
         })
 
         const spans = mocks.app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
+
         expect(spans).to.have.length(2)
-        expect(spans[0]).to.have.property('innerHTML', '@zing')
+        expect(spans[0]).to.have.property('innerHTML', opts.handle)
         expect(spans[1]).to.have.property('innerHTML', ' ')
       })
     } else if (opts.result === 'unauthorized') {

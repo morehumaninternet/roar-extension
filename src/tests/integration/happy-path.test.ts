@@ -19,6 +19,6 @@ describe('happy path', () => {
   onceAuthenticated(mocks)
   captureFirstScreenshot(mocks)
   takingScreenshots(mocks)
-  feedbackEditing(mocks)
-  postingFeedback(mocks, { result: 'success' })
+  feedbackEditing(mocks, { handle: '@zing' })
+  postingFeedback(mocks, { handle: '@zing', result: 'success' })
 })
