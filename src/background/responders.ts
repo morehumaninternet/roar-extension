@@ -4,6 +4,7 @@ import { domainOf } from './domain'
 import { newFeedbackState } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
+import * as copy from '../copy'
 import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
@@ -51,41 +52,26 @@ function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: Feed
   return updateFeedback(state, target, callback(target))
 }
 
-const standardAlert = `Something went wrong. Please try again.`
+const contactSupportFor: Set<FetchRoarFailure['reason']> = new Set([
+  'response not json',
+  'response not expected data type',
+  'bad request',
+  'service down',
+  'server error',
+  'unknown status',
+  'timeout',
+])
 
 function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial<StoreState> {
-  switch (failure.reason) {
-    case 'response not json': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'response not expected data type': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'bad request': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'unauthorized': {
-      return {
-        auth: { state: 'not_authed' },
-        alert: { message: 'Your session ended. Please log in to try again.' },
-      }
-    }
-    case 'service down': {
-      return { alert: { message: 'Twitter appears to be down. Please try again later.', contactSupport: true } }
-    }
-    case 'server error': {
-      return { alert: { message: 'We encountered a problem on our end. Please try again later.', contactSupport: true } }
-    }
-    case 'unknown status': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'timeout': {
-      return { alert: { message: `That took too long. Please try again.`, contactSupport: true } }
-    }
-    case 'network down': {
-      return { alert: { message: 'You are offline. Please check your network connection and try again.' } }
-    }
+  const message: string = copy.alerts[failure.reason] || copy.alerts.standard
+  const contactSupport = contactSupportFor.has(failure.reason)
+  const updates: Partial<StoreState> = {
+    alert: { message, contactSupport },
   }
+  if (failure.reason === 'unauthorized') {
+    updates.auth = { state: 'not_authed' }
+  }
+  return updates
 }
 
 export const responders: Responders<Action> = {
@@ -160,7 +146,7 @@ export const responders: Responders<Action> = {
     }
     return {
       alert: {
-        message: `We tried to fetch the twitter handle for ${domain} but something went wrong.`,
+        message: copy.fetchHandleFailure(domain),
         contactSupport: true,
       },
       ...tabUpdates,
@@ -179,7 +165,7 @@ export const responders: Responders<Action> = {
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
     return {
-      alert: { message: standardAlert, contactSupport: true },
+      alert: { message: copy.alerts.standard, contactSupport: true },
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
