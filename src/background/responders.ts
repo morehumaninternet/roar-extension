@@ -124,7 +124,7 @@ export const responders: Responders<Action> = {
   },
   fetchHandleStart(state, { tabId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, tabId, tab => ({
-      twitterHandle: { status: 'IN_PROGRESS', handle: null },
+      twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
     }))
   },
   fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
@@ -132,14 +132,18 @@ export const responders: Responders<Action> = {
       if (tab.domain !== domain) return {}
       return {
         editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
-        twitterHandle: { status: 'DONE', handle },
+        twitterHandle: {
+          status: 'DONE',
+          handle: handle || tab.feedbackState.twitterHandle.handle,
+          isActualAccount: !!handle,
+        },
       }
     })
   },
   fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
     const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
-      return { twitterHandle: { status: 'DONE', handle: null } }
+      return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
     })
     if (isEmpty(tabUpdates)) {
       return {}

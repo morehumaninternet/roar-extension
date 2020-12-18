@@ -2,6 +2,10 @@ import { expect } from 'chai'
 import { createMocks } from './mocks'
 import { mountPopup } from './steps/mount-popup'
 import { runBackground } from './steps/run-background'
+import { captureFirstScreenshot } from './steps/capture-first-screenshot'
+import { takingScreenshots } from './steps/taking-screenshots'
+import { postingFeedback } from './steps/posting-feedback'
+import { feedbackEditing } from './steps/feedback-editing'
 
 describe('twitter handle does not exist for the domain', () => {
   const mocks = createMocks()
@@ -19,4 +23,9 @@ describe('twitter handle does not exist for the domain', () => {
       expect(tooltip_error_msg.innerHTML).to.equal('No twitter account could be found')
     })
   })
+
+  captureFirstScreenshot(mocks)
+  takingScreenshots(mocks)
+  feedbackEditing(mocks, { handle: '@zing.com' })
+  postingFeedback(mocks, { handle: '@zing.com', result: 'success' })
 })

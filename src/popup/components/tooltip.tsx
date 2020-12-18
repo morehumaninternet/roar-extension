@@ -36,7 +36,7 @@ const ToolTip = ({ visible, hovering, twitterHandle }: ToolTipProps): JSX.Elemen
         left: hovering.left,
       }}
     >
-      {twitterHandle.handle ? (
+      {twitterHandle.isActualAccount ? (
         <TwitterLink handle={twitterHandle.handle} />
       ) : (
         <div className="link-tooltip__error">{twitterHandle.status === 'DONE' ? 'No twitter account could be found' : 'Searching for twitter account...'}</div>
