@@ -7,9 +7,12 @@ export function Alert({ alertMessage, contactSupport, onClose }: { alertMessage:
       <div className="alert-message">
         {alertMessage}
         {contactSupport && (
-          <span>
-            If this error persists, please contact <a href="mailto:support@morehumaninternet.org">support@morehumaninternet.org</a>
-          </span>
+          <>
+            <br />
+            <span>
+              If this error persists, please contact <a href="mailto:support@morehumaninternet.org">support@morehumaninternet.org</a>
+            </span>
+          </>
         )}
       </div>
       <CloseButton onClick={onClose} />
