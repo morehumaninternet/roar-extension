@@ -5,12 +5,7 @@ function tweetFormData(target: FeedbackTarget): FormData {
 
   const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
-
-  if (target.feedbackTargetType === 'tab') {
-    tweetData.append('domain', target.domain!)
-  } else {
-    tweetData.append('help', 'true')
-  }
+  tweetData.append('domain', target.domain!)
 
   // Adding all the screenshot files under the same form key - 'images'.
   target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))

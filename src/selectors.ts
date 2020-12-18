@@ -13,18 +13,8 @@ export function ensureActiveTab(state: StoreState): TabInfo {
   throw new Error('Active tab should exist')
 }
 
-export function targetById(state: StoreState, targetId: FeedbackTargetId): Maybe<FeedbackTarget> {
-  return targetId === 'help' ? state.help : state.tabs.get(targetId)
-}
-
-export function activeFeedbackTarget(state: StoreState): null | FeedbackTarget {
-  if (state.help.on) return state.help
-  return activeTab(state)
-}
-
-export function ensureActiveFeedbackTarget(state: StoreState): FeedbackTarget {
-  if (state.help.on) return state.help
-  return ensureActiveTab(state)
+export function tabById(state: StoreState, targetId: FeedbackTargetId): Maybe<FeedbackTarget> {
+  return state.tabs.get(targetId)
 }
 
 export function totalImages(feedbackTarget: FeedbackTarget): number {
@@ -80,7 +70,7 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
       }
     }
     case 'authenticated': {
-      const feedbackTarget = activeFeedbackTarget(storeState)
+      const feedbackTarget = activeTab(storeState)
 
       return {
         view: 'Authenticated',
@@ -88,7 +78,6 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         user: storeState.auth.user,
         tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
         darkModeOn: storeState.darkModeOn,
-        helpOn: storeState.help.on,
         pickingEmoji: storeState.pickingEmoji,
         addImageDisabled: addImageDisabled(feedbackTarget),
         postTweetDisabled: postTweetDisabled(feedbackTarget),
