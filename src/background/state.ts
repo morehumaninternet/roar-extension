@@ -2,8 +2,6 @@ import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { prependHandle } from '../draft-js-utils'
 
-const roarTwitterHandle = '@roarmhi'
-
 export const emptyFeedbackState = (): FeedbackState => ({
   isTweeting: false,
   takeAutoSnapshot: true,
@@ -23,12 +21,6 @@ export const emptyFeedbackState = (): FeedbackState => ({
     handle: '@mhi-roar-placeholder',
     isActualAccount: false,
   },
-})
-
-export const emptyHelpFeedbackState = (): FeedbackState => ({
-  ...emptyFeedbackState(),
-  editorState: prependHandle(EditorState.createEmpty(), roarTwitterHandle),
-  twitterHandle: { status: 'DONE', handle: roarTwitterHandle, isActualAccount: true },
 })
 
 export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
