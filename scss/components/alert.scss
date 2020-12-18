@@ -1,10 +1,12 @@
 .alert {
   position: absolute;
   bottom: 0;
+  width: $min-width;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
+  box-sizing: border-box;
   padding: 20px;
 
   background-color: $human-yellow-warning-background;
