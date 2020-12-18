@@ -27,7 +27,7 @@ export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean
 }
 
 export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
-  return getCharacterLimit(feedbackTarget).remaining < 0
+  return !!feedbackTarget && (getLength(feedbackTarget.feedbackState.editorState) === 0 || getCharacterLimit(feedbackTarget).remaining < 0)
 }
 
 export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): CharacterLimit {
