@@ -1,0 +1,21 @@
+.emoji-picker-container {
+  display: inherit;
+  transition: width 0.2s;
+
+  &.closed {
+    width: 0;
+    overflow: hidden;
+  }
+
+  &.open {
+    border-right: var(--open-emoji-picker-border-right);
+  }
+}
+
+.emoji-mart-preview {
+  display: none;
+}
+
+.emoji-mart-bar:last-child {
+  display: none;
+}

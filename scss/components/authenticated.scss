@@ -1,0 +1,17 @@
+.authenticated {
+  display: grid;
+  grid-template-columns: 1fr $min-width;
+}
+
+main {
+  padding: $main-padding;
+  display: flex;
+}
+
+.twitter-interface {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  flex-grow: 1;
+}
