@@ -1,9 +1,10 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { domainOf } from './domain'
-import { newFeedbackState, emptyHelpState } from './state'
-import { targetById, ensureActiveFeedbackTarget } from '../selectors'
+import { newFeedbackState } from './state'
+import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
+import * as copy from '../copy'
 import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
@@ -27,7 +28,7 @@ function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
 function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdates: Partial<FeedbackState>): Partial<StoreState> {
   const nextFeedbackState = { ...target.feedbackState, ...feedbackUpdates }
   const nextTarget: FeedbackTarget = { ...target, feedbackState: nextFeedbackState }
-  return nextTarget.feedbackTargetType === 'help' ? { help: nextTarget } : setTab(state, nextTarget)
+  return setTab(state, nextTarget)
 }
 
 function updateFeedbackByTargetId(
@@ -35,7 +36,7 @@ function updateFeedbackByTargetId(
   targetId: FeedbackTargetId,
   callback: (target: FeedbackTarget) => Partial<FeedbackState>
 ): Partial<StoreState> {
-  const target = targetById(state, targetId)
+  const target = tabById(state, targetId)
   if (!target) return {}
   return updateFeedback(state, target, callback(target))
 }
@@ -47,45 +48,30 @@ function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (
 }
 
 function updateActiveFeedback(state: StoreState, callback: (feedbackTarget: FeedbackTarget) => Partial<FeedbackState>): Partial<StoreState> {
-  const target = ensureActiveFeedbackTarget(state)
+  const target = ensureActiveTab(state)
   return updateFeedback(state, target, callback(target))
 }
 
-const standardAlert = `Something went wrong. Please try again.`
+const contactSupportFor: Set<FetchRoarFailure['reason']> = new Set([
+  'response not json',
+  'response not expected data type',
+  'bad request',
+  'service down',
+  'server error',
+  'unknown status',
+  'timeout',
+])
 
 function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial<StoreState> {
-  switch (failure.reason) {
-    case 'response not json': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'response not expected data type': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'bad request': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'unauthorized': {
-      return {
-        auth: { state: 'not_authed' },
-        alert: { message: 'Your session ended. Please log in to try again.' },
-      }
-    }
-    case 'service down': {
-      return { alert: { message: 'Twitter appears to be down. Please try again later.', contactSupport: true } }
-    }
-    case 'server error': {
-      return { alert: { message: 'We encountered a problem on our end. Please try again later.', contactSupport: true } }
-    }
-    case 'unknown status': {
-      return { alert: { message: standardAlert, contactSupport: true } }
-    }
-    case 'timeout': {
-      return { alert: { message: `That took too long. Please try again.`, contactSupport: true } }
-    }
-    case 'network down': {
-      return { alert: { message: 'You are offline. Please check your network connection and try again.' } }
-    }
+  const message: string = copy.alerts[failure.reason] || copy.alerts.standard
+  const contactSupport = contactSupportFor.has(failure.reason)
+  const updates: Partial<StoreState> = {
+    alert: { message, contactSupport },
   }
+  if (failure.reason === 'unauthorized') {
+    updates.auth = { state: 'not_authed' }
+  }
+  return updates
 }
 
 export const responders: Responders<Action> = {
@@ -109,9 +95,6 @@ export const responders: Responders<Action> = {
   },
   togglePickingEmoji(state): Partial<StoreState> {
     return { pickingEmoji: !state.pickingEmoji }
-  },
-  toggleHelp(state): Partial<StoreState> {
-    return { help: { ...state.help, on: !state.help.on } }
   },
   toggleDarkMode(state): Partial<StoreState> {
     return { darkModeOn: !state.darkModeOn }
@@ -167,7 +150,7 @@ export const responders: Responders<Action> = {
     }
     return {
       alert: {
-        message: `We tried to fetch the twitter handle for ${domain} but something went wrong.`,
+        message: copy.fetchHandleFailure(domain),
         contactSupport: true,
       },
       ...tabUpdates,
@@ -186,7 +169,7 @@ export const responders: Responders<Action> = {
   },
   imageCaptureFailure(state, { targetId, error }): Partial<StoreState> {
     return {
-      alert: { message: standardAlert, contactSupport: true },
+      alert: { message: copy.alerts.standard, contactSupport: true },
       ...updateFeedbackByTargetId(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
@@ -196,10 +179,6 @@ export const responders: Responders<Action> = {
     return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
-    if (targetId === 'help') {
-      return { help: emptyHelpState() }
-    }
-
     return updateTabFeedbackIfExists(state, targetId, tab => {
       const { handle } = tab.feedbackState.twitterHandle
       return {
@@ -211,7 +190,7 @@ export const responders: Responders<Action> = {
     })
   },
   postTweetFailure(state, { targetId, failure }): Partial<StoreState> {
-    const target = targetById(state, targetId)
+    const target = tabById(state, targetId)
     const feedbackUpdates = target ? updateFeedback(state, target, { isTweeting: false }) : {}
 
     return {

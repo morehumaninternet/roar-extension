@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
-import { ensureActiveTab, ensureActiveFeedbackTarget } from '../../../selectors'
+import { ensureActiveTab } from '../../../selectors'
 
 type PostFeedbackResult = 'success' | 'unauthorized' | '500'
 
@@ -28,7 +28,7 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
       postButton.click()
 
       expect(mocks.getState().mostRecentAction.type).to.equal('clickPost')
-      await mocks.whenState(state => ensureActiveFeedbackTarget(state).feedbackState.isTweeting)
+      await mocks.whenState(state => ensureActiveTab(state).feedbackState.isTweeting)
 
       const [url, initOpts] = fetchMock.lastCall()!
       expect(url).to.equal('https://test-roar-server.com/v1/feedback')

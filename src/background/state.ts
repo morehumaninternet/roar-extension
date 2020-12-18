@@ -31,13 +31,6 @@ export const emptyHelpFeedbackState = (): FeedbackState => ({
   twitterHandle: { status: 'DONE', handle: roarTwitterHandle, isActualAccount: true },
 })
 
-export const emptyHelpState = (): StoreState['help'] => ({
-  feedbackTargetType: 'help',
-  id: 'help',
-  on: false,
-  feedbackState: emptyHelpFeedbackState(),
-})
-
 export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
   const empty = emptyFeedbackState()
   if (!domain) return empty
@@ -59,7 +52,6 @@ export const newStoreState = (browserInfo: BrowserInfo): StoreState => ({
   tabs: Map(),
   auth: { state: 'not_authed' },
   pickingEmoji: false,
-  help: emptyHelpState(),
   darkModeOn: false,
   alert: null,
   mostRecentAction: { type: 'INITIALIZING' },

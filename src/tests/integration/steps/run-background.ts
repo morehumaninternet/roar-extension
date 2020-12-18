@@ -43,13 +43,6 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
       expect(state.tabs).to.be.an.instanceOf(Map)
       expect(state.tabs).to.have.property('size', 0)
       expect(state.pickingEmoji).to.equal(false)
-      expect(state.help.on).to.equal(false)
-      expect(state.help.feedbackState).to.be.an('object')
-      expect(state.help.feedbackState.addingImages).to.equal(0)
-      expect(state.help.feedbackState.editingImage).to.equal(null)
-      expect(state.help.feedbackState.images).to.eql([])
-      expect(getPlainText(state.help.feedbackState.editorState)).to.equal('@roarmhi ')
-      expect(state.help.feedbackState.twitterHandle).to.eql({ status: 'DONE', handle: '@roarmhi', isActualAccount: true })
       expect(state.alert).to.equal(null)
     })
 

@@ -26,10 +26,6 @@ export async function takeScreenshot(
   tabs: typeof browser.tabs,
   dispatchBackgroundActions: Dispatchers<BackgroundAction>
 ): Promise<void> {
-  if (target.feedbackTargetType === 'help') {
-    return console.log('TODO take screenshot of popup on help click')
-  }
-
   try {
     dispatchBackgroundActions.imageCaptureStart({ targetId: target.id })
     const tab = target
