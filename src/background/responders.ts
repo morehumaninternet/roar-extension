@@ -212,7 +212,7 @@ export const responders: Responders<Action> = {
       },
     }))
   },
-  imageUpload(state, { file }): Partial<StoreState> {
+  imageUpload(state): Partial<StoreState> {
     return {}
   },
   disableAutoSnapshot(state, { targetId }): Partial<StoreState> {
