@@ -5,6 +5,7 @@ import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
 import { UserAvatar } from '../components/user-avatar'
+import { Alert } from '../components/alert'
 // import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
@@ -24,7 +25,7 @@ export function Authenticated({
 
   if (!feedback.exists) {
     if (feedback.reasonDisabledMessage) {
-      return <p>{feedback.reasonDisabledMessage}</p>
+      return <Alert alertMessage={feedback.reasonDisabledMessage} contactSupport={false} onClose={window.close} />
     }
     return null
   }
