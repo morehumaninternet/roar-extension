@@ -23,4 +23,9 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   }
   detectLogin(store.dispatchers)
   monitorTabs(store.dispatchers, chrome)
+  chrome.runtime.onInstalled.addListener(details => {
+    if (details.reason === 'install') {
+      chrome.tabs.create({ active: true, url: `${window.roarServerUrl}/welcome` })
+    }
+  })
 }
