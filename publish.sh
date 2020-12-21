@@ -29,7 +29,7 @@ if [ -f "$ARTIFACT_FILE_NAME" ]; then
   exit 1
 fi
 
-# Build the project pointing to https://roar-server.herokuapp.com
+# Build the project pointing to https://roar.morehumaninternet.org
 ENV=$TARGET npm run build
 
 # Clear and remake the publish directory
