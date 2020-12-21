@@ -32,22 +32,20 @@ const lightBlue = chalk.hex('#4a81bc')
 const normalText = blue
 const emphasis = pink.bold
 
+const bundleCommand = (entrypoint, color) => ({
+  name: color(`bundle:${entrypoint}`),
+  command: `npm run rollup -- src/${entrypoint}/index.ts ${watchFlag} --file bundled/${entrypoint}.js`,
+  env: { ENV, ROAR_SERVER_URL }
+})
+
 // The commands to run, give each a color so that they appear distinct in the terminal
 const commands = [
   {
     name: green('scss'),
     command: `npm run scss -- ${watchFlag}`
   },
-  {
-    name: gold('bundle:popup'),
-    command: `npm run rollup -- src/popup/index.tsx ${watchFlag} --file bundled/popup.js`,
-    env: { ENV, ROAR_SERVER_URL }
-  },
-  {
-    name: lightBlue('bundle:background'),
-    command: `npm run rollup -- src/background/index.ts ${watchFlag} --file bundled/background.js`,
-    env: { ENV, ROAR_SERVER_URL }
-  },
+  bundleCommand('popup', gold),
+  bundleCommand('background', lightBlue),
 ]
 
 // Create an output stream that writes to process.stdout
@@ -98,10 +96,9 @@ const onCommandCompleted = () => {
 // they exit with code 0
 readline.createInterface(passThrough).on('line', line => {
   const commandCompletedRegex = watchMode
-    ? /^\[.+\] Compiled|created/
-    : /^\[.+\] .* exited with code 0/
+    ? /(^.+ created .+\.js in .+s$)|(^.+ Compiled .+\.scss to .+\.css\.$)/
+    : /^.* exited with code 0/
 
-  // const match = stripAnsi(line).match(/^\[(.+)\] (.*)$/)
   if (commandCompletedRegex.test(stripAnsi(line))) {
     onCommandCompleted()
   }
