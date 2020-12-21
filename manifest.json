@@ -17,7 +17,7 @@
     "128": "img/roar_128.png"
   },
   "manifest_version": 2,
-  "permissions": ["<all_urls>", "storage", "tabs", "activeTab"],
+  "permissions": ["<all_urls>", "storage", "tabs"],
   "externally_connectable": {
     "matches": ["https://roar-server.herokuapp.com/*", "https://localhost:5004/*"]
   },
