@@ -19,7 +19,7 @@
   "manifest_version": 2,
   "permissions": ["<all_urls>", "storage", "tabs", "activeTab"],
   "externally_connectable": {
-    "matches": ["https://roar-server.herokuapp.com/*", "https://localhost:5004/*"]
+    "matches": ["https://roar.morehumaninternet.org/*", "https://roar-server.herokuapp.com/*", "https://localhost:5004/*"]
   },
   "web_accessible_resources": []
 }

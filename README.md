@@ -22,7 +22,7 @@ Run the build once
 ```bash
 npm run build
 
-# 🛠 Building a local version of Roar! that points to https://roar-server.herokuapp.com
+# 🛠 Building a local version of Roar! that points to https://roar.morehumaninternet.org
 # [scss] ...
 # [bundle:popup] ...
 # [bundle:background] ...
@@ -34,7 +34,7 @@ Run the build in watch mode
 ```bash
 npm run build:watch
 
-# 🛠 Building a local version of Roar! in watch mode that points to https://roar-server.herokuapp.com
+# 🛠 Building a local version of Roar! in watch mode that points to https://roar.morehumaninternet.org
 # [scss] ...
 # [bundle:popup] ...
 # [bundle:background] ...
@@ -75,7 +75,7 @@ NYC_OPTS='--reporter=lcov' npm test # Generate code coverage as HTML
 
 ### Publishing the Staging Extension
 
-Both stage and production point to https://roar-server.herokuapp.com. The same artifact is used by both chrome and firefox. Bear this in mind when adding a feature that might only work in chrome or only work in firefox. To create the artifacts, select an appropriate semantic version and run
+Both stage and production point to https://roar.morehumaninternet.org. The same artifact is used by both chrome and firefox. Bear this in mind when adding a feature that might only work in chrome or only work in firefox. To create the artifacts, select an appropriate semantic version and run
 
 ```bash
 npm run publish -- stage X.Y.Z # Creates artifacts/stage vX.Y.Z.zip

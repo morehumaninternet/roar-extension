@@ -19,7 +19,7 @@ process.argv.slice(2).forEach(flag => {
 })
 
 const watchFlag = watchMode ? '--watch' : ''
-const ROAR_SERVER_URL = pointToLocalServer ? 'https://localhost:5004' : 'https://roar-server.herokuapp.com'
+const ROAR_SERVER_URL = pointToLocalServer ? 'https://localhost:5004' : 'https://roar.morehumaninternet.org'
 const ENV = process.env.ENV || 'local'
 assert.oneOf(ENV, ['local', 'stage', 'production'])
 
