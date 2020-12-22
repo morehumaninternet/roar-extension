@@ -24,6 +24,8 @@
     "url": "https://github.com/morehumaninternet/roar-extension/issues"
   },
   "dependencies": {
+    "@sentry/react": "^5.29.2",
+    "@sentry/tracing": "^5.29.2",
     "@types/firefox-webext-browser": "67.0.2",
     "draft-js": "0.11.7",
     "emoji-mart": "3.0.0",
