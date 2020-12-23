@@ -82,6 +82,7 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
       }
     })
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
+    browser.tabs.get.resolves({ width: 1200, height: 900 })
   }
 
   const teardownPopupWindow = () => {

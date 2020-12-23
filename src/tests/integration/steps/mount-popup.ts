@@ -1,10 +1,8 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
-import { mount } from '../../../popup/mount'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
-import { mock } from 'fetch-mock'
 
 const handleDescriptions = {
   cached: 'is cached',
@@ -55,7 +53,6 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    before(() => mocks.browser.tabs.get.withArgs(14).resolves({ width: 1200, height: 900 }))
     before(() => mocks.mount())
 
     if (!opts.alreadyAuthenticated) {
