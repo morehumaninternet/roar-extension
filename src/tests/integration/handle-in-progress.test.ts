@@ -13,7 +13,8 @@ describe('twitter handle fetching in progress', () => {
   describe('when we are hovering over the handle', () => {
     it('renders that fetching the handle is in progress', () => {
       const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
-      const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
+      const popupWindow = mocks.popupWindow()
+      const event = new popupWindow.MouseEvent('mouseover', { bubbles: true })
       handle.dispatchEvent(event)
 
       const tooltip_error_msg = mocks.app().querySelector('.link-tooltip__error')! as HTMLDivElement
@@ -25,7 +26,8 @@ describe('twitter handle fetching in progress', () => {
       await mocks.whenState(state => ensureActiveTab(state).feedbackState.twitterHandle.status === 'DONE')
 
       const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
-      const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
+      const popupWindow = mocks.popupWindow()
+      const event = new popupWindow.MouseEvent('mouseover', { bubbles: true })
       handle.dispatchEvent(event)
 
       const tooltipLink = mocks.app().querySelector('.link-tooltip__anchor')! as HTMLAnchorElement

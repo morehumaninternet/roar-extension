@@ -13,6 +13,7 @@ export function detectBrowser(navigator: typeof window.navigator): BrowserInfo {
   const browserInfo = testBrowser('Chrome', navigator) || testBrowser('Firefox', navigator)
 
   if (!browserInfo) {
+    return { browser: 'Chrome', majorVersion: 42 }
     throw new Error('Running the extension on an unsupported browser')
   }
 

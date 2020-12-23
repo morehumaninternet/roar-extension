@@ -4,6 +4,7 @@ import * as listeners from './listeners'
 import { detectLogin } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
+import { createApi } from './api'
 
 declare global {
   interface Window {
@@ -15,13 +16,14 @@ declare global {
 export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome, navigator: typeof window.navigator): void {
   // Attach the store to the window so the popup can access it
   // see src/popup/mount.tsx
+  const api = createApi(backgroundWindow)
   const browserInfo = detectBrowser(navigator)
   const handleCache = createHandleCache(chrome)
   const store = (backgroundWindow.store = create(browserInfo))
   for (const listener of Object.values(listeners)) {
-    listener({ store, browser, chrome, handleCache })
+    listener({ api, store, browser, chrome, handleCache })
   }
-  detectLogin(store.dispatchers)
+  detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
   monitorTabs(store.dispatchers, chrome)
   chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {

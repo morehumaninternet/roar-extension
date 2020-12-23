@@ -1,5 +1,3 @@
-import * as api from './api'
-
 function tweetFormData(target: FeedbackTarget): FormData {
   const tweetData = new FormData()
 
@@ -13,7 +11,7 @@ function tweetFormData(target: FeedbackTarget): FormData {
   return tweetData
 }
 
-export const postTweet = async (target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+export const postTweet = async (api: Api, target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
   const targetId: FeedbackTargetId = target.id
   dispatchBackgroundActions.postTweetStart({ targetId })
 
@@ -27,6 +25,7 @@ export const postTweet = async (target: FeedbackTarget, chrome: typeof global.ch
 }
 
 export const fetchTwitterHandle = async (
+  api: Api,
   tabId: number,
   domain: string,
   dispatchBackgroundActions: Dispatchers<BackgroundAction>,
@@ -48,6 +47,9 @@ export const fetchTwitterHandle = async (
   return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, failure: result })
 }
 
-export async function detectLogin(dispatchActions: Dispatchers<Action>): Promise<void> {
-  dispatchActions.detectLoginResult(await api.getMe())
+export async function detectLogin(api: Api, dispatchActions: Dispatchers<Action>, opts: { dispatchSuccessOnly?: boolean } = {}): Promise<void> {
+  const result = await api.getMe()
+  if (result.ok || !opts.dispatchSuccessOnly) {
+    dispatchActions.detectLoginResult(result)
+  }
 }

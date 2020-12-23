@@ -198,3 +198,20 @@ type FetchRoarFailure =
 type FetchRoarResult<T> = { ok: true; data: T } | FetchRoarFailure
 
 type ImageCaptureFailure = { reason: 'file size limit exceeded'; message: string } | { reason: 'unknown'; message: string }
+
+type FeedbackResponseData = {
+  url: string
+}
+
+type WebsiteResponseData = {
+  domain: string
+  twitter_handle: null | string
+}
+
+type Api = {
+  fetchRoar<T extends object>(path: string, init: RequestInit, decoder: any): Promise<FetchRoarResult<T>>
+  postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>>
+  getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>>
+  getMe(): Promise<FetchRoarResult<User>>
+  makeLogoutRequest(): Promise<Response>
+}

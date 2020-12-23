@@ -2,11 +2,12 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as fetchMock from 'fetch-mock'
-import { last } from 'lodash'
+import { pick, last } from 'lodash'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
+import { mount } from '../../popup/mount'
 import { whenState } from '../../redux-utils'
 
 type MockBrowser = typeof global.browser & {
@@ -22,9 +23,10 @@ type CreateMocksOpts = {
 
 export type Mocks = {
   backgroundWindow: Window
-  popupWindow: DOMWindow & { addEventListener: sinon.SinonSpy }
+  popupWindow(): DOMWindow & { addEventListener: sinon.SinonSpy }
   browser: MockBrowser
   chrome: typeof chrome
+  mount(): void
   app(): HTMLDivElement
   getState(): StoreState
   whenState(cb: (state: StoreState) => boolean): Promise<StoreState>
@@ -43,13 +45,14 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
       ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:82.0) Gecko/20100101 Firefox/82.0'
       : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
 
-  const backgroundWindow: Window = { navigator: { userAgent } } as any
-
-  const popupWindow: any = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
-  popupWindow.roarServerUrl = 'https://test-roar-server.com'
+  const backgroundWindow: any = new JSDOM('', { userAgent, url: 'https://should-not-appear.com' }).window
+  backgroundWindow.roarServerUrl = 'https://test-roar-server.com'
 
   let addEventListener: sinon.SinonSpy
   let removeEventListener: sinon.SinonSpy
+
+  let popupWindow: any
+  let popupWindowGlobals
 
   const captureVisibleTabResolvers: any[] = []
   const captureVisibleTabRejecters: any[] = []
@@ -74,37 +77,59 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     },
   } as any
 
-  const popupWindowGlobals = {
-    window: popupWindow,
-    location: popupWindow.location,
-    document: popupWindow.document,
-    Blob: popupWindow.Blob,
-    Node: popupWindow.Node,
-    FormData: popupWindow.FormData,
-    fetch: popupWindow.fetch,
-    requestAnimationFrame: sinon.stub().callsArgWith(0),
-  }
-
   // ReactDOM needs a global window to work
   const setup = () => {
-    addEventListener = sinon.spy(popupWindow, 'addEventListener')
-    removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
-    Object.assign(global, popupWindowGlobals)
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
   }
 
-  const teardown = () => {
-    addEventListener.restore()
-    removeEventListener.restore()
-    // Render a blank div into the app-container before removing globals to trigger any cleanup from the React components themselves
-    ReactDOM.render(<div />, popupWindow.document.getElementById('app-container'))
-    for (const key in popupWindowGlobals) {
-      delete (global as any)[key]
+  const teardownPopupWindow = () => {
+    if (popupWindow) {
+      // If the popupWindow was not closed, render a blank div into the app-container
+      // before removing globals to trigger any cleanup from the React components themselves
+      if (!popupWindow.close.callCount) {
+        ReactDOM.render(<div />, popupWindow.document.getElementById('app-container'))
+      }
+      for (const key in popupWindowGlobals) {
+        delete (global as any)[key]
+      }
     }
+    popupWindow = undefined
+    popupWindowGlobals = undefined
+  }
+
+  const teardownBackgroundWindow = () => {
     chrome.reset()
     const err = !fetchMock.done() && new Error('Fetch not called the expected number of times')
     fetchMock.restore()
     if (err) throw err
+  }
+
+  const teardown = () => {
+    teardownPopupWindow()
+    teardownBackgroundWindow()
+    sinon.restore()
+  }
+
+  const mountPopup = () => {
+    popupWindow = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
+    popupWindow.roarServerUrl = 'https://test-roar-server.com'
+
+    addEventListener = sinon.spy(popupWindow, 'addEventListener')
+    removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
+
+    popupWindowGlobals = {
+      window: popupWindow,
+      location: popupWindow.location,
+      document: popupWindow.document,
+      Blob: popupWindow.Blob,
+      Node: popupWindow.Node,
+      FormData: popupWindow.FormData,
+      requestAnimationFrame: sinon.stub().callsArgWith(0),
+    }
+
+    Object.assign(global, popupWindowGlobals)
+    sinon.spy(popupWindow, 'close')
+    mount(chrome as any, popupWindow as any)
   }
 
   const app = () => popupWindow.document.querySelector('#app-container > .app') as HTMLDivElement
@@ -114,8 +139,11 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   after(teardown)
 
   return {
+    mount: mountPopup,
     backgroundWindow,
-    popupWindow,
+    popupWindow() {
+      return popupWindow
+    },
     browser,
     chrome,
     app,

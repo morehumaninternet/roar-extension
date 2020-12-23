@@ -47,7 +47,8 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
     })
 
     if (opts.alreadyAuthenticated) {
-      it('is already authenticated', () => {
+      it('is already authenticated', async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
         expect(mocks.getState().auth).to.eql({ state: 'authenticated', user: { photoUrl: 'https://some-image-url.com/123' } })
       })
     } else {

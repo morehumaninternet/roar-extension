@@ -1,24 +1,24 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { makeLogoutRequest } from './api'
 import { detectLogin, fetchTwitterHandle, postTweet } from './api-handlers'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById, totalImages } from '../selectors'
 
 type ListenerDependencies = {
+  api: Api
   store: AppStore
   browser: typeof global.browser
   chrome: typeof global.chrome
   handleCache: TwitterHandleCache
 }
 
-export function popupConnect({ store, browser, handleCache }: ListenerDependencies): void {
+export function popupConnect({ api, store, browser, handleCache }: ListenerDependencies): void {
   store.on('popupConnect', state => {
     // We open a separate tab that the user authenticates with. So if they open the popup back up
     // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
     // aren't logged in
-    if (state.auth.state === 'authenticating') {
-      detectLogin(store.dispatchers)
+    if (state.auth.state === 'authenticating' || state.auth.state === 'not_authed') {
+      detectLogin(api, store.dispatchers)
     }
 
     const target = ensureActiveTab(state)
@@ -30,7 +30,7 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        fetchTwitterHandle(tab.id, tab.domain, store.dispatchers, handleCache)
+        fetchTwitterHandle(api, tab.id, tab.domain, store.dispatchers, handleCache)
       }
     }
 
@@ -42,10 +42,10 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
   })
 }
 
-export function clickLogout({ store, browser }: ListenerDependencies): void {
+export function clickLogout({ api, store, browser }: ListenerDependencies): void {
   store.on('clickLogout', state => {
     if (state.auth.state === 'not_authed') {
-      makeLogoutRequest()
+      api.makeLogoutRequest()
     }
   })
 }
@@ -82,7 +82,7 @@ export function signInWithTwitter({ store, chrome }: ListenerDependencies): void
 // handle to have been fetched. While waiting an alert my fire or we may lose
 // the target (perhaps the tab closed). If that happens we say we are ready even
 // though we won't actually post the tweet.
-export function clickPost({ store, chrome }: ListenerDependencies): void {
+export function clickPost({ api, store, chrome }: ListenerDependencies): void {
   store.on('clickPost', state => {
     const targetId = ensureActiveTab(state).id
 
@@ -98,7 +98,7 @@ export function clickPost({ store, chrome }: ListenerDependencies): void {
       .then(state => {
         const target = tabById(state, targetId)
         if (!state.alert && target) {
-          return postTweet(target, chrome, store.dispatchers)
+          return postTweet(api, target, chrome, store.dispatchers)
         }
       })
       .catch(error => {
