@@ -99,9 +99,6 @@ type NotAuthedState = {
 
 type AuthenticatingState = {
   view: 'Authenticating'
-  browser: SupportedBrowser
-  authenticationFailure: Dispatchers<UserAction>['authenticationFailure']
-  authenticationSuccess: Dispatchers<UserAction>['authenticationSuccess']
 }
 
 type AuthenticatedState = {
@@ -134,8 +131,7 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'authenticationSuccess'; payload: { photoUrl: null | string } }
-  | { type: 'authenticationFailure'; payload: { error: any } }
+  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'dismissAlert' }
   | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
   | { type: 'updateEditorState'; payload: { editorState: any } }

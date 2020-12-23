@@ -12,7 +12,7 @@ export function signInViaTwitter(mocks: Mocks, opts: SignInViaTwitterOpts = {}):
     after(() => windowClose.restore())
 
     it('transitions to an "authenticating" state when the sign in with twitter button is clicked', async () => {
-      const signInButton = mocks.app().querySelector('button')! as HTMLButtonElement
+      const signInButton = mocks.app().querySelector('.sign-in-btn')! as HTMLButtonElement
       signInButton.click()
       expect(mocks.getState().auth).to.have.property('state', 'authenticating')
       await new Promise(resolve => setTimeout(resolve, 0))

@@ -64,9 +64,6 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
     case 'authenticating': {
       return {
         view: 'Authenticating',
-        browser: storeState.browserInfo.browser,
-        authenticationFailure: dispatchUserActions.authenticationFailure,
-        authenticationSuccess: dispatchUserActions.authenticationSuccess,
       }
     }
     case 'authenticated': {

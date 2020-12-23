@@ -49,6 +49,5 @@ export const fetchTwitterHandle = async (
 }
 
 export async function detectLogin(dispatchActions: Dispatchers<Action>): Promise<void> {
-  const result = await api.getMe()
-  if (result.ok) dispatchActions.authenticationSuccess(result.data)
+  dispatchActions.detectLoginResult(await api.getMe())
 }
