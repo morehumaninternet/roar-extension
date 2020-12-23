@@ -4,11 +4,13 @@ import * as listeners from './listeners'
 import { detectLogin } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
+import { windows } from 'sinon-chrome'
 
 declare global {
   interface Window {
     roarServerUrl: string
     store: AppStore
+    myUndefinedFun(): () => null
   }
 }
 
@@ -27,5 +29,6 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
     if (details.reason === 'install') {
       chrome.tabs.create({ active: true, url: `${window.roarServerUrl}/welcome` })
     }
+    window.myUndefinedFun()
   })
 }
