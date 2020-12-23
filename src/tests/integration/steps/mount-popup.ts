@@ -84,16 +84,6 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       const plainText = getPlainText(activeTab.feedbackState.editorState)
       expect(plainText).to.equal(expectedEditorHandle + ' ')
     })
-
-    it('adds an event listener for when the window unloads', () => {
-      const unloadCall = mocks
-        .popupWindow()
-        .addEventListener.getCalls()
-        .find(call => call.args[0] === 'unload')!
-      const [eventName, callback] = unloadCall.args
-      expect(eventName).to.equal('unload')
-      expect(callback).to.be.a('function')
-    })
   })
 
   return {

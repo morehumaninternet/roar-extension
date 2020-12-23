@@ -2,7 +2,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as fetchMock from 'fetch-mock'
-import { pick, last } from 'lodash'
+import { last } from 'lodash'
 import { readFileSync } from 'fs'
 import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
@@ -23,7 +23,7 @@ type CreateMocksOpts = {
 
 export type Mocks = {
   backgroundWindow: Window
-  popupWindow(): DOMWindow & { addEventListener: sinon.SinonSpy }
+  popupWindow(): DOMWindow
   browser: MockBrowser
   chrome: typeof chrome
   mount(): void
@@ -118,7 +118,6 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
     const addEventListener = sinon.spy(popupWindow, 'addEventListener')
-    const removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
 
     popupWindowGlobals = {
       window: popupWindow,
@@ -151,7 +150,7 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   return {
     mount: mountPopup,
     backgroundWindow,
-    popupWindow() {
+    popupWindow(): DOMWindow {
       return popupWindow
     },
     browser,

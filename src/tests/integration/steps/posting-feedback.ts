@@ -19,7 +19,7 @@ const mockResponse = (result: PostFeedbackResult): fetchMock.MockResponse => {
 
 export function postingFeedback(mocks: Mocks, opts: { handle: string; result: PostFeedbackResult }): void {
   describe(`post feedback (${opts.result})`, () => {
-    let priorChromeTabsCreateCallCount: number
+    let priorChromeTabsCreateCallCount: number // tslint:disable-line:no-let
 
     before(() => {
       priorChromeTabsCreateCallCount = mocks.chrome.tabs.create.callCount

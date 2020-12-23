@@ -1,6 +1,6 @@
 import { JsonDecoder } from 'ts.data.json'
 
-export function createApi(window: any) {
+export function createApi(window: any): Api {
   async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
     try {
       const controller = new window.AbortController()
