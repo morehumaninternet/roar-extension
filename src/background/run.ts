@@ -21,7 +21,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   const handleCache = createHandleCache(chrome)
   const store = (backgroundWindow.store = create(browserInfo))
   for (const listener of Object.values(listeners)) {
-    listener({ api, store, browser, chrome, handleCache })
+    listener({ window: backgroundWindow, api, store, browser, chrome, handleCache })
   }
   detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
   monitorTabs(store.dispatchers, chrome)

@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { ensureActiveTab } from '../../../selectors'
+import { getPlainText } from '../../../draft-js-utils'
 
 type PostFeedbackResult = 'success' | 'unauthorized' | '500'
 
@@ -49,17 +50,13 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
 
     if (opts.result === 'success') {
       it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-        await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
+        const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
         expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
           url: 'https://t.co/sometweethash',
           active: true,
         })
-
-        const spans = mocks.app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
-
-        expect(spans).to.have.length(2)
-        expect(spans[0]).to.have.property('innerHTML', opts.handle)
-        expect(spans[1]).to.have.property('innerHTML', ' ')
+        const activeTab = ensureActiveTab(state)
+        expect(getPlainText(activeTab.feedbackState.editorState)).to.equal(`${activeTab.feedbackState.twitterHandle.handle} `)
       })
     } else if (opts.result === 'unauthorized') {
       it('transitions to an unauthed state with a dismissable alert explaining what happened', async () => {

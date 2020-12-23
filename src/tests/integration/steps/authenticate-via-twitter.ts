@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
-import { mount } from '../../../popup/mount'
 
 type AuthenticateViaTwitterOpts = {
   unauthorized?: boolean
@@ -11,7 +10,6 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
   describe('authentication via twitter', () => {
     before(() => {
       const response = opts.unauthorized ? { status: 401, body: 'Unauthorized' } : { status: 200, body: { photoUrl: 'https://some-image-url.com/123' } }
-
       fetchMock.mock('https://test-roar-server.com/v1/me', response)
     })
 
@@ -26,11 +24,7 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
     })
 
     it('the popup disconnects when the window unloads', () => {
-      const [eventName, callback] = mocks.popupWindow().addEventListener.firstCall.args
-      expect(eventName).to.equal('unload')
-      expect(callback).to.be.a('function')
-      callback()
-      // expect(mocks.getState().mostRecentAction).to.eql({ type: 'popupDisconnect' })
+      expect(mocks.getState().mostRecentAction).to.eql({ type: 'popupDisconnect' })
     })
 
     it('makes a request to /v1/me to get the current user when the popup mounts again (after the user has logged in in the separate tab)', () => {

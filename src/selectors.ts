@@ -49,16 +49,11 @@ function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): Auth
 }
 
 export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
-  const signInWithTwitter = () => {
-    dispatchUserActions.signInWithTwitter()
-    popupWindow.close()
-  }
-
   switch (storeState.auth.state) {
     case 'not_authed': {
       return {
         view: 'NotAuthed',
-        signInWithTwitter,
+        signInWithTwitter: dispatchUserActions.signInWithTwitter,
       }
     }
     case 'authenticating': {

@@ -2,9 +2,10 @@ import { AppStore } from './store'
 import * as images from './images'
 import { detectLogin, fetchTwitterHandle, postTweet } from './api-handlers'
 import { whenState } from '../redux-utils'
-import { ensureActiveTab, tabById, totalImages } from '../selectors'
+import { ensureActiveTab, tabById } from '../selectors'
 
 type ListenerDependencies = {
+  window: Window
   api: Api
   store: AppStore
   browser: typeof global.browser
@@ -65,13 +66,13 @@ export function imageUpload({ store }: ListenerDependencies): void {
   })
 }
 
-export function onInstall({ store, chrome }: ListenerDependencies): void {
+export function onInstall({ window, store, chrome }: ListenerDependencies): void {
   store.on('onInstall', state => {
     chrome.tabs.create({ url: `${window.roarServerUrl}/welcome`, active: true })
   })
 }
 
-export function signInWithTwitter({ store, chrome }: ListenerDependencies): void {
+export function signInWithTwitter({ window, store, chrome }: ListenerDependencies): void {
   store.on('signInWithTwitter', state => {
     chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
   })

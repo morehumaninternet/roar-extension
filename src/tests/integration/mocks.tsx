@@ -48,9 +48,6 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
   const backgroundWindow: any = new JSDOM('', { userAgent, url: 'https://should-not-appear.com' }).window
   backgroundWindow.roarServerUrl = 'https://test-roar-server.com'
 
-  let addEventListener: sinon.SinonSpy
-  let removeEventListener: sinon.SinonSpy
-
   let popupWindow: any
   let popupWindowGlobals
 
@@ -79,6 +76,11 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
 
   // ReactDOM needs a global window to work
   const setup = () => {
+    chrome.tabs.create.callsFake(() => {
+      if (popupWindow) {
+        popupWindow.close()
+      }
+    })
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
   }
 
@@ -114,8 +116,8 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     popupWindow = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
     popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
-    addEventListener = sinon.spy(popupWindow, 'addEventListener')
-    removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
+    const addEventListener = sinon.spy(popupWindow, 'addEventListener')
+    const removeEventListener = sinon.spy(popupWindow, 'removeEventListener')
 
     popupWindowGlobals = {
       window: popupWindow,
@@ -128,7 +130,14 @@ export function createMocks(opts: CreateMocksOpts = {}): Mocks {
     }
 
     Object.assign(global, popupWindowGlobals)
-    sinon.spy(popupWindow, 'close')
+
+    const close = popupWindow.close.bind(popupWindow)
+    sinon.stub(popupWindow, 'close').callsFake(() => {
+      const [, unloadCallback] = addEventListener.getCalls().find(({ args: [eventName] }) => eventName === 'unload')!.args
+      unloadCallback()
+      close()
+      process.nextTick(teardownPopupWindow)
+    })
     mount(chrome as any, popupWindow as any)
   }
 
