@@ -12,10 +12,9 @@ export function signInViaTwitter(mocks: Mocks, opts: SignInViaTwitterOpts = {}):
       const signInButton = mocks.app().querySelector('.sign-in-btn')! as HTMLButtonElement
       signInButton.click()
       expect(mocks.getState().auth).to.have.property('state', 'authenticating')
-      await new Promise(resolve => setTimeout(resolve, 0))
     })
 
-    it('creates a new tab', () => {
+    it('creates a new tab at /v1/auth/twitter', () => {
       expect(mocks.chrome.tabs.create).to.have.callCount(1)
       expect(mocks.chrome.tabs.create.firstCall.args[0]).to.have.property('url', `https://test-roar-server.com/v1/auth/twitter`)
       expect(mocks.chrome.tabs.create.firstCall.args[0]).to.have.property('active', true)
