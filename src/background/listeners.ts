@@ -18,7 +18,7 @@ export function popupConnect({ store, browser, handleCache }: ListenerDependenci
     // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
     // aren't logged in
     if (state.auth.state === 'authenticating') {
-      detectLogin(store.dispatchers, { failIfNotLoggedIn: true })
+      detectLogin(store.dispatchers)
     }
 
     const target = ensureActiveTab(state)
@@ -62,6 +62,12 @@ export function imageUpload({ store }: ListenerDependencies): void {
     const target = ensureActiveTab(state)
     const { file } = state.mostRecentAction.payload
     images.imageUpload(target.id, file, store.dispatchers)
+  })
+}
+
+export function onInstall({ store, chrome }: ListenerDependencies): void {
+  store.on('onInstall', state => {
+    chrome.tabs.create({ url: `${window.roarServerUrl}/welcome`, active: true })
   })
 }
 

@@ -48,13 +48,7 @@ export const fetchTwitterHandle = async (
   return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, failure: result })
 }
 
-export async function detectLogin(dispatchActions: Dispatchers<Action>, opts: { failIfNotLoggedIn?: boolean } = {}): Promise<void> {
+export async function detectLogin(dispatchActions: Dispatchers<Action>): Promise<void> {
   const result = await api.getMe()
-  if (result.ok) {
-    return dispatchActions.authenticationSuccess(result.data)
-  }
-  // TODO: handle different types of errors differently with a common function
-  if (opts.failIfNotLoggedIn) {
-    dispatchActions.authenticationFailure({ error: { message: 'Not logged in.' } })
-  }
+  if (result.ok) dispatchActions.authenticationSuccess(result.data)
 }

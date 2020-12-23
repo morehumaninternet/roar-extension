@@ -84,6 +84,9 @@ export const responders: Responders<Action> = {
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
   },
+  onInstall(): Partial<StoreState> {
+    return { auth: { state: 'authenticating' } }
+  },
   authenticationSuccess(state, { photoUrl }): Partial<StoreState> {
     return { auth: { state: 'authenticated', user: { photoUrl } } }
   },
