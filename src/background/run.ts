@@ -1,3 +1,15 @@
+/*
+  The true entrypoint of the background script. We use dependency injection in receiving global
+  objects from index.ts so that we may more easily test how the background script functions.
+
+  The general pattern of the background script is to create a global store that, at any point in
+  time, has the entire application state. Responders, exactly one for each action, return the
+  updates to be made to the store state. Listeners have various behaviors which take effect after
+  an action has been processed by the store and may call external APIs such as fetch or
+  chrome.tabs.create to make API requests, create tabs, or start taking screenshots. The results
+  of these functions are then dispatched back to the store. Finally, the background script listens
+  for various events including changes to tabs/windows and dispatches them to the store.
+*/
 import { AppStore, create } from './store'
 import { detectBrowser } from './browser-detection'
 import * as listeners from './listeners'
@@ -14,20 +26,31 @@ declare global {
 }
 
 export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome, navigator: typeof window.navigator): void {
-  // Attach the store to the window so the popup can access it
-  // see src/popup/mount.tsx
+  // Create an api object with functions to make API calls to the roar server
   const api = createApi(backgroundWindow)
+
+  // Detect the browser
   const browserInfo = detectBrowser(navigator)
+
+  // Create an object with get/set functions to cache twitter handles, reducing the number of API calls
   const handleCache = createHandleCache(chrome)
+
+  // Attach the store to the window so the popup can access it see src/popup/mount.tsx
   const store = (backgroundWindow.store = create(browserInfo))
+
+  // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.values(listeners)) {
     listener({ window: backgroundWindow, api, store, browser, chrome, handleCache })
   }
-  detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
+
+  // Monitor tabs & windows, dispatching relevant information to the store
   monitorTabs(store.dispatchers, chrome)
+
+  // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
+  detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
+
+  // When the extension is first installed, open the /welcome page
   chrome.runtime.onInstalled.addListener(details => {
-    if (details.reason === 'install') {
-      store.dispatchers.onInstall()
-    }
+    if (details.reason === 'install') store.dispatchers.onInstall()
   })
 }

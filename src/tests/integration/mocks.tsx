@@ -1,6 +1,6 @@
 /*
-  Creates, for tests running in node.js, a number of objects representing the background window,
-  popup window(s), and other globals that otherwise exist only in a browser context.
+  Creates, for tests running in node.js, objects representing the background window, popup
+  window(s), and other globals that otherwise exist only in a browser context.
 
   By calling createMocks() within a describe block, the mocks will be created within that block.
   While various stubs/mocks are added to the global object, these are handled as part of various
