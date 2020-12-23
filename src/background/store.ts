@@ -2,6 +2,8 @@ import { Store, createStore } from 'redux'
 import { newStoreState } from './state'
 import { responders } from './responders'
 
+import * as Sentry from '@sentry/react'
+
 export type AppStore = Store<StoreState, Action> & {
   dispatchers: Dispatchers<Action>
   on<T extends Action['type']>(type: T, callback: (nextState: StoreState & { mostRecentAction: Action & { type: T } }) => void): () => void
@@ -31,7 +33,11 @@ function reducer(state: StoreState, action: Action): StoreState {
 }
 
 export function create(browserInfo: BrowserInfo): AppStore {
-  const store: AppStore = createStore(reducer, newStoreState(browserInfo))
+  const sentryReduxEnhancer = Sentry.createReduxEnhancer({
+    // Optionally pass options
+  })
+
+  const store: AppStore = createStore(reducer, newStoreState(browserInfo), sentryReduxEnhancer)
 
   // Create dispatchers for each action type, one for each key in responders
   store.dispatchers = Object.keys(responders).reduce(
