@@ -43,9 +43,6 @@ export function Images({ feedback, startEditingImage, clickDeleteImage }: Images
 
   return (
     <div className="images">
-      {range(feedback.addingImages).map(n => (
-        <ImageSpinner key={n} />
-      ))}
       {feedback.images.map((image, index) => (
         <ImageThumbnail
           key={`${image.uri}_${index}`}
@@ -53,6 +50,9 @@ export function Images({ feedback, startEditingImage, clickDeleteImage }: Images
           startEditingImage={() => startEditingImage({ imageIndex: index })}
           clickDeleteImage={() => clickDeleteImage({ imageIndex: index })}
         />
+      ))}
+      {range(feedback.addingImages).map(n => (
+        <ImageSpinner key={n} />
       ))}
     </div>
   )
