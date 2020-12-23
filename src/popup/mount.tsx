@@ -3,7 +3,11 @@ import * as ReactDOM from 'react-dom'
 import { AppStore } from '../background/store'
 import { App } from './app'
 
+import * as Sentry from '@sentry/react'
+
 function render(popupWindow: Window, dispatchUserActions: Dispatchers<UserAction>, storeState: StoreState, appContainer: HTMLElement): any {
+  Sentry.init({ dsn: 'https://47168d6790c049949ca47811566b6425@o474677.ingest.sentry.io/5566480' })
+
   return ReactDOM.render(<App popupWindow={popupWindow} storeState={storeState} dispatchUserActions={dispatchUserActions} />, appContainer)
 }
 
