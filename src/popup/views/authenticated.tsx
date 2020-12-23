@@ -7,6 +7,8 @@ import { Tweeting } from '../components/tweeting'
 import { UserAvatar } from '../components/user-avatar'
 // import { EditingImage } from '../components/editing-image'
 
+import * as Sentry from '@sentry/react'
+
 export function Authenticated({
   feedback,
   tweeting,
@@ -30,34 +32,40 @@ export function Authenticated({
   }
 
   return (
-    <div className="authenticated">
-      <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
-      <main>
-        <UserAvatar clickLogout={dispatchUserActions.clickLogout} src={user.photoUrl || '/img/default-avatar.png'} />
+    <Sentry.ErrorBoundary fallback={'An error has occurred'}>
+      <div className="authenticated">
+        <EmojiPicker pickingEmoji={pickingEmoji} dispatchUserActions={dispatchUserActions} />
+        <main>
+          <UserAvatar clickLogout={dispatchUserActions.clickLogout} src={user.photoUrl || '/img/default-avatar.png'} />
 
-        <div className="twitter-interface">
-          <FeedbackEditor
-            editorState={feedback.state.editorState}
-            hovering={feedback.state.hovering}
-            updateEditorState={dispatchUserActions.updateEditorState}
-            hoverOver={dispatchUserActions.hoverOver}
-            twitterHandle={feedback.state.twitterHandle}
-          />
-          <Images feedback={feedback.state} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
-          <ActionBar
-            clickPost={dispatchUserActions.clickPost}
-            togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
-            clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
-            toggleDarkMode={dispatchUserActions.toggleDarkMode}
-            pickingEmoji={pickingEmoji}
-            darkModeOn={darkModeOn}
-            addImageDisabled={addImageDisabled}
-            imageUpload={dispatchUserActions.imageUpload}
-            characterLimit={characterLimit}
-            postTweetDisabled={postTweetDisabled}
-          />
-        </div>
-      </main>
-    </div>
+          <div className="twitter-interface">
+            <FeedbackEditor
+              editorState={feedback.state.editorState}
+              hovering={feedback.state.hovering}
+              updateEditorState={dispatchUserActions.updateEditorState}
+              hoverOver={dispatchUserActions.hoverOver}
+              twitterHandle={feedback.state.twitterHandle}
+            />
+            <Images
+              feedback={feedback.state}
+              startEditingImage={dispatchUserActions.startEditingImage}
+              clickDeleteImage={dispatchUserActions.clickDeleteImage}
+            />
+            <ActionBar
+              clickPost={dispatchUserActions.clickPost}
+              togglePickingEmoji={dispatchUserActions.togglePickingEmoji}
+              clickTakeScreenshot={dispatchUserActions.clickTakeScreenshot}
+              toggleDarkMode={dispatchUserActions.toggleDarkMode}
+              pickingEmoji={pickingEmoji}
+              darkModeOn={darkModeOn}
+              addImageDisabled={addImageDisabled}
+              imageUpload={dispatchUserActions.imageUpload}
+              characterLimit={characterLimit}
+              postTweetDisabled={postTweetDisabled}
+            />
+          </div>
+        </main>
+      </div>
+    </Sentry.ErrorBoundary>
   )
 }
