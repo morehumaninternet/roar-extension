@@ -66,11 +66,32 @@ web-ext run
 
 ### Testing
 
-TODO!
+To run tests and view coverage report:
 
 ```bash
 npm test
-NYC_OPTS='--reporter=lcov' npm test # Generate code coverage as HTML
+```
+
+#### Developing Tests 
+
+In general, integration tests are favored. As Roar! is a browser extension, the test setup needs to mimic that environment. This includes mocking the browser (tabs, windows, active tab,
+etc.), mounting/starting the extension background window, and mounting the extension popup.
+This environment needs to be established before the ```describe``` block.
+
+The basic skeleton for an integration test is:
+```
+  const mocks = createMocks() // create mocks
+
+  // background opts include whether user is already authenticated. If needed,
+  // specific windows and tabs can be configured for the tests
+  runBackground(mocks, opts) 
+
+  // mount the popup. Options include whether user needs authentication and the state 
+  // of the webpage twitter handle for the tests
+  mountPopup(mocks, options)
+
+  // specific tests start here
+  describe('test topic', () => { ... })
 ```
 
 ### Publishing the Staging Extension
