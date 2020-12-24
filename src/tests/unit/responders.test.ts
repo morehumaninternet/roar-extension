@@ -6,14 +6,14 @@ import { getPlainText } from '../../draft-js-utils'
 describe('responders', () => {
   describe('chrome.windows.getAll', () => {
     it('sets the focusedWindowId to be that of the focused window', () => {
-      const stateUpdates = responders['chrome.windows.getAll'](newStoreState({ browser: 'Chrome', majorVersion: 86 }), {
+      const stateUpdates = responders['chrome.windows.getAll'](newStoreState(), {
         windows: [{ id: 1, focused: false } as any, { id: 2, focused: true } as any],
       })
       expect(stateUpdates).to.eql({ focusedWindowId: 2 })
     })
 
     it('returns no updates if no window is focused', () => {
-      const stateUpdates = responders['chrome.windows.getAll'](newStoreState({ browser: 'Chrome', majorVersion: 86 }), {
+      const stateUpdates = responders['chrome.windows.getAll'](newStoreState(), {
         windows: [{ id: 1, focused: false } as any, { id: 2, focused: false } as any],
       })
       expect(stateUpdates).to.eql({})
@@ -21,7 +21,7 @@ describe('responders', () => {
   })
   describe('chrome.tabs.onUpdated', () => {
     it('makes a new empty feedback with the updated domain, if the url changes', () => {
-      const storeState: StoreState = newStoreState({ browser: 'Chrome', majorVersion: 86 })
+      const storeState: StoreState = newStoreState()
 
       storeState.tabs = storeState.tabs.set(17, {
         feedbackTargetType: 'tab',

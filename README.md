@@ -67,9 +67,9 @@ web-ext run
 ### Testing
 
 ```bash
-npm test
-NYC_OPTS='--reporter=lcov' npm test # run tests and view coverage report
-MOCHA_OPTS='--watch' npm test # run tests in watch mode
+npm test              # Run the tests once
+npm run test:coverage # Run the tests once with html code coverage available in /coverage
+npm run test:watch # run tests in watch mode
 ```
 
 #### Developing Tests
@@ -79,20 +79,20 @@ etc.), mounting/starting the extension background window, and mounting the exten
 This environment needs to be established before the ```describe``` block.
 
 The basic skeleton for an integration test is:
+
+```typescript
+describe('overarching behavior', () => {
+  const mocks = createMocks()
+  runBackground(mocks)
+  mountPopup(mocks)
+
+  describe('specific behavior', () => {
+    ...
+  })
+})
 ```
-  const mocks = createMocks() // create mocks
 
-  // background opts include whether user is already authenticated. If needed,
-  // specific windows and tabs can be configured for the tests
-  runBackground(mocks, opts)
-
-  // mount the popup. Options include whether user needs authentication and the state
-  // of the webpage twitter handle for the tests
-  mountPopup(mocks, options)
-
-  // specific tests start here
-  describe('test topic', () => { ... })
-```
+See the top-level comment in [src/tests/integration/mocks.tsx](src/tests/integration/mocks.tsx) for more details.
 
 ### Publishing the Staging Extension
 
