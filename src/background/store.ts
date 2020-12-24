@@ -30,8 +30,8 @@ function reducer(state: StoreState, action: Action): StoreState {
   return nextState
 }
 
-export function create(browserInfo: BrowserInfo): AppStore {
-  const store: AppStore = createStore(reducer, newStoreState(browserInfo))
+export function create(): AppStore {
+  const store: AppStore = createStore(reducer, newStoreState())
 
   // Create dispatchers for each action type, one for each key in responders
   store.dispatchers = Object.keys(responders).reduce(

@@ -11,7 +11,6 @@
   for various events including changes to tabs/windows and dispatches them to the store.
 */
 import { AppStore, create } from './store'
-import { detectBrowser } from './browser-detection'
 import * as listeners from './listeners'
 import { detectLogin } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
@@ -29,14 +28,11 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   // Create an api object with functions to make API calls to the roar server
   const api = createApi(backgroundWindow)
 
-  // Detect the browser
-  const browserInfo = detectBrowser(navigator)
-
   // Create an object with get/set functions to cache twitter handles, reducing the number of API calls
   const handleCache = createHandleCache(chrome)
 
   // Attach the store to the window so the popup can access it see src/popup/mount.tsx
-  const store = (backgroundWindow.store = create(browserInfo))
+  const store = (backgroundWindow.store = create())
 
   // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.values(listeners)) {

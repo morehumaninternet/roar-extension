@@ -3,10 +3,6 @@
 
 type Maybe<T> = T | null | undefined
 
-type SupportedBrowser = 'Firefox' | 'Chrome'
-
-type BrowserInfo = { browser: SupportedBrowser; majorVersion: number }
-
 type Screenshot = {
   type: 'screenshot'
   tab: {
@@ -79,7 +75,6 @@ type FeedbackTarget = TabInfo
 type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
-  browserInfo: BrowserInfo
   focusedWindowId: number
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth

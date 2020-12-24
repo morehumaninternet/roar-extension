@@ -10,6 +10,7 @@ const handleDescriptions = {
   'does not exist': 'does not exist for the domain',
   '500': 'cannot be fetched due to a server error',
   'resolves later': 'is resolved later',
+  'never fetched': 'is never fetched',
 }
 
 type MountPopupOpts = {
@@ -39,8 +40,8 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
 
     before(() => mocks.chrome.storage.local.get.callsArgWith(0, { handleCache }))
 
-    // Expect an API call if the handle is not cached
-    if (opts.handle !== 'cached') {
+    // Expect an API call if the handle is not cached and
+    if (opts.handle !== 'cached' && opts.handle !== 'never fetched') {
       before(() => {
         const response = opts.handle === '500' ? { status: 500, body: 'I made a huge mistake' } : { status: 200, body: { twitter_handle, domain } }
 
@@ -63,11 +64,17 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    it('dispatches popupConnect, resulting in the twitter handle being fetched & a call made to captureVisibleTab to get a screenshot', () => {
-      const activeTab = ensureActiveTab(mocks.getState())
-      expect(activeTab.feedbackState.addingImages).to.equal(1)
-      expect(activeTab.feedbackState.twitterHandle.handle).to.equal(expectedEditorHandle)
-    })
+    if (opts.handle !== 'never fetched') {
+      it('fetches the twitter handle', () => {
+        const activeTab = ensureActiveTab(mocks.getState())
+        expect(activeTab.feedbackState.twitterHandle.handle).to.equal(expectedEditorHandle)
+      })
+
+      it('calls captureVisibleTab to get a screenshot', () => {
+        const activeTab = ensureActiveTab(mocks.getState())
+        expect(activeTab.feedbackState.addingImages).to.equal(1)
+      })
+    }
 
     if (opts.handle === 'exists') {
       it('caches the handle in chrome.storage.local', () => {
@@ -79,11 +86,13 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    it('has the appropriate handle in the editor state', () => {
-      const activeTab = ensureActiveTab(mocks.getState())
-      const plainText = getPlainText(activeTab.feedbackState.editorState)
-      expect(plainText).to.equal(expectedEditorHandle + ' ')
-    })
+    if (opts.handle !== 'never fetched') {
+      it('has the appropriate handle in the editor state', () => {
+        const activeTab = ensureActiveTab(mocks.getState())
+        const plainText = getPlainText(activeTab.feedbackState.editorState)
+        expect(plainText).to.equal(expectedEditorHandle + ' ')
+      })
+    }
   })
 
   return {

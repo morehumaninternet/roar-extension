@@ -1,9 +1,7 @@
 import { expect } from 'chai'
 import { Mocks } from '../mocks'
 
-type SignInViaTwitterOpts = { browser?: SupportedBrowser }
-
-export function signInViaTwitter(mocks: Mocks, opts: SignInViaTwitterOpts = {}): void {
+export function signInViaTwitter(mocks: Mocks): void {
   describe('sign in via twitter', () => {
     let popupWindow // tslint:disable-line:no-let
     before(() => (popupWindow = mocks.popupWindow()))
