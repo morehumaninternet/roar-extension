@@ -55,7 +55,7 @@ type MockBrowser = typeof global.browser & {
 }
 
 export type Mocks = {
-  backgroundWindow: Window
+  backgroundWindow: DOMWindow
   popupWindow(): DOMWindow
   browser: MockBrowser
   chrome: typeof chrome
@@ -73,7 +73,7 @@ const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'ut
 fetchMock.config.overwriteRoutes = true
 
 export function createMocks(): Mocks {
-  const backgroundWindow: any = new JSDOM('', { url: 'https://should-not-appear.com' }).window
+  const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
   backgroundWindow.roarServerUrl = 'https://test-roar-server.com'
 
   // TODO: use dependency injection in the codebase to access these
