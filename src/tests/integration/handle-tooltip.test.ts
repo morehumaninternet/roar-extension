@@ -19,7 +19,8 @@ describe('handle tooltip', () => {
   describe('when we are hovering over the handle', () => {
     it('renders a tooltip', () => {
       const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
-      const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
+      const popupWindow = mocks.popupWindow()
+      const event = new popupWindow.MouseEvent('mouseover', { bubbles: true })
       handle.dispatchEvent(event)
 
       const tooltipLink = mocks.app().querySelector('.link-tooltip__anchor')! as HTMLAnchorElement
@@ -30,7 +31,8 @@ describe('handle tooltip', () => {
 
     it('does not remove the tooltip when hovering over it', () => {
       const tooltip = mocks.app().querySelector('.link-tooltip')! as HTMLDivElement
-      const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
+      const popupWindow = mocks.popupWindow()
+      const event = new popupWindow.MouseEvent('mouseover', { bubbles: true })
       tooltip.dispatchEvent(event)
 
       const tooltipLink = mocks.app().querySelector('.link-tooltip__anchor')
@@ -39,7 +41,8 @@ describe('handle tooltip', () => {
 
     it('removes the tooltip when hovering over something else', () => {
       const postBtn = mocks.app().querySelector('.post-btn')! as HTMLButtonElement
-      const event = new mocks.popupWindow.MouseEvent('mouseover', { bubbles: true })
+      const popupWindow = mocks.popupWindow()
+      const event = new popupWindow.MouseEvent('mouseover', { bubbles: true })
       postBtn.dispatchEvent(event)
 
       const tooltipLink = mocks.app().querySelector('.link-tooltip__anchor')

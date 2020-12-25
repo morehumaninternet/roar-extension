@@ -1,11 +1,11 @@
 import * as fetchMock from 'fetch-mock'
 import { expect } from 'chai'
 import { JsonDecoder } from 'ts.data.json'
-import * as api from '../../background/api'
+import { createApi } from '../../background/api'
 import { createMocks } from '../integration/mocks'
 
 describe('api', () => {
-  createMocks()
+  const api = createApi(createMocks().backgroundWindow)
 
   describe('fetchRoar', () => {
     async function mockPost(status: number, body: any): Promise<FetchRoarResult<{ nice: string }>> {

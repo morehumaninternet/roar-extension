@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { ensureActiveTab } from '../../../selectors'
+import { getPlainText } from '../../../draft-js-utils'
 
 type PostFeedbackResult = 'success' | 'unauthorized' | '500'
 
@@ -18,7 +19,10 @@ const mockResponse = (result: PostFeedbackResult): fetchMock.MockResponse => {
 
 export function postingFeedback(mocks: Mocks, opts: { handle: string; result: PostFeedbackResult }): void {
   describe(`post feedback (${opts.result})`, () => {
+    let priorChromeTabsCreateCallCount: number // tslint:disable-line:no-let
+
     before(() => {
+      priorChromeTabsCreateCallCount = mocks.chrome.tabs.create.callCount
       const response = mockResponse(opts.result)
       fetchMock.mock('https://test-roar-server.com/v1/feedback', response)
     })
@@ -48,23 +52,22 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
     })
 
     if (opts.result === 'success') {
-      it('launches a new tab with the tweet upon completion and clears the existing feedback', async () => {
-        await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
-        expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
-          url: 'https://t.co/sometweethash',
-          active: true,
-        })
-
-        const spans = mocks.app().querySelectorAll('.twitter-interface > .DraftEditor-root span[data-text="true"]')
-
-        expect(spans).to.have.length(2)
-        expect(spans[0]).to.have.property('innerHTML', opts.handle)
-        expect(spans[1]).to.have.property('innerHTML', ' ')
+      it('creates a new tab with the tweet upon completion and clears the existing feedback', async () => {
+        const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
+        expect(mocks.chrome.tabs.create).to.have.callCount(1 + priorChromeTabsCreateCallCount)
+        expect(mocks.chrome.tabs.create.lastCall.args).to.eql([
+          {
+            url: 'https://t.co/sometweethash',
+            active: true,
+          },
+        ])
+        const activeTab = ensureActiveTab(state)
+        expect(getPlainText(activeTab.feedbackState.editorState)).to.equal(`${activeTab.feedbackState.twitterHandle.handle} `)
       })
     } else if (opts.result === 'unauthorized') {
       it('transitions to an unauthed state with a dismissable alert explaining what happened', async () => {
         const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
-        expect(mocks.chrome.tabs.create).to.have.callCount(0)
+        expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)
         expect(state.auth.state).to.equal('not_authed')
         const alertMessage = mocks.app().querySelector('.alert .alert-message')! as HTMLDivElement
         expect(alertMessage.innerHTML).to.equal('Your session ended. Please log in to try again.')
@@ -72,7 +75,7 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
     } else {
       it('stays authenticated and displays an alert', async () => {
         const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
-        expect(mocks.chrome.tabs.create).to.have.callCount(0)
+        expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)
         expect(state.auth.state).to.equal('authenticated')
         const alertMessage = mocks.app().querySelector('.alert-message')?.innerHTML
         expect(alertMessage).to.include('We encountered a problem on our end. Please try again later.')

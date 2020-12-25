@@ -66,33 +66,33 @@ web-ext run
 
 ### Testing
 
-To run tests and view coverage report:
-
 ```bash
-npm test
+npm test              # Run the tests once
+npm run test:coverage # Run the tests once with html code coverage available in /coverage
+npm run test:watch # run tests in watch mode
 ```
 
-#### Developing Tests 
+#### Developing Tests
 
 In general, integration tests are favored. As Roar! is a browser extension, the test setup needs to mimic that environment. This includes mocking the browser (tabs, windows, active tab,
 etc.), mounting/starting the extension background window, and mounting the extension popup.
 This environment needs to be established before the ```describe``` block.
 
 The basic skeleton for an integration test is:
+
+```typescript
+describe('overarching behavior', () => {
+  const mocks = createMocks()
+  runBackground(mocks)
+  mountPopup(mocks)
+
+  describe('specific behavior', () => {
+    ...
+  })
+})
 ```
-  const mocks = createMocks() // create mocks
 
-  // background opts include whether user is already authenticated. If needed,
-  // specific windows and tabs can be configured for the tests
-  runBackground(mocks, opts) 
-
-  // mount the popup. Options include whether user needs authentication and the state 
-  // of the webpage twitter handle for the tests
-  mountPopup(mocks, options)
-
-  // specific tests start here
-  describe('test topic', () => { ... })
-```
+See the top-level comment in [src/tests/integration/mocks.tsx](src/tests/integration/mocks.tsx) for more details.
 
 ### Publishing the Staging Extension
 
@@ -105,4 +105,8 @@ npm run publish -- production X.Y.Z # Creates artifacts/production vX.Y.Z.zip
 
 ### Project Overview
 
-The [manifest.json](manifest.json) file declares the [popup](html/popup.html) and the [background page](html/background-page.html) which are largely just responsible for loading their corresponding scripts that are compiled & bundled from [src/popup/index.tsx](src/popup/index.tsx) and [src/background/index.ts](src/background/index.ts) respectively. All state management and interaction with the server takes place in the background script as the popup can be closed at any time. The popup is responsible solely for painting the user interface and sending callbacks that trigger changes to [the store](src/background/store.ts). Those changes are observed in the singleton [background subscription](src/background/subscribe.ts) which will then call functions of its own to do things like take screenshots, etc. Globally available type definitions are declared in [src/types](src/types).
+The [manifest.json](manifest.json) file declares the [popup](html/popup.html) and the [background page](html/background-page.html) which are largely just responsible for loading their corresponding scripts that are compiled & bundled from [src/popup/index.tsx](src/popup/index.tsx) and [src/background/index.ts](src/background/index.ts) respectively.
+
+All state management and interaction with the server takes place in the background script as the popup can be closed at any time. The popup is responsible solely for painting the user interface and sending callbacks that trigger changes to [the store](src/background/store.ts). Those changes are observed by the various [listeners](src/background/listeners.ts) which will then call functions of its own to do things like take screenshots, etc. Globally available type definitions are declared in [src/types](src/types). See the top-level comment in [src/background/run.ts](src/background/run.ts) for more information.
+
+For testing, we have a few unit tests written in [src/tests/unit](src/tests/unit), but the bulk of our tests are integration tests written in [src/tests/integration](src/tests/integration). These rely heavily on [src/tests/integration/mocks.tsx](src/tests/integration/mocks.tsx) to stub global objects and whose top-level comment should help guide you in writing your own integration tests.

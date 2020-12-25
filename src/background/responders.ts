@@ -84,11 +84,20 @@ export const responders: Responders<Action> = {
   signInWithTwitter(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
   },
-  authenticationSuccess(state, { photoUrl }): Partial<StoreState> {
-    return { auth: { state: 'authenticated', user: { photoUrl } } }
+  onInstall(): Partial<StoreState> {
+    return { auth: { state: 'authenticating' } }
   },
-  authenticationFailure(state, { error }): Partial<StoreState> {
-    return { alert: { message: error.message }, auth: { state: 'not_authed' } }
+  detectLoginResult(state, result): Partial<StoreState> {
+    if (result.ok) {
+      return { auth: { state: 'authenticated', user: result.data } }
+    }
+    const updates: Partial<StoreState> = {
+      auth: { state: 'not_authed' },
+    }
+    if (result.reason !== 'unauthorized') {
+      Object.assign(updates, handleFailure(result))
+    }
+    return updates
   },
   dismissAlert(): Partial<StoreState> {
     return { alert: null }

@@ -3,10 +3,6 @@
 
 type Maybe<T> = T | null | undefined
 
-type SupportedBrowser = 'Firefox' | 'Chrome'
-
-type BrowserInfo = { browser: SupportedBrowser; majorVersion: number }
-
 type Screenshot = {
   type: 'screenshot'
   tab: {
@@ -79,7 +75,6 @@ type FeedbackTarget = TabInfo
 type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
-  browserInfo: BrowserInfo
   focusedWindowId: number
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth
@@ -99,9 +94,6 @@ type NotAuthedState = {
 
 type AuthenticatingState = {
   view: 'Authenticating'
-  browser: SupportedBrowser
-  authenticationFailure: Dispatchers<UserAction>['authenticationFailure']
-  authenticationSuccess: Dispatchers<UserAction>['authenticationSuccess']
 }
 
 type AuthenticatedState = {
@@ -134,8 +126,7 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'authenticationSuccess'; payload: { photoUrl: null | string } }
-  | { type: 'authenticationFailure'; payload: { error: any } }
+  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'dismissAlert' }
   | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
   | { type: 'updateEditorState'; payload: { editorState: any } }
@@ -160,6 +151,7 @@ type BackgroundAction =
   | { type: 'imageCaptureSuccess'; payload: { targetId: FeedbackTargetId; image: Image } }
   | { type: 'imageCaptureFailure'; payload: { targetId: FeedbackTargetId; failure: ImageCaptureFailure } }
   | { type: 'disableAutoSnapshot'; payload: { targetId: FeedbackTargetId } }
+  | { type: 'onInstall' }
   | { type: 'chrome.windows.getAll'; payload: { windows: ReadonlyArray<chrome.windows.Window> } }
   | { type: 'chrome.tabs.query'; payload: { tabs: ReadonlyArray<chrome.tabs.Tab> } }
   | { type: 'chrome.tabs.onCreated'; payload: { tab: chrome.tabs.Tab } }
@@ -201,3 +193,20 @@ type FetchRoarFailure =
 type FetchRoarResult<T> = { ok: true; data: T } | FetchRoarFailure
 
 type ImageCaptureFailure = { reason: 'file size limit exceeded'; message: string } | { reason: 'unknown'; message: string }
+
+type FeedbackResponseData = {
+  url: string
+}
+
+type WebsiteResponseData = {
+  domain: string
+  twitter_handle: null | string
+}
+
+type Api = {
+  fetchRoar<T extends object>(path: string, init: RequestInit, decoder: any): Promise<FetchRoarResult<T>>
+  postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>>
+  getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>>
+  getMe(): Promise<FetchRoarResult<User>>
+  makeLogoutRequest(): Promise<Response>
+}

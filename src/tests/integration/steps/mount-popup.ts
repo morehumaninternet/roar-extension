@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
-import { mount } from '../../../popup/mount'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
 
@@ -55,12 +54,11 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    before(() => mocks.browser.tabs.get.withArgs(14).resolves({ width: 1200, height: 900 }))
-    before(() => mount(mocks.chrome as any, mocks.popupWindow as any))
+    before(() => mocks.mount())
 
     if (!opts.alreadyAuthenticated) {
       it('mounts the app with a button to sign in with twitter', () => {
-        const appContainer = mocks.popupWindow.document.getElementById('app-container')!
+        const appContainer = mocks.popupWindow().document.getElementById('app-container')!
         const signInWithTwitter = appContainer.querySelector('button')!
         expect(signInWithTwitter.innerHTML).to.match(/.+(Log in with Twitter)$/)
       })
@@ -95,13 +93,6 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
         expect(plainText).to.equal(expectedEditorHandle + ' ')
       })
     }
-
-    it('adds an event listener for when the window unloads', () => {
-      const unloadCall = mocks.popupWindow.addEventListener.getCalls().find(call => call.args[0] === 'unload')!
-      const [eventName, callback] = unloadCall.args
-      expect(eventName).to.equal('unload')
-      expect(callback).to.be.a('function')
-    })
   })
 
   return {

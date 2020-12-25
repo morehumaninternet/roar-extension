@@ -46,7 +46,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
     })
 
     before(() => {
-      run(mocks.backgroundWindow, mocks.browser, mocks.chrome as any, mocks.backgroundWindow.navigator)
+      run(mocks.backgroundWindow as any, mocks.browser, mocks.chrome as any, mocks.backgroundWindow.navigator)
       // Throw an error if ever a Failure event is dispatched
       unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
         if (opts.allowActionFailure) return
@@ -62,7 +62,6 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
 
     it('loads window.store, which starts with an empty state', () => {
       const state = mocks.getState()
-      expect(state.browserInfo).to.have.all.keys('browser', 'majorVersion')
       expect(state.focusedWindowId).to.equal(-1)
       expect(state.tabs).to.be.an.instanceOf(Map)
       expect(state.tabs).to.have.property('size', 0)

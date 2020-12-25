@@ -11,6 +11,8 @@
     "scss": "sass scss/popup.scss bundled/popup.css",
     "rollup": "rollup --config rollup.config.js",
     "test": "nyc $NYC_OPTS --exclude src/types.ts --exclude src/tests mocha $MOCHA_OPTS -r src/tests/setup.js -r src/types.ts src/**/*.test.ts*",
+    "test:coverage": "NYC_OPTS='--reporter=lcov' npm test",
+    "test:watch": "MOCHA_OPTS='--watch --watch-extensions ts,tsx' npm test",
     "zip-source-code-for-firefox": "cd .. && find extensions | grep -v 'node_modules' | grep -v '.git' | grep -v 'manifest.json' | grep -v '^extensions/compiled' | grep -v '^extensions/bundled' | grep -v '^extensions/publish' | grep -v '^extensions$' | grep -v '.zip$' | zip -rTg extension-source-code.zip -@ && cd extensions"
   },
   "repository": {
@@ -24,15 +26,12 @@
     "url": "https://github.com/morehumaninternet/roar-extension/issues"
   },
   "dependencies": {
-    "@types/firefox-webext-browser": "67.0.2",
     "draft-js": "0.11.7",
     "emoji-mart": "3.0.0",
     "immutable": "4.0.0-rc.12",
-    "konva": "7.1.6",
     "lodash": "4.17.20",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-konva": "17.0.0-0",
     "redux": "4.0.1",
     "spinthatshit": "1.0.4",
     "ts.data.json": "^1.5.0",
@@ -48,6 +47,7 @@
     "@types/draft-js": "0.10.44",
     "@types/emoji-mart": "3.0.4",
     "@types/fetch-mock": "7.3.3",
+    "@types/firefox-webext-browser": "67.0.2",
     "@types/jsdom": "16.2.5",
     "@types/lodash": "4.14.123",
     "@types/mocha": "5.2.7",

@@ -1,5 +1,6 @@
 import * as React from 'react'
 
-export function Authenticating({ browser, authenticationSuccess, authenticationFailure }: AuthenticatingState): JSX.Element {
+// Typescript complains about props: {}
+export function Authenticating(_props: object): JSX.Element {
   return <div className="authenticating-spinner" />
 }

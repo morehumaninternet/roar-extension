@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import * as sinon from 'sinon'
 import { createMocks } from './mocks'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
@@ -11,22 +10,19 @@ describe('another window is opened', () => {
   mountPopup(mocks, { alreadyAuthenticated: true, handle: 'exists' })
 
   describe('when another window is focused on', () => {
-    let popupWindowClose: sinon.SinonStub // tslint:disable-line:no-let
-    before(() => (popupWindowClose = sinon.stub(mocks.popupWindow, 'close')))
-    after(() => popupWindowClose.restore())
-
     it('does not close the popup if the window ID is -1', () => {
       const [callback] = mocks.chrome.windows.onFocusChanged.addListener.firstCall.args
       const anotherWindowId = -1
       callback(anotherWindowId)
-      expect(popupWindowClose).to.have.callCount(0)
+      expect(mocks.popupWindow().close).to.have.callCount(0)
     })
 
     it('closes the popup', () => {
+      const popupWindow = mocks.popupWindow()
       const [callback] = mocks.chrome.windows.onFocusChanged.addListener.firstCall.args
       const anotherWindowId = 3
       callback(anotherWindowId)
-      expect(popupWindowClose).to.have.callCount(1)
+      expect(popupWindow.close).to.have.callCount(1)
     })
   })
 })

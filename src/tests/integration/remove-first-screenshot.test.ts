@@ -4,7 +4,6 @@ import { ensureActiveTab } from '../../selectors'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
 import { authenticateViaTwitter } from './steps/authenticate-via-twitter'
-import { onceAuthenticated } from './steps/once-authenticated'
 import { signInViaTwitter } from './steps/sign-in-via-twitter'
 import { captureFirstScreenshot } from './steps/capture-first-screenshot'
 
@@ -15,7 +14,6 @@ describe('removing the first screenshot', () => {
   mountPopup(mocks, { handle: 'exists' })
   signInViaTwitter(mocks)
   authenticateViaTwitter(mocks)
-  onceAuthenticated(mocks)
   captureFirstScreenshot(mocks)
 
   describe('removing first screenshot', () => {
