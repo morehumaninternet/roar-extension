@@ -3,7 +3,7 @@ import { createMocks } from './mocks'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
 
-describe('authenticated and not a webpage', () => {
+describe('authenticated and not a web page', () => {
   const mocks = createMocks()
 
   runBackground(mocks, {
@@ -13,10 +13,10 @@ describe('authenticated and not a webpage', () => {
   })
   mountPopup(mocks, { alreadyAuthenticated: true, handle: 'never fetched' })
 
-  describe('not a webpage', () => {
+  describe('not a web page', () => {
     it('renders appropriate alert message', () => {
       const alertMessage = mocks.app().querySelector('.alert-message')?.innerHTML
-      expect(alertMessage).to.include('Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.')
+      expect(alertMessage).to.include('Roar does not work on this tab because it is not a web page.')
     })
   })
 })

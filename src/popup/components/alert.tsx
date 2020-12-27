@@ -1,11 +1,22 @@
 import * as React from 'react'
 import { CloseButton } from './close-button'
 
-export function Alert({ alertMessage, contactSupport, onClose }: { alertMessage: string; contactSupport?: boolean; onClose(): void }): JSX.Element {
+type AlertProps = {
+  alertMessage: string | ReadonlyArray<string>
+  additionalClassName?: string
+  contactSupport?: boolean
+  onClose(): void
+}
+
+export function Alert({ additionalClassName, alertMessage, contactSupport, onClose }: AlertProps): JSX.Element {
+  const messages = Array.isArray(alertMessage) ? alertMessage : [alertMessage]
+
   return (
-    <div className="alert">
+    <div className={`alert ${additionalClassName || ''}`}>
       <div className="alert-message">
-        {alertMessage}
+        {messages.map(m => (
+          <div key={m}>{m}</div>
+        ))}
         {contactSupport && (
           <>
             <br />

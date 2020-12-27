@@ -13,10 +13,12 @@ export function AppContents({ popupWindow, storeState, dispatchUserActions }: Ap
   const appState = toAppState(popupWindow, storeState, dispatchUserActions)
 
   switch (appState.view) {
+    case 'NotWebPage':
+      return <views.NotWebPage />
     case 'NotAuthed':
       return <views.NotAuthed {...appState} />
     case 'Authenticating':
-      return <views.Authenticating {...appState} />
+      return <views.Authenticating />
     case 'Authenticated':
       return <views.Authenticated {...appState} />
   }

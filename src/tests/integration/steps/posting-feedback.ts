@@ -70,7 +70,7 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
         expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)
         expect(state.auth.state).to.equal('not_authed')
         const alertMessage = mocks.app().querySelector('.alert .alert-message')! as HTMLDivElement
-        expect(alertMessage.innerHTML).to.equal('Your session ended. Please log in to try again.')
+        expect(alertMessage.innerHTML).to.include('Your session ended. Please log in to try again.')
       })
     } else {
       it('stays authenticated and displays an alert', async () => {
