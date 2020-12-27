@@ -1,5 +1,5 @@
 $profile-image-radius: 18px;
-$caret-radius: 12px;
+$caret-radius: 8px;
 
 .user-avatar {
   position: relative;
@@ -32,10 +32,8 @@ $caret-radius: 12px;
 
     .logout-btn {
       display: inline-block;
-      width: 92px;
-      height: 46px;
-      font-size: 1.2rem;
-      padding: 12px 6px;
+      font-size: 1rem;
+      padding: 8px 12px;
       font-weight: bold;
       color: var(--post-btn-text-color);
       background-color: var(--post-btn-background-color);
