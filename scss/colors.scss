@@ -8,6 +8,7 @@ $twitter-blue: #1da1f2;
   --background-color: white;
   --text-color: #{$human-blue};
   --post-btn-background-color: #{$human-blue};
+  --post-btn-background-color-hover: #153F72;
   --post-btn-text-color: white;
   --image-border-color: #{$human-blue};
   --open-emoji-picker-border-right: 1px solid #d9d9d9;
@@ -15,11 +16,13 @@ $twitter-blue: #1da1f2;
   --twitter-link-text-color: white;
   --twitter-button-background-color: #{$twitter-blue};
   --twitter-button-text-color: white;
+  --svg-btn-background-color-hover: rgba(250, 117, 158, 0.2);
 
   &.dark-theme {
     --background-color: #{$human-blue};
     --text-color: white;
     --post-btn-background-color: #{$human-pink};
+    --post-btn-background-color-hover: #FF729D;
     --post-btn-text-color: #{$human-blue};
     --image-border-color: #{$human-pink};
     --open-emoji-picker-border-right: none;
@@ -27,6 +30,7 @@ $twitter-blue: #1da1f2;
     --twitter-link-text-color: #{$human-blue};
     --twitter-button-background-color: white;
     --twitter-button-text-color: #{$twitter-blue};
+    --svg-btn-background-color-hover: rgba(255, 255, 255, 0.2);
   }
 
   background-color: var(--background-color);
