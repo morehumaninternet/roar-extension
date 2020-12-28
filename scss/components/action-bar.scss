@@ -83,6 +83,13 @@ $svg-btn-height: $svg-height + 18px;
     height: $svg-height;
   }
 
+  &.LightMode, &.DarkMode {
+    svg {
+      height: $svg-height + 3px;
+      margin-left: -2px;
+    }
+  }
+
   svg > path:not(.circle-outline) {
     fill: $human-pink;
   }
