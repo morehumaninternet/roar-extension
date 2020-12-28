@@ -1,6 +1,5 @@
 .not-authed {
-  min-height: 380px;
-  min-width: 476px;
+  min-width: $min-width;
   padding: 10px;
   box-sizing: border-box;
   display: flex;

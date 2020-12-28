@@ -38,9 +38,7 @@ function ImageSpinner(): JSX.Element {
   )
 }
 
-export function Images({ feedback, startEditingImage, clickDeleteImage }: ImagesProps): null | JSX.Element {
-  if (!feedback.images.length && !feedback.addingImages) return null
-
+export function Images({ feedback, startEditingImage, clickDeleteImage }: ImagesProps): JSX.Element {
   return (
     <div className="images">
       {feedback.images.map((image, index) => (

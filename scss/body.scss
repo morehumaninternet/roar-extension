@@ -1,6 +1,5 @@
 $main-padding: 10px;
 $min-width: 476px;
-$min-height: 380px;
 
 html,
 body {
@@ -13,5 +12,10 @@ body {
   max-width: 800px;
   max-height: 600px;
   min-width: $min-width;
-  min-height: $min-height;
+}
+
+.not-authed,
+.authenticating,
+.authenticated {
+  min-height: 388px;
 }

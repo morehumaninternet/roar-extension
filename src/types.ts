@@ -87,6 +87,10 @@ type StoreState = {
   mostRecentAction: Action | { type: 'INITIALIZING' }
 }
 
+type NotWebPageState = {
+  view: 'NotWebPage'
+}
+
 type NotAuthedState = {
   view: 'NotAuthed'
   signInWithTwitter(): void
@@ -98,7 +102,7 @@ type AuthenticatingState = {
 
 type AuthenticatedState = {
   view: 'Authenticated'
-  feedback: { exists: true; state: FeedbackState } | { exists: false; reasonDisabledMessage: null | string }
+  feedback: Maybe<FeedbackState>
   user: User
   tweeting: null | { at: string }
   darkModeOn: boolean
@@ -109,7 +113,7 @@ type AuthenticatedState = {
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-type AppState = NotAuthedState | AuthenticatingState | AuthenticatedState
+type AppState = NotWebPageState | NotAuthedState | AuthenticatingState | AuthenticatedState
 
 // A Responder is a function that takes the current state of the application and the payload of the action of the corresponding
 // type and returns any updates that should be made to the store. With this approach, we can ensure that we have an exhaustive

@@ -5,8 +5,6 @@ import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
 import { Tweeting } from '../components/tweeting'
 import { UserAvatar } from '../components/user-avatar'
-import { Alert } from '../components/alert'
-// import { EditingImage } from '../components/editing-image'
 
 export function Authenticated({
   feedback,
@@ -23,10 +21,7 @@ export function Authenticated({
     return <Tweeting at={tweeting.at} />
   }
 
-  if (!feedback.exists) {
-    if (feedback.reasonDisabledMessage) {
-      return <Alert alertMessage={feedback.reasonDisabledMessage} contactSupport={false} onClose={window.close} />
-    }
+  if (!feedback) {
     return null
   }
 
@@ -38,13 +33,13 @@ export function Authenticated({
 
         <div className="twitter-interface">
           <FeedbackEditor
-            editorState={feedback.state.editorState}
-            hovering={feedback.state.hovering}
+            editorState={feedback.editorState}
+            hovering={feedback.hovering}
             updateEditorState={dispatchUserActions.updateEditorState}
             hoverOver={dispatchUserActions.hoverOver}
-            twitterHandle={feedback.state.twitterHandle}
+            twitterHandle={feedback.twitterHandle}
           />
-          <Images feedback={feedback.state} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
+          <Images feedback={feedback} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
           <ActionBar
             clickPost={dispatchUserActions.clickPost}
             togglePickingEmoji={dispatchUserActions.togglePickingEmoji}

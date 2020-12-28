@@ -38,17 +38,14 @@ export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): Charac
   return { remaining, percentageCompleted }
 }
 
-function authenticatedStateFeedback(feedbackTarget: null | FeedbackTarget): AuthenticatedState['feedback'] {
-  if (!feedbackTarget) {
-    return { exists: false, reasonDisabledMessage: null }
-  }
-  if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.domain) {
-    return { exists: false, reasonDisabledMessage: 'Roar does not work on this tab because it is not a webpage. Please open Roar on a webpage to try again.' }
-  }
-  return { exists: true, state: feedbackTarget.feedbackState }
-}
-
 export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
+  const feedbackTarget = activeTab(storeState)
+  if (feedbackTarget) {
+    if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.domain) {
+      return { view: 'NotWebPage' }
+    }
+  }
+
   switch (storeState.auth.state) {
     case 'not_authed': {
       return {
@@ -62,11 +59,9 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
       }
     }
     case 'authenticated': {
-      const feedbackTarget = activeTab(storeState)
-
       return {
         view: 'Authenticated',
-        feedback: authenticatedStateFeedback(feedbackTarget),
+        feedback: feedbackTarget?.feedbackState,
         user: storeState.auth.user,
         tweeting: feedbackTarget?.feedbackState.isTweeting ? { at: feedbackTarget.feedbackState.twitterHandle.handle! } : null,
         darkModeOn: storeState.darkModeOn,

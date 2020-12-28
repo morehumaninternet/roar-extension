@@ -1,6 +1,4 @@
 .alert {
-  position: absolute;
-  bottom: 0;
   width: $min-width;
   display: flex;
   align-items: center;
@@ -11,6 +9,11 @@
 
   background-color: $human-yellow-warning-background;
   color: $human-yellow-warning;
+
+  &:not(.whole-page) {
+    position: absolute;
+    bottom: 0;
+  }
 
   > .close-btn {
     circle {
