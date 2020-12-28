@@ -1,20 +1,17 @@
-$standard-btn-height: 36px;
-$svg-btn-grow: 4px;
-$svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
-
+$svg-height: 24px;
+$svg-btn-height: $svg-height + 18px;
 
 .action-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  margin-left: -8px;
 
   > .action-buttons {
     display: flex;
     align-items: flex-start;
     flex-grow: 0;
     margin-right: auto;
-    margin-left: -$svg-btn-grow;
   }
 
   > input[type='file'] {
@@ -23,8 +20,8 @@ $svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
 
   .character-countdown {
     svg.circular-chart {
-      height: $standard-btn-height;
-      width: $standard-btn-height;
+      height: $svg-height;
+      width: $svg-height;
       display: block;
       margin-right: 12px;
       circle {
@@ -59,32 +56,38 @@ $svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
 
   > .post-btn {
     flex-grow: 0;
-    height: 48px;
+    height: 40px;
     width: 90px;
     font-size: 16px;
     font-weight: bold;
     background-color: var(--post-btn-background-color);
     color: var(--post-btn-text-color);
-    border-radius: 50px;
+    border-radius: 20px;
 
+    &:hover {
+      background-color: var(--post-btn-background-color-hover);
+    }
     &:disabled {
       opacity: 0.65;
     }
   }
 }
 
-.svg-btn-container {
-  width: 48px;
-  height: $svg-btn-grow-height;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .svg-btn {
+  height: $svg-btn-height;
+  width: $svg-btn-height;
+  border-radius: $svg-btn-height / 2;
+  margin-right: -2px;
+
   svg {
-    height: $standard-btn-height;
-    transition: height .3s;
+    height: $svg-height;
+  }
+
+  &.LightMode, &.DarkMode {
+    svg {
+      height: $svg-height + 3px;
+      margin-left: -2px;
+    }
   }
 
   svg > path:not(.circle-outline) {
@@ -127,8 +130,6 @@ $svg-btn-grow-height: $standard-btn-height + $svg-btn-grow;
   }
 
   &:hover {
-    svg {
-      height: $svg-btn-grow-height;
-    }
+    background-color: var(--svg-btn-background-color-hover);
   }
 }

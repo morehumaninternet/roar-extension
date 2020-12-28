@@ -1,5 +1,5 @@
 svg.roar-logo {
-  height: 128px;
+  height: 64px;
 
   path.mouth {
     fill: $human-blue;
@@ -20,7 +20,7 @@ svg.mhi-with-text-logo {
 
 .built-with-love {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   font-size: 13px;
 
@@ -37,8 +37,9 @@ svg.mhi-with-text-logo {
   }
 
   svg.mhi-with-text-logo {
-    height: 36px;
-    margin-left: 2px;
+    height: 32px;
+    margin-left: 8px;
+    margin-top: 4px;
   }
 }
 

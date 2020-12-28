@@ -13,10 +13,8 @@ type ActionButtonProps = {
 
 export function ActionButton({ kind, onClick, disabled, additionalClassNames }: ActionButtonProps): JSX.Element {
   return (
-    <div className="svg-btn-container">
-      <button title={startCase(kind)} className={`svg-btn ${kind} ${additionalClassNames || ''}`} onClick={onClick} disabled={disabled}>
-        {svgs[kind]}
-      </button>
-    </div>
+    <button title={startCase(kind)} className={`svg-btn ${kind} ${additionalClassNames || ''}`} onClick={onClick} disabled={disabled}>
+      {svgs[kind]}
+    </button>
   )
 }
