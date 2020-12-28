@@ -10,7 +10,7 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
   const description = opts.unauthorized ? 'unauthorized' : 'authorized'
 
   describe(`authentication via twitter (${description})`, () => {
-    let resolveResponse: () => void
+    let resolveResponse: () => void // tslint:disable-line:no-let
     before(() => {
       const response = opts.unauthorized ? { status: 401, body: 'Unauthorized' } : { status: 200, body: { photoUrl: 'https://some-image-url.com/123' } }
       fetchMock.mock('https://test-roar-server.com/v1/me', new Promise(resolve => (resolveResponse = () => resolve(response))))

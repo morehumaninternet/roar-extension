@@ -18,7 +18,7 @@ export function createHandlers(
   dispatchBackgroundActions: Dispatchers<BackgroundAction>
 ): ApiHandlers {
   return {
-    async postTweet(target: FeedbackTarget) {
+    async postTweet(target: FeedbackTarget): Promise<void> {
       const targetId: FeedbackTargetId = target.id
       dispatchBackgroundActions.postTweetStart({ targetId })
 
@@ -31,7 +31,7 @@ export function createHandlers(
       return dispatchBackgroundActions.postTweetFailure({ targetId, failure: result })
     },
 
-    async fetchTwitterHandle(tabId: number, domain: string) {
+    async fetchTwitterHandle(tabId: number, domain: string): Promise<void> {
       dispatchBackgroundActions.fetchHandleStart({ tabId })
 
       const cachedHandle = await handleCache.get(domain)
