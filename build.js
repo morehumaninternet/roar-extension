@@ -29,6 +29,7 @@ const pink = chalk.hex('#fa759e')
 const green = chalk.hex('#6FCF97')
 const gold = chalk.hex('#FFCA00')
 const lightBlue = chalk.hex('#4a81bc')
+const purple = chalk.hex('#800080')
 const normalText = blue
 const emphasis = pink.bold
 
@@ -46,6 +47,7 @@ const commands = [
   },
   bundleCommand('popup', gold),
   bundleCommand('background', lightBlue),
+  bundleCommand('auth-success', purple),
 ]
 
 // Create an output stream that writes to process.stdout

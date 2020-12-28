@@ -17,9 +17,19 @@
     "128": "img/roar_128.png"
   },
   "manifest_version": 2,
-  "permissions": ["<all_urls>", "storage", "tabs"],
+  "permissions": ["<all_urls>", "storage", "tabs", "notifications"],
   "externally_connectable": {
     "matches": ["https://roar.morehumaninternet.org/*", "https://roar-server.herokuapp.com/*", "https://localhost:5004/*"]
   },
-  "web_accessible_resources": []
+  "web_accessible_resources": [],
+  "content_scripts": [
+    {
+      "matches": ["https://roar.morehumaninternet.org/auth-success"],
+      "js": ["/bundled/auth-success.js"]
+    },
+    {
+      "matches": ["https://localhost:5004/auth-success"],
+      "js": ["/bundled/auth-success.js"]
+    }
+  ]
 }

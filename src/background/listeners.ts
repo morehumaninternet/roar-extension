@@ -1,6 +1,6 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { detectLogin, fetchTwitterHandle, postTweet } from './api-handlers'
+import { fetchTwitterHandle, postTweet } from './api-handlers'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
 
@@ -15,13 +15,6 @@ type ListenerDependencies = {
 
 export function popupConnect({ api, store, browser, handleCache }: ListenerDependencies): void {
   store.on('popupConnect', state => {
-    // We open a separate tab that the user authenticates with. So if they open the popup back up
-    // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
-    // aren't logged in
-    if (state.auth.state === 'authenticating' || state.auth.state === 'not_authed') {
-      detectLogin(api, store.dispatchers)
-    }
-
     const target = ensureActiveTab(state)
     if (target.feedbackState.isTweeting) return
 

@@ -16,6 +16,8 @@ import { detectLogin } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
 import { createApi } from './api'
+import { whenState } from '../redux-utils'
+import { onLogin } from '../copy'
 
 declare global {
   interface Window {
@@ -48,5 +50,18 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   // When the extension is first installed, open the /welcome page
   chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') store.dispatchers.onInstall()
+  })
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (sender.url === `${window.roarServerUrl}/auth-success` && message.type === 'auth-success') {
+      detectLogin(api, store.dispatchers)
+      whenState(store, state => state.auth.state === 'authenticated').then(() =>
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: '/img/roar_128.png',
+          ...onLogin,
+        })
+      )
+    }
   })
 }
