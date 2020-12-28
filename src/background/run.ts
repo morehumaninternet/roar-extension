@@ -52,16 +52,20 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
     if (details.reason === 'install') store.dispatchers.onInstall()
   })
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (sender.url === `${window.roarServerUrl}/auth-success` && message.type === 'auth-success') {
+  // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
+  chrome.webNavigation.onCommitted.addListener(details => {
+    if (details.url === `${window.roarServerUrl}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
+      chrome.tabs.remove(details.tabId)
       detectLogin(api, store.dispatchers)
-      whenState(store, state => state.auth.state === 'authenticated').then(() =>
-        chrome.notifications.create({
+      whenState(store, ({ auth }) => auth.state === 'authenticated').then(() => {
+        const notificationId = 'logged-in'
+        chrome.notifications.create(notificationId, {
           type: 'basic',
           iconUrl: '/img/roar_128.png',
           ...onLogin,
         })
-      )
+        setTimeout(() => chrome.notifications.clear(notificationId), 5000)
+      })
     }
   })
 }

@@ -11,5 +11,5 @@ export const fetchHandleFailure = (domain: string) => `We tried to fetch the twi
 
 export const onLogin = {
   title: 'Successful login',
-  message: "You're in! Click the mouth icon to start giving feedback",
+  message: "You're in! Click the icon to start giving feedback",
 }
