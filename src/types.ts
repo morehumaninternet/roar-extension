@@ -145,10 +145,7 @@ type UserAction =
 
 type BackgroundAction =
   | { type: 'detectLoginStart' }
-  | {
-      type: 'detectLoginResult'
-      payload: { type: 'initial' | 'auth-success' | 'premature popupConnect'; result: FetchRoarResult<{ photoUrl: null | string }> }
-    }
+  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
@@ -222,6 +219,6 @@ type Api = {
 type ApiHandlers = {
   postTweet(target: FeedbackTarget): Promise<any>
   fetchTwitterHandle(tabId: number, domain: string): Promise<any>
-  detectLogin(type: 'initial' | 'auth-success'): Promise<void>
+  detectLogin(): Promise<void>
   makeLogoutRequest(): Promise<Response>
 }

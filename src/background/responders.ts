@@ -90,7 +90,7 @@ export const responders: Responders<Action> = {
   detectLoginStart(): Partial<StoreState> {
     return { auth: { state: 'detectLogin' } }
   },
-  detectLoginResult(state, { type, result }): Partial<StoreState> {
+  detectLoginResult(state, result): Partial<StoreState> {
     if (result.ok) {
       return { auth: { state: 'authenticated', user: result.data } }
     }

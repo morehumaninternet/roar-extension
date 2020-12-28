@@ -16,10 +16,7 @@ export function popupConnect({ apiHandlers, store, browser }: ListenerDependenci
     // We open a separate tab that the user authenticates with. So if they open the popup back up
     // when they're in the authenticating state, we know they're not logged in yet
     if (state.auth.state === 'authenticating') {
-      return store.dispatchers.detectLoginResult({
-        type: 'premature popupConnect',
-        result: { ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' },
-      })
+      store.dispatchers.detectLoginResult({ ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' })
     }
 
     const target = ensureActiveTab(state)

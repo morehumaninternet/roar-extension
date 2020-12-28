@@ -47,7 +47,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   monitorTabs(store.dispatchers, chrome)
 
   // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
-  apiHandlers.detectLogin('initial')
+  apiHandlers.detectLogin()
 
   // When the extension is first installed, open the /welcome page
   chrome.runtime.onInstalled.addListener(details => {
@@ -58,7 +58,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   chrome.webNavigation.onCommitted.addListener(details => {
     if (details.url === `${ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
       chrome.tabs.remove(details.tabId)
-      apiHandlers.detectLogin('auth-success')
+      apiHandlers.detectLogin()
       whenState(store, ({ auth }) => auth.state === 'authenticated')
         .then(() => {
           const notificationId = 'logged-in'

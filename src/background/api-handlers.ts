@@ -48,10 +48,9 @@ export function createHandlers(
       return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, failure: result })
     },
 
-    async detectLogin(type: 'initial' | 'auth-success'): Promise<void> {
+    async detectLogin(): Promise<void> {
       dispatchBackgroundActions.detectLoginStart()
-      const result = await api.getMe()
-      dispatchBackgroundActions.detectLoginResult({ type, result })
+      dispatchBackgroundActions.detectLoginResult(await api.getMe())
     },
 
     makeLogoutRequest: api.makeLogoutRequest,
