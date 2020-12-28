@@ -18,9 +18,11 @@ import { createHandleCache } from './handle-cache'
 import { createApi } from './api'
 import { whenState } from '../redux-utils'
 import { onLogin } from '../copy'
+import { maxApiRequestMilliseconds } from './settings'
 
 declare global {
   var ROAR_SERVER_URL: string
+  var CONSOLE_ERROR: (error: any) => void
   interface Window {
     store: AppStore
   }
@@ -59,16 +61,16 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
     if (details.url === `${ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
       chrome.tabs.remove(details.tabId)
       apiHandlers.detectLogin()
-      whenState(store, ({ auth }) => auth.state === 'authenticated')
-        .then(() => {
+      whenState(store, ({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1).then(state => {
+        if (state.auth.state === 'authenticated') {
           const notificationId = 'logged-in'
           chrome.notifications.create(notificationId, {
             type: 'basic',
             iconUrl: '/img/roar_128.png',
             ...onLogin,
           })
-        })
-        .catch(console.error)
+        }
+      })
     }
   })
 }

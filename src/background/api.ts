@@ -1,4 +1,5 @@
 import { JsonDecoder } from 'ts.data.json'
+import { maxApiRequestMilliseconds } from './settings'
 
 export function createApi(window: any): Api {
   async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
@@ -7,7 +8,7 @@ export function createApi(window: any): Api {
       const promisedResponse = fetch(`${ROAR_SERVER_URL}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
 
       controller.signal.addEventListener('abort', () => controller.abort())
-      const timeout = setTimeout(() => controller.abort(), 30000)
+      const timeout = setTimeout(() => controller.abort(), maxApiRequestMilliseconds)
       promisedResponse.finally(() => clearTimeout(timeout))
 
       const response = await promisedResponse
@@ -47,7 +48,7 @@ export function createApi(window: any): Api {
       if (error.name === 'AbortError') {
         return { ok: false, reason: 'timeout', details: error.message }
       } else {
-        console.error(error)
+        CONSOLE_ERROR(error)
         return { ok: false, reason: 'network down', details: error.message }
       }
     }

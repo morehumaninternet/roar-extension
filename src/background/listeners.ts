@@ -2,6 +2,7 @@ import { AppStore } from './store'
 import * as images from './images'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
+import { maxApiRequestMilliseconds } from './settings'
 
 type ListenerDependencies = {
   window: Window
@@ -92,7 +93,7 @@ export function clickPost({ apiHandlers, store, chrome }: ListenerDependencies):
       return imagesReady && twitterHandleReady
     }
 
-    whenState(store, ready, 30000)
+    whenState(store, ready, maxApiRequestMilliseconds)
       .then(state => {
         const target = tabById(state, targetId)
         if (!state.alert && target) {

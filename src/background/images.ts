@@ -51,7 +51,7 @@ export async function takeScreenshot(
       targetId: tab.id,
     })
   } catch (error) {
-    console.error(error)
+    CONSOLE_ERROR(error)
     dispatchBackgroundActions.imageCaptureFailure({
       targetId: target.id,
       failure: {
@@ -92,7 +92,7 @@ export async function imageUpload(targetId: FeedbackTargetId, file: File, dispat
       image: { type: 'imageupload', name: file.name, uri, blob },
     })
   } catch (error) {
-    console.error(error)
+    CONSOLE_ERROR(error)
     dispatchBackgroundActions.imageCaptureFailure({
       targetId,
       failure: {

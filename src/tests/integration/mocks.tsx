@@ -142,6 +142,8 @@ export function createMocks(): Mocks {
     teardownPopupWindow()
     teardownBackgroundWindow()
     sinon.restore()
+    const logError: sinon.SinonStub = CONSOLE_ERROR as any
+    logError.reset()
   }
 
   // ReactDOM needs a global window to work with
