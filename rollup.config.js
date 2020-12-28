@@ -12,7 +12,7 @@ export default {
     replace({
       // Use a minified build for react for production
       'process.env.NODE_ENV': JSON.stringify(process.env.ENV === 'production' ? 'production' : 'development'),
-      'window.roarServerUrl': JSON.stringify(process.env.ROAR_SERVER_URL),
+      'ROAR_SERVER_URL': JSON.stringify(process.env.ROAR_SERVER_URL),
     }),
     typescript(),
     resolve(),

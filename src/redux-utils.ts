@@ -8,6 +8,8 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
   let resolve: (state: State) => void
   let reject: (error: any) => void
 
+  const timeoutError = new Error('timeout')
+
   const promise = new Promise<State>((res, rej) => {
     resolve = res
     reject = rej
@@ -15,7 +17,7 @@ export function whenState<State>(store: Store<State>, predicate: (state: State) 
 
   const timeout = setTimeout(() => {
     unsubscribe()
-    reject(new Error('timeout'))
+    reject(timeoutError)
   }, timeoutMillis)
 
   const callback = () => {

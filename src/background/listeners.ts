@@ -1,20 +1,27 @@
 import { AppStore } from './store'
 import * as images from './images'
-import { fetchTwitterHandle, postTweet } from './api-handlers'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
 
 type ListenerDependencies = {
   window: Window
-  api: Api
+  apiHandlers: ApiHandlers
   store: AppStore
   browser: typeof global.browser
   chrome: typeof global.chrome
-  handleCache: TwitterHandleCache
 }
 
-export function popupConnect({ api, store, browser, handleCache }: ListenerDependencies): void {
+export function popupConnect({ apiHandlers, store, browser }: ListenerDependencies): void {
   store.on('popupConnect', state => {
+    // We open a separate tab that the user authenticates with. So if they open the popup back up
+    // when they're in the authenticating state, we know they're not logged in yet
+    if (state.auth.state === 'authenticating') {
+      return store.dispatchers.detectLoginResult({
+        type: 'premature popupConnect',
+        result: { ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' },
+      })
+    }
+
     const target = ensureActiveTab(state)
     if (target.feedbackState.isTweeting) return
 
@@ -24,7 +31,7 @@ export function popupConnect({ api, store, browser, handleCache }: ListenerDepen
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        fetchTwitterHandle(api, tab.id, tab.domain, store.dispatchers, handleCache)
+        apiHandlers.fetchTwitterHandle(tab.id, tab.domain)
       }
     }
 
@@ -36,10 +43,10 @@ export function popupConnect({ api, store, browser, handleCache }: ListenerDepen
   })
 }
 
-export function clickLogout({ api, store, browser }: ListenerDependencies): void {
+export function clickLogout({ apiHandlers, store }: ListenerDependencies): void {
   store.on('clickLogout', state => {
     if (state.auth.state === 'not_authed') {
-      api.makeLogoutRequest()
+      apiHandlers.makeLogoutRequest()
     }
   })
 }
@@ -61,13 +68,13 @@ export function imageUpload({ store }: ListenerDependencies): void {
 
 export function onInstall({ window, store, chrome }: ListenerDependencies): void {
   store.on('onInstall', state => {
-    chrome.tabs.create({ url: `${window.roarServerUrl}/welcome`, active: true })
+    chrome.tabs.create({ url: `${ROAR_SERVER_URL}/welcome`, active: true })
   })
 }
 
 export function signInWithTwitter({ window, store, chrome }: ListenerDependencies): void {
   store.on('signInWithTwitter', state => {
-    chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
+    chrome.tabs.create({ url: `${ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
   })
 }
 
@@ -76,7 +83,7 @@ export function signInWithTwitter({ window, store, chrome }: ListenerDependencie
 // handle to have been fetched. While waiting an alert my fire or we may lose
 // the target (perhaps the tab closed). If that happens we say we are ready even
 // though we won't actually post the tweet.
-export function clickPost({ api, store, chrome }: ListenerDependencies): void {
+export function clickPost({ apiHandlers, store, chrome }: ListenerDependencies): void {
   store.on('clickPost', state => {
     const targetId = ensureActiveTab(state).id
 
@@ -92,7 +99,7 @@ export function clickPost({ api, store, chrome }: ListenerDependencies): void {
       .then(state => {
         const target = tabById(state, targetId)
         if (!state.alert && target) {
-          return postTweet(api, target, chrome, store.dispatchers)
+          return apiHandlers.postTweet(target)
         }
       })
       .catch(error => {

@@ -58,7 +58,7 @@ type CharacterLimit = {
 
 type User = { photoUrl: null | string }
 
-type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
+type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'detectLogin' } | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
@@ -130,7 +130,6 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'dismissAlert' }
   | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
   | { type: 'updateEditorState'; payload: { editorState: any } }
@@ -145,6 +144,11 @@ type UserAction =
   | { type: 'imageUpload'; payload: { file: File } }
 
 type BackgroundAction =
+  | { type: 'detectLoginStart' }
+  | {
+      type: 'detectLoginResult'
+      payload: { type: 'initial' | 'auth-success' | 'premature popupConnect'; result: FetchRoarResult<{ photoUrl: null | string }> }
+    }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
@@ -212,5 +216,12 @@ type Api = {
   postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>>
   getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>>
   getMe(): Promise<FetchRoarResult<User>>
+  makeLogoutRequest(): Promise<Response>
+}
+
+type ApiHandlers = {
+  postTweet(target: FeedbackTarget): Promise<any>
+  fetchTwitterHandle(tabId: number, domain: string): Promise<any>
+  detectLogin(type: 'initial' | 'auth-success'): Promise<void>
   makeLogoutRequest(): Promise<Response>
 }

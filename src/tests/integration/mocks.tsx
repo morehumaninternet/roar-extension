@@ -74,7 +74,6 @@ fetchMock.config.overwriteRoutes = true
 
 export function createMocks(): Mocks {
   const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
-  backgroundWindow.roarServerUrl = 'https://test-roar-server.com'
 
   // TODO: use dependency injection in the codebase to access these
   const backgroundWindowGlobals = {
@@ -148,7 +147,6 @@ export function createMocks(): Mocks {
   // ReactDOM needs a global window to work with
   const mountPopup = () => {
     popupWindow = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
-    popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
     const addEventListener = sinon.spy(popupWindow, 'addEventListener')
 

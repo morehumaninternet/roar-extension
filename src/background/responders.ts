@@ -87,7 +87,10 @@ export const responders: Responders<Action> = {
   onInstall(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
   },
-  detectLoginResult(state, result): Partial<StoreState> {
+  detectLoginStart(): Partial<StoreState> {
+    return { auth: { state: 'detectLogin' } }
+  },
+  detectLoginResult(state, { type, result }): Partial<StoreState> {
     if (result.ok) {
       return { auth: { state: 'authenticated', user: result.data } }
     }

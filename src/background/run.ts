@@ -12,7 +12,7 @@
 */
 import { AppStore, create } from './store'
 import * as listeners from './listeners'
-import { detectLogin } from './api-handlers'
+import { createHandlers } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
 import { createApi } from './api'
@@ -20,8 +20,8 @@ import { whenState } from '../redux-utils'
 import { onLogin } from '../copy'
 
 declare global {
+  var ROAR_SERVER_URL: string
   interface Window {
-    roarServerUrl: string
     store: AppStore
   }
 }
@@ -36,16 +36,18 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   // Attach the store to the window so the popup can access it see src/popup/mount.tsx
   const store = (backgroundWindow.store = create())
 
+  const apiHandlers = createHandlers(api, handleCache, chrome, store.dispatchers)
+
   // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.values(listeners)) {
-    listener({ window: backgroundWindow, api, store, browser, chrome, handleCache })
+    listener({ window: backgroundWindow, apiHandlers, store, browser, chrome })
   }
 
   // Monitor tabs & windows, dispatching relevant information to the store
   monitorTabs(store.dispatchers, chrome)
 
   // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
-  detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
+  apiHandlers.detectLogin('initial')
 
   // When the extension is first installed, open the /welcome page
   chrome.runtime.onInstalled.addListener(details => {
@@ -54,18 +56,19 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
   chrome.webNavigation.onCommitted.addListener(details => {
-    if (details.url === `${window.roarServerUrl}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
+    if (details.url === `${ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
       chrome.tabs.remove(details.tabId)
-      detectLogin(api, store.dispatchers)
-      whenState(store, ({ auth }) => auth.state === 'authenticated').then(() => {
-        const notificationId = 'logged-in'
-        chrome.notifications.create(notificationId, {
-          type: 'basic',
-          iconUrl: '/img/roar_128.png',
-          ...onLogin,
+      apiHandlers.detectLogin('auth-success')
+      whenState(store, ({ auth }) => auth.state === 'authenticated')
+        .then(() => {
+          const notificationId = 'logged-in'
+          chrome.notifications.create(notificationId, {
+            type: 'basic',
+            iconUrl: '/img/roar_128.png',
+            ...onLogin,
+          })
         })
-        setTimeout(() => chrome.notifications.clear(notificationId), 5000)
-      })
+        .catch(console.error)
     }
   })
 }
