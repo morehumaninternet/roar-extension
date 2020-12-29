@@ -1,10 +1,12 @@
 import { Store, createStore } from 'redux'
 import { newStoreState } from './state'
 import { responders } from './responders'
+import { whenState } from '../redux-utils'
 
 export type AppStore = Store<StoreState, Action> & {
   dispatchers: Dispatchers<Action>
   on<T extends Action['type']>(type: T, callback: (nextState: StoreState & { mostRecentAction: Action & { type: T } }) => void): () => void
+  whenState(predicate: (state: StoreState) => boolean, timeoutMillis?: number): Promise<StoreState>
 }
 
 function reducer(state: StoreState, action: Action): StoreState {
@@ -58,6 +60,8 @@ export function create(): AppStore {
       }
     })
   }
+
+  store.whenState = (callback, timeoutMillis) => whenState(store, callback, timeoutMillis)
 
   return store
 }

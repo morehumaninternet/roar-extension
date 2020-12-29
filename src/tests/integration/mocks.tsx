@@ -45,7 +45,6 @@ import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
 import { mount } from '../../popup/mount'
-import { whenState } from '../../redux-utils'
 
 type MockBrowser = typeof global.browser & {
   tabs: {
@@ -196,17 +195,13 @@ export function createMocks(): Mocks {
   return {
     mount: mountPopup,
     backgroundWindow,
-    popupWindow(): DOMWindow {
-      return popupWindow
-    },
+    popupWindow: () => popupWindow,
     browser,
     chrome,
     app,
     getState,
     resolveLatestCaptureVisibleTab,
     rejectLatestCaptureVisibleTab,
-    whenState(cb): Promise<StoreState> {
-      return whenState(backgroundWindow.store, cb)
-    },
+    whenState: cb => backgroundWindow.store.whenState(cb),
   }
 }

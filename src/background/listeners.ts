@@ -1,5 +1,4 @@
 import { AppStore } from './store'
-import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
 import { maxApiRequestMilliseconds } from './settings'
 import { onLogin } from '../copy'
@@ -75,7 +74,8 @@ export function createListeners({ apiHandlers, store, images, chrome }: Listener
         return imagesReady && twitterHandleReady
       }
 
-      whenState(store, ready, maxApiRequestMilliseconds)
+      store
+        .whenState(ready, maxApiRequestMilliseconds)
         .then(state => {
           const target = tabById(state, targetId)
           if (!state.alert && target) {
@@ -92,7 +92,8 @@ export function createListeners({ apiHandlers, store, images, chrome }: Listener
     authSuccess: ({ mostRecentAction }) => {
       chrome.tabs.remove(mostRecentAction.payload.tabId)
       apiHandlers.detectLogin()
-      whenState(store, ({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
+      store
+        .whenState(({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
         .then(state => {
           if (state.auth.state === 'authenticated') {
             chrome.notifications.create({
