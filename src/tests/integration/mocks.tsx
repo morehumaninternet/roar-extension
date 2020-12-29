@@ -17,8 +17,8 @@
   you to mount/open the popup twice. The first time you are not_authed and will be asked to sign
   in. Clicking that button will create a separate tab outside the popup where you'll log in,
   which also closes the popupWindow (a behavior we code up here as part of the callsFake of
-  popupWindow.close). Then after logging in, the user mounts the popup again. This time, the call
-  to detectLogin determines that the user is logged in and transitions the user to an
+  popupWindow.close). Then after logging in, we detect a redirect to the auth-success page where
+  another detectLogin call determines that the user is logged in and transitions the user to an
   authenticated state.
 
   The globally available browser and chrome objects are mocked here as well. For browser we only

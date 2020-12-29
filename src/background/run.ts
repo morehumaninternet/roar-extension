@@ -16,9 +16,6 @@ import { createHandlers } from './api-handlers'
 import { monitorChrome } from './monitorChrome'
 import { createHandleCache } from './handle-cache'
 import { createApi } from './api'
-import { whenState } from '../redux-utils'
-import { onLogin } from '../copy'
-import { maxApiRequestMilliseconds } from './settings'
 import { createImages } from './images'
 
 declare global {
@@ -48,9 +45,10 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
     store.on(listener, listeners[listener]!)
   }
 
-  // Monitor tabs & windows, dispatching relevant information to the store
+  // Monitor various events managed by the chrome API, dispatching relevant information to the store
+  // see https://developer.chrome.com/docs/extensions/reference/
   monitorChrome(store.dispatchers, chrome)
 
-  // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
+  // When a chrome window is created, detect whether the user is already logged in
   apiHandlers.detectLogin()
 }
