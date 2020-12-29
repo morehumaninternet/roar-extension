@@ -11,7 +11,7 @@
   for various events including changes to tabs/windows and dispatches them to the store.
 */
 import { AppStore, create } from './store'
-import * as listeners from './listeners'
+import { createListeners } from './listeners'
 import { createHandlers } from './api-handlers'
 import { monitorTabs } from './monitorTabs'
 import { createHandleCache } from './handle-cache'
@@ -41,9 +41,11 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   const images = createImages(browser.tabs, store.dispatchers)
 
+  const listeners = createListeners({ apiHandlers, store, images, createTab: chrome.tabs.create })
+
   // Add a subscription for each listener, passing dependencies to each
-  for (const listener of Object.values(listeners)) {
-    listener({ apiHandlers, store, images, createTab: chrome.tabs.create })
+  for (const listener of Object.keys(listeners) as ReadonlyArray<Action['type']>) {
+    store.on(listener, listeners[listener]!)
   }
 
   // Monitor tabs & windows, dispatching relevant information to the store

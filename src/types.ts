@@ -5,7 +5,10 @@
 declare module NodeJS {
   interface Global {
     ROAR_SERVER_URL: string
-    CONSOLE_ERROR(error: any): void
+  }
+
+  interface Global {
+    CONSOLE_ERROR: (error: any) => void
   }
 }
 
@@ -185,6 +188,12 @@ type Dispatcher<A extends Action, T extends A['type']> = A extends { type: T; pa
 
 type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
+}
+
+type Listener<A extends Action, T extends A['type']> = (state: StoreState & { mostRecentAction: A & { type: T } }) => void
+
+type Listeners<A extends Action> = {
+  [T in A['type']]?: Listener<A, T>
 }
 
 type TwitterHandleCache = {
