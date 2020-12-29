@@ -7,12 +7,6 @@ import { onLogin } from '../copy'
 
 export const listeners: Listeners<Action> = {
   popupConnect: state => {
-    // We open a separate tab that the user authenticates with. So if they open the popup back up
-    // when they're in the authenticating state, we know they're not logged in yet
-    if (state.auth.state === 'authenticating') {
-      dispatch('detectLoginResult', { ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' })
-    }
-
     const target = ensureActiveTab(state)
     if (target.feedbackState.isTweeting) return
 

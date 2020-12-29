@@ -72,10 +72,10 @@ export const responders: Responders<Action> = {
     return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   signInWithTwitter(): Partial<StoreState> {
-    return { auth: { state: 'authenticating' } }
+    return {}
   },
   onInstall(): Partial<StoreState> {
-    return { auth: { state: 'authenticating' } }
+    return {}
   },
   authSuccess(): Partial<StoreState> {
     return {}

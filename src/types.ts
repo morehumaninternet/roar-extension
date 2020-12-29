@@ -72,9 +72,6 @@ type User = { photoUrl: null | string }
 type Auth =
   // The user is not authed and not actively authenticating.
   | { state: 'not_authed' }
-  // The user is not authed, but authenticating outside the popup window.
-  // If they open the popup again before detectLogin is called they are transitioned to a not_authed state
-  | { state: 'authenticating' }
   // The user may or may not be authenticated.
   // We enter this state either because chrome is booting up, in which case we may still have an active
   // cookie or because we detected a redirect to the /auth-success page
