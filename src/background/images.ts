@@ -1,5 +1,5 @@
 import { domainOf } from './domain'
-import { getDispatcher } from './store'
+import { dispatch } from './store'
 
 function dataURItoBlob(dataURI: string): Blob {
   // convert base64 to raw binary data held in a string
@@ -33,7 +33,7 @@ function readFileUri(file: File): Promise<string> {
 
 export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
   try {
-    getDispatcher('imageCaptureStart')({ targetId: target.id })
+    dispatch('imageCaptureStart', { targetId: target.id })
     const tab = target
     const gettingTab = browser.tabs.get(tab.id)
     const screenshotUri = await browser.tabs.captureVisibleTab({ format: 'png' } as any)
@@ -41,7 +41,7 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const domain = domainOf(tab.url)
-    getDispatcher('imageCaptureSuccess')({
+    dispatch('imageCaptureSuccess', {
       image: {
         type: 'screenshot',
         tab: {
@@ -58,7 +58,7 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
     })
   } catch (error) {
     global.CONSOLE_ERROR(error)
-    getDispatcher('imageCaptureFailure')({
+    dispatch('imageCaptureFailure', {
       targetId: target.id,
       failure: {
         reason: 'unknown',
@@ -70,10 +70,10 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
 
 export async function imageUpload(targetId: FeedbackTargetId, file: File): Promise<void> {
   try {
-    getDispatcher('imageCaptureStart')({ targetId })
+    dispatch('imageCaptureStart', { targetId })
     const fiveMegabytes = 5 * Math.pow(2, 20)
     if (file.size > fiveMegabytes) {
-      return getDispatcher('imageCaptureFailure')({
+      return dispatch('imageCaptureFailure', {
         targetId,
         failure: {
           reason: 'file size limit exceeded',
@@ -84,13 +84,13 @@ export async function imageUpload(targetId: FeedbackTargetId, file: File): Promi
     const uri = await readFileUri(file)
     const blob = dataURItoBlob(uri)
 
-    getDispatcher('imageCaptureSuccess')({
+    dispatch('imageCaptureSuccess', {
       targetId,
       image: { type: 'imageupload', name: file.name, uri, blob },
     })
   } catch (error) {
     global.CONSOLE_ERROR(error)
-    getDispatcher('imageCaptureFailure')({
+    dispatch('imageCaptureFailure', {
       targetId,
       failure: {
         reason: 'unknown',

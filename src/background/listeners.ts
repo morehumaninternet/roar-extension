@@ -1,4 +1,4 @@
-import { getStore } from './store'
+import { dispatch, whenState } from './store'
 import { ensureActiveTab, tabById } from '../selectors'
 import * as apiHandlers from './api-handlers'
 import * as images from './images'
@@ -10,7 +10,7 @@ export const listeners: Listeners<Action> = {
     // We open a separate tab that the user authenticates with. So if they open the popup back up
     // when they're in the authenticating state, we know they're not logged in yet
     if (state.auth.state === 'authenticating') {
-      getStore().dispatchers.detectLoginResult({ ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' })
+      dispatch('detectLoginResult', { ok: false, reason: 'unauthorized', details: 'Opened popup before logging in' })
     }
 
     const target = ensureActiveTab(state)
@@ -29,7 +29,7 @@ export const listeners: Listeners<Action> = {
     // Take an automatic screenshot if we didn't take one before
     if (target.feedbackState.takeAutoSnapshot) {
       images.takeScreenshot(target)
-      getStore().dispatchers.disableAutoSnapshot({ targetId: target.id })
+      dispatch('disableAutoSnapshot', { targetId: target.id })
     }
   },
   clickLogout: state => {
@@ -68,8 +68,7 @@ export const listeners: Listeners<Action> = {
       return imagesReady && twitterHandleReady
     }
 
-    getStore()
-      .whenState(ready, maxApiRequestMilliseconds)
+    whenState(ready, maxApiRequestMilliseconds)
       .then(state => {
         const target = tabById(state, targetId)
         if (!state.alert && target) {
@@ -78,7 +77,7 @@ export const listeners: Listeners<Action> = {
       })
       .catch(error => {
         if (error.message === 'timeout') {
-          getStore().dispatchers.postTweetFailure({ targetId, failure: { reason: 'timeout' } })
+          dispatch('postTweetFailure', { targetId, failure: { reason: 'timeout' } })
         }
       })
   },
@@ -86,8 +85,7 @@ export const listeners: Listeners<Action> = {
   authSuccess: ({ mostRecentAction }) => {
     chrome.tabs.remove(mostRecentAction.payload.tabId)
     apiHandlers.detectLogin()
-    getStore()
-      .whenState(({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
+    whenState(({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
       .then(state => {
         if (state.auth.state === 'authenticated') {
           chrome.notifications.create({

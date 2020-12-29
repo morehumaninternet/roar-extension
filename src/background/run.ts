@@ -32,7 +32,7 @@ export function run(backgroundWindow: Window): void {
 
   // Monitor various events managed by the chrome API, dispatching relevant information to the store
   // see https://developer.chrome.com/docs/extensions/reference/
-  monitorChrome(store.dispatchers, chrome)
+  monitorChrome()
 
   // When a chrome window is created, detect whether the user is already logged in
   apiHandlers.detectLogin()
