@@ -19,10 +19,9 @@ import { createApi } from './api'
 import { whenState } from '../redux-utils'
 import { onLogin } from '../copy'
 import { maxApiRequestMilliseconds } from './settings'
+import { createImages } from './images'
 
 declare global {
-  var ROAR_SERVER_URL: string
-  var CONSOLE_ERROR: (error: any) => void
   interface Window {
     store: AppStore
   }
@@ -40,9 +39,11 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   const apiHandlers = createHandlers(api, handleCache, chrome, store.dispatchers)
 
+  const images = createImages(browser.tabs, store.dispatchers)
+
   // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.values(listeners)) {
-    listener({ window: backgroundWindow, apiHandlers, store, browser, chrome })
+    listener({ apiHandlers, store, images, createTab: chrome.tabs.create })
   }
 
   // Monitor tabs & windows, dispatching relevant information to the store
@@ -58,7 +59,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
   chrome.webNavigation.onCommitted.addListener(details => {
-    if (details.url === `${ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
+    if (details.url === `${global.ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
       chrome.tabs.remove(details.tabId)
       apiHandlers.detectLogin()
       whenState(store, ({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1).then(state => {

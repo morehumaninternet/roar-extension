@@ -1,18 +1,16 @@
 import { AppStore } from './store'
-import * as images from './images'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
 import { maxApiRequestMilliseconds } from './settings'
 
 type ListenerDependencies = {
-  window: Window
   apiHandlers: ApiHandlers
   store: AppStore
-  browser: typeof global.browser
-  chrome: typeof global.chrome
+  images: Images
+  createTab: typeof chrome.tabs.create
 }
 
-export function popupConnect({ apiHandlers, store, browser }: ListenerDependencies): void {
+export function popupConnect({ apiHandlers, store, images }: ListenerDependencies): void {
   store.on('popupConnect', state => {
     // We open a separate tab that the user authenticates with. So if they open the popup back up
     // when they're in the authenticating state, we know they're not logged in yet
@@ -35,7 +33,7 @@ export function popupConnect({ apiHandlers, store, browser }: ListenerDependenci
 
     // Take an automatic screenshot if we didn't take one before
     if (target.feedbackState.takeAutoSnapshot) {
-      images.takeScreenshot(target, browser.tabs, store.dispatchers)
+      images.takeScreenshot(target)
       store.dispatchers.disableAutoSnapshot({ targetId: target.id })
     }
   })
@@ -49,30 +47,30 @@ export function clickLogout({ apiHandlers, store }: ListenerDependencies): void 
   })
 }
 
-export function clickTakeScreenshot({ store, browser }: ListenerDependencies): void {
+export function clickTakeScreenshot({ store, images }: ListenerDependencies): void {
   store.on('clickTakeScreenshot', state => {
     const target = ensureActiveTab(state)
-    images.takeScreenshot(target, browser.tabs, store.dispatchers)
+    images.takeScreenshot(target)
   })
 }
 
-export function imageUpload({ store }: ListenerDependencies): void {
+export function imageUpload({ store, images }: ListenerDependencies): void {
   store.on('imageUpload', state => {
     const target = ensureActiveTab(state)
     const { file } = state.mostRecentAction.payload
-    images.imageUpload(target.id, file, store.dispatchers)
+    images.imageUpload(target.id, file)
   })
 }
 
-export function onInstall({ window, store, chrome }: ListenerDependencies): void {
+export function onInstall({ store, createTab }: ListenerDependencies): void {
   store.on('onInstall', state => {
-    chrome.tabs.create({ url: `${ROAR_SERVER_URL}/welcome`, active: true })
+    createTab({ url: `${global.ROAR_SERVER_URL}/welcome`, active: true })
   })
 }
 
-export function signInWithTwitter({ window, store, chrome }: ListenerDependencies): void {
+export function signInWithTwitter({ store, createTab }: ListenerDependencies): void {
   store.on('signInWithTwitter', state => {
-    chrome.tabs.create({ url: `${ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
+    createTab({ url: `${global.ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
   })
 }
 
@@ -81,7 +79,7 @@ export function signInWithTwitter({ window, store, chrome }: ListenerDependencie
 // handle to have been fetched. While waiting an alert my fire or we may lose
 // the target (perhaps the tab closed). If that happens we say we are ready even
 // though we won't actually post the tweet.
-export function clickPost({ apiHandlers, store, chrome }: ListenerDependencies): void {
+export function clickPost({ apiHandlers, store }: ListenerDependencies): void {
   store.on('clickPost', state => {
     const targetId = ensureActiveTab(state).id
 

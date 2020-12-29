@@ -142,7 +142,7 @@ export function createMocks(): Mocks {
     teardownPopupWindow()
     teardownBackgroundWindow()
     sinon.restore()
-    const logError: sinon.SinonStub = CONSOLE_ERROR as any
+    const logError: sinon.SinonStub = global.CONSOLE_ERROR as any
     logError.reset()
   }
 

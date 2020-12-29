@@ -5,7 +5,7 @@ export function createApi(window: any): Api {
   async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
     try {
       const controller = new window.AbortController()
-      const promisedResponse = fetch(`${ROAR_SERVER_URL}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
+      const promisedResponse = fetch(`${global.ROAR_SERVER_URL}/${path}`, { credentials: 'include', signal: controller.signal, ...init })
 
       controller.signal.addEventListener('abort', () => controller.abort())
       const timeout = setTimeout(() => controller.abort(), maxApiRequestMilliseconds)
@@ -48,7 +48,7 @@ export function createApi(window: any): Api {
       if (error.name === 'AbortError') {
         return { ok: false, reason: 'timeout', details: error.message }
       } else {
-        CONSOLE_ERROR(error)
+        global.CONSOLE_ERROR(error)
         return { ok: false, reason: 'network down', details: error.message }
       }
     }
@@ -77,7 +77,7 @@ export function createApi(window: any): Api {
   }
 
   function makeLogoutRequest(): Promise<Response> {
-    return fetch(`${ROAR_SERVER_URL}/v1/logout`, {
+    return fetch(`${global.ROAR_SERVER_URL}/v1/logout`, {
       method: 'POST',
       credentials: 'include',
     })

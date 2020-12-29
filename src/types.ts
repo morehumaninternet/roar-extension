@@ -1,6 +1,14 @@
 /// <reference path="../node_modules/@types/draft-js/index.d.ts" />
 /// <reference path="../node_modules/immutable/dist/immutable.d.ts" />
 
+// Declare variables that are passed in via rollup.config.js
+declare module NodeJS {
+  interface Global {
+    ROAR_SERVER_URL: string
+    CONSOLE_ERROR(error: any): void
+  }
+}
+
 type Maybe<T> = T | null | undefined
 
 type Screenshot = {
@@ -221,4 +229,9 @@ type ApiHandlers = {
   fetchTwitterHandle(tabId: number, domain: string): Promise<any>
   detectLogin(): Promise<void>
   makeLogoutRequest(): Promise<Response>
+}
+
+type Images = {
+  takeScreenshot(target: FeedbackTarget): Promise<void>
+  imageUpload(targetId: FeedbackTargetId, file: File): Promise<void>
 }
