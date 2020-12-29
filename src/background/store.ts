@@ -34,7 +34,7 @@ function reducer(state: StoreState, action: Action): StoreState {
 
 // Save a reference to a singleton store.
 // The actual extension will only ever have one, but these will be created anew during integration tests.
-let store: AppStore
+let store: AppStore // tslint:disable-line:no-let
 
 export function create(): AppStore {
   store = createStore(reducer, newStoreState())
@@ -67,10 +67,6 @@ export function create(): AppStore {
 
   store.whenState = (callback, timeoutMillis) => reduxUtils.whenState(store, callback, timeoutMillis)
 
-  return store
-}
-
-export function getStore(): AppStore {
   return store
 }
 
