@@ -3,12 +3,10 @@ import { FeedbackEditor } from '../components/feedback-editor'
 import { Images } from '../components/images'
 import { ActionBar } from '../components/action-bar'
 import { EmojiPicker } from '../components/emoji-picker'
-import { Tweeting } from '../components/tweeting'
 import { UserAvatar } from '../components/user-avatar'
 
 export function Authenticated({
   feedback,
-  tweeting,
   user,
   pickingEmoji,
   darkModeOn,
@@ -17,10 +15,6 @@ export function Authenticated({
   characterLimit,
   postTweetDisabled,
 }: AuthenticatedState): JSX.Element | null {
-  if (tweeting) {
-    return <Tweeting at={tweeting.at} />
-  }
-
   if (!feedback) {
     return null
   }
@@ -51,6 +45,7 @@ export function Authenticated({
             imageUpload={dispatchUserActions.imageUpload}
             characterLimit={characterLimit}
             postTweetDisabled={postTweetDisabled}
+            isTweeting={feedback.isTweeting}
           />
         </div>
       </main>

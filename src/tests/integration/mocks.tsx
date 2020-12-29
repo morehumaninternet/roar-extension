@@ -158,6 +158,9 @@ export function createMocks(): Mocks {
 
   // ReactDOM needs a global window to work with
   const mountPopup = () => {
+    if (popupWindow) {
+      throw new Error('Must wait for teardown of previous popupWindow')
+    }
     popupWindow = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
 
     const addEventListener = sinon.spy(popupWindow, 'addEventListener')
@@ -180,6 +183,11 @@ export function createMocks(): Mocks {
       const unloadListener = addEventListener.getCalls().find(({ args: [eventName] }) => eventName === 'unload')!
       const [, unloadCallback] = unloadListener.args
       unloadCallback()
+
+      // If the popupWindow was not closed, render a blank div into the app-container
+      // before removing globals to trigger any cleanup from the React components themselves
+      ReactDOM.render(<div />, popupWindow.document.getElementById('app-container'))
+
       // Call the actual window.close function
       close()
 
@@ -188,9 +196,8 @@ export function createMocks(): Mocks {
         Uncaught Error: Should not already be working.
           at performSyncWorkOnRoot (node_modules/react-dom/cjs/react-dom.development.js:22265:13)
 
-        I'm guessing that JSDOM's window.close does some things on the next tick of the event loop itself,
-        so we wait for that to finish before tearing everything down ourselves. Since we'll never mount and
-        close several popup windows all at once, this is fine.
+        I'm guessing that some components we rely on clean up on the next tick of the event loop, so we wait for that
+        to complete here
       */
       process.nextTick(teardownPopupWindow)
     })
