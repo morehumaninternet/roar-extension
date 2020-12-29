@@ -1,4 +1,5 @@
 import { domainOf } from './domain'
+import { dispatch } from './store'
 
 function dataURItoBlob(dataURI: string): Blob {
   // convert base64 to raw binary data held in a string
@@ -21,21 +22,26 @@ function dataURItoBlob(dataURI: string): Blob {
   return new Blob([ab], { type: mimeString })
 }
 
-export async function takeScreenshot(
-  target: FeedbackTarget,
-  tabs: typeof browser.tabs,
-  dispatchBackgroundActions: Dispatchers<BackgroundAction>
-): Promise<void> {
+function readFileUri(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
   try {
-    dispatchBackgroundActions.imageCaptureStart({ targetId: target.id })
+    dispatch('imageCaptureStart', { targetId: target.id })
     const tab = target
-    const gettingTab = tabs.get(tab.id)
-    const screenshotUri = await tabs.captureVisibleTab({ format: 'png' } as any)
+    const gettingTab = browser.tabs.get(tab.id)
+    const screenshotUri = await browser.tabs.captureVisibleTab({ format: 'png' } as any)
     const moreTabInfo = await gettingTab
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
     const domain = domainOf(tab.url)
-    dispatchBackgroundActions.imageCaptureSuccess({
+    dispatch('imageCaptureSuccess', {
       image: {
         type: 'screenshot',
         tab: {
@@ -51,8 +57,8 @@ export async function takeScreenshot(
       targetId: tab.id,
     })
   } catch (error) {
-    console.error(error)
-    dispatchBackgroundActions.imageCaptureFailure({
+    global.CONSOLE_ERROR(error)
+    dispatch('imageCaptureFailure', {
       targetId: target.id,
       failure: {
         reason: 'unknown',
@@ -62,21 +68,12 @@ export async function takeScreenshot(
   }
 }
 
-function readFileUri(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result))
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
-export async function imageUpload(targetId: FeedbackTargetId, file: File, dispatchBackgroundActions: Dispatchers<BackgroundAction>): Promise<void> {
+export async function imageUpload(targetId: FeedbackTargetId, file: File): Promise<void> {
   try {
-    dispatchBackgroundActions.imageCaptureStart({ targetId })
+    dispatch('imageCaptureStart', { targetId })
     const fiveMegabytes = 5 * Math.pow(2, 20)
     if (file.size > fiveMegabytes) {
-      return dispatchBackgroundActions.imageCaptureFailure({
+      return dispatch('imageCaptureFailure', {
         targetId,
         failure: {
           reason: 'file size limit exceeded',
@@ -87,13 +84,13 @@ export async function imageUpload(targetId: FeedbackTargetId, file: File, dispat
     const uri = await readFileUri(file)
     const blob = dataURItoBlob(uri)
 
-    dispatchBackgroundActions.imageCaptureSuccess({
+    dispatch('imageCaptureSuccess', {
       targetId,
       image: { type: 'imageupload', name: file.name, uri, blob },
     })
   } catch (error) {
-    console.error(error)
-    dispatchBackgroundActions.imageCaptureFailure({
+    global.CONSOLE_ERROR(error)
+    dispatch('imageCaptureFailure', {
       targetId,
       failure: {
         reason: 'unknown',

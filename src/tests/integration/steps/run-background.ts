@@ -46,7 +46,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
     })
 
     before(() => {
-      run(mocks.backgroundWindow as any, mocks.browser, mocks.chrome as any, mocks.backgroundWindow.navigator)
+      run(mocks.backgroundWindow as any)
       // Throw an error if ever a Failure event is dispatched
       unsubscribe = mocks.backgroundWindow.store.subscribe(() => {
         if (opts.allowActionFailure) return

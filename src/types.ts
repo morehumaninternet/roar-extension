@@ -1,6 +1,17 @@
 /// <reference path="../node_modules/@types/draft-js/index.d.ts" />
 /// <reference path="../node_modules/immutable/dist/immutable.d.ts" />
 
+// Declare variables that are passed in via rollup.config.js
+declare module NodeJS {
+  interface Global {
+    ROAR_SERVER_URL: string
+  }
+
+  interface Global {
+    CONSOLE_ERROR: (error: any) => void
+  }
+}
+
 type Maybe<T> = T | null | undefined
 
 type Screenshot = {
@@ -58,7 +69,19 @@ type CharacterLimit = {
 
 type User = { photoUrl: null | string }
 
-type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'authenticated'; user: User }
+type Auth =
+  // The user is not authed and not actively authenticating.
+  | { state: 'not_authed' }
+  // The user may or may not be authenticated.
+  // We enter this state either because chrome is booting up, in which case we may still have an active
+  // cookie or because we detected a redirect to the /auth-success page
+  // Importantly if the user opens the popup while in this state we don't transition them into another
+  // state until we have a detectLoginResult, rendering a spinner in the Authenticating view in the meanwhile.
+  // In practice, we transition into this state while the popup isn't mounted so the user should generally be
+  // none the wiser.
+  | { state: 'detectLogin' }
+  // The user is authenticated and we have their user data.
+  | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
@@ -130,7 +153,6 @@ type UserAction =
   | { type: 'popupConnect' }
   | { type: 'popupDisconnect' }
   | { type: 'signInWithTwitter' }
-  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'dismissAlert' }
   | { type: 'hoverOver'; payload: { hovering: Partial<FeedbackState['hovering']> } }
   | { type: 'updateEditorState'; payload: { editorState: any } }
@@ -145,6 +167,9 @@ type UserAction =
   | { type: 'imageUpload'; payload: { file: File } }
 
 type BackgroundAction =
+  | { type: 'authSuccess'; payload: { tabId: number } }
+  | { type: 'detectLoginStart' }
+  | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
   | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
@@ -178,6 +203,12 @@ type Dispatchers<A extends Action> = {
   [T in A['type']]: Dispatcher<A, T>
 }
 
+type Listener<A extends Action, T extends A['type']> = (state: StoreState & { mostRecentAction: A & { type: T } }) => void
+
+type Listeners<A extends Action> = {
+  [T in A['type']]?: Listener<A, T>
+}
+
 type TwitterHandleCache = {
   get(domain: string): Promise<Maybe<string>>
   set(domain: string, handle: string): Promise<void>
@@ -205,12 +236,4 @@ type FeedbackResponseData = {
 type WebsiteResponseData = {
   domain: string
   twitter_handle: null | string
-}
-
-type Api = {
-  fetchRoar<T extends object>(path: string, init: RequestInit, decoder: any): Promise<FetchRoarResult<T>>
-  postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>>
-  getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>>
-  getMe(): Promise<FetchRoarResult<User>>
-  makeLogoutRequest(): Promise<Response>
 }

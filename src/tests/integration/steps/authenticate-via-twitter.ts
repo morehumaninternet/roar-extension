@@ -10,14 +10,48 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
   const description = opts.unauthorized ? 'unauthorized' : 'authorized'
 
   describe(`authentication via twitter (${description})`, () => {
+    let resolveResponse: () => void // tslint:disable-line:no-let
     before(() => {
       const response = opts.unauthorized ? { status: 401, body: 'Unauthorized' } : { status: 200, body: { photoUrl: 'https://some-image-url.com/123' } }
-      fetchMock.mock('https://test-roar-server.com/v1/me', response)
+      fetchMock.mock('https://test-roar-server.com/v1/me', new Promise(resolve => (resolveResponse = () => resolve(response))))
     })
 
-    it('makes a request to /v1/me to get the current user when the popup mounts again (after the user has logged in in the separate tab)', () => {
-      mocks.mount()
+    it('closes the tab that was redirected to the /auth-success page', async () => {
+      const tabIdToClose = 802
+      const [callback] = mocks.chrome.webNavigation.onCommitted.addListener.firstCall.args
+      expect(mocks.chrome.tabs.remove).to.have.callCount(0)
+      callback({
+        url: 'https://test-roar-server.com/auth-success',
+        transitionQualifiers: ['server_redirect'],
+        tabId: tabIdToClose,
+      })
+      expect(mocks.chrome.tabs.remove).to.have.been.calledOnceWithExactly(tabIdToClose)
     })
+
+    it('transitions to a detectLogin auth state', async () => {
+      expect(mocks.getState().auth.state).to.equal('detectLogin')
+    })
+
+    it('has launched no notification', () => {
+      expect(mocks.chrome.notifications.create).to.have.callCount(0)
+    })
+
+    it('transitions out of a detectLogin auth state when the response from the call to /v1/me has come back', async () => {
+      resolveResponse()
+      await mocks.whenState(({ auth }) => auth.state !== 'detectLogin')
+    })
+
+    if (!opts.unauthorized) {
+      it('launches a notification explaining the user is logged in', async () => {
+        expect(mocks.chrome.notifications.create).to.have.callCount(1)
+        const [notification] = mocks.chrome.notifications.create.firstCall.args
+        expect(notification).to.have.property('title', 'Successful login')
+      })
+    }
+  })
+
+  describe(`mounting the popup after authentication via twitter (${description})`, () => {
+    before(mocks.mount)
 
     if (opts.unauthorized) {
       it('goes back to the not-authed view', () => {

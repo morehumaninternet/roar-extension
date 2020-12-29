@@ -17,8 +17,8 @@
   you to mount/open the popup twice. The first time you are not_authed and will be asked to sign
   in. Clicking that button will create a separate tab outside the popup where you'll log in,
   which also closes the popupWindow (a behavior we code up here as part of the callsFake of
-  popupWindow.close). Then after logging in, the user mounts the popup again. This time, the call
-  to detectLogin determines that the user is logged in and transitions the user to an
+  popupWindow.close). Then after logging in, we detect a redirect to the auth-success page where
+  another detectLogin call determines that the user is logged in and transitions the user to an
   authenticated state.
 
   The globally available browser and chrome objects are mocked here as well. For browser we only
@@ -45,7 +45,6 @@ import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
 import { mount } from '../../popup/mount'
-import { whenState } from '../../redux-utils'
 
 type MockBrowser = typeof global.browser & {
   tabs: {
@@ -67,24 +66,14 @@ export type Mocks = {
   rejectLatestCaptureVisibleTab(): void
 }
 
+let activeMocks = false
+
 const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: 'utf-8' })
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
 fetchMock.config.overwriteRoutes = true
 
 export function createMocks(): Mocks {
-  const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
-  backgroundWindow.roarServerUrl = 'https://test-roar-server.com'
-
-  // TODO: use dependency injection in the codebase to access these
-  const backgroundWindowGlobals = {
-    Blob: backgroundWindow.Blob,
-    FormData: backgroundWindow.FormData,
-  }
-
-  let popupWindow: any
-  let popupWindowGlobals
-
   const captureVisibleTabResolvers: any[] = []
   const captureVisibleTabRejecters: any[] = []
   const resolveLatestCaptureVisibleTab = () => {
@@ -108,7 +97,26 @@ export function createMocks(): Mocks {
     },
   } as any
 
+  const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
+
+  const backgroundWindowGlobals = {
+    chrome,
+    browser,
+    AbortController: backgroundWindow.AbortController,
+    Blob: backgroundWindow.Blob,
+    FormData: backgroundWindow.FormData,
+  }
+
+  let popupWindow: any
+  let popupWindowGlobals
+
   const setup = () => {
+    if (activeMocks) {
+      throw new Error(
+        'Cannot setup mocks as teardown of previous mocks is not complete.\nCheck that you called createMocks() within a top-level describe block.'
+      )
+    }
+    activeMocks = true
     Object.assign(global, backgroundWindowGlobals)
     chrome.tabs.create.callsFake(() => popupWindow?.close())
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
@@ -143,12 +151,14 @@ export function createMocks(): Mocks {
     teardownPopupWindow()
     teardownBackgroundWindow()
     sinon.restore()
+    const logError: sinon.SinonStub = global.CONSOLE_ERROR as any
+    logError.reset()
+    activeMocks = false
   }
 
   // ReactDOM needs a global window to work with
   const mountPopup = () => {
     popupWindow = new JSDOM(popupHTML, { url: 'https://should-not-appear.com' }).window
-    popupWindow.roarServerUrl = 'https://test-roar-server.com'
 
     const addEventListener = sinon.spy(popupWindow, 'addEventListener')
 
@@ -196,17 +206,13 @@ export function createMocks(): Mocks {
   return {
     mount: mountPopup,
     backgroundWindow,
-    popupWindow(): DOMWindow {
-      return popupWindow
-    },
+    popupWindow: () => popupWindow,
     browser,
     chrome,
     app,
     getState,
     resolveLatestCaptureVisibleTab,
     rejectLatestCaptureVisibleTab,
-    whenState(cb): Promise<StoreState> {
-      return whenState(backgroundWindow.store, cb)
-    },
+    whenState: cb => backgroundWindow.store.whenState(cb),
   }
 }

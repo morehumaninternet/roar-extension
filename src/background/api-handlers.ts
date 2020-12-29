@@ -1,3 +1,7 @@
+import * as api from './api'
+import * as handleCache from './handle-cache'
+import { dispatch } from './store'
+
 function tweetFormData(target: FeedbackTarget): FormData {
   const tweetData = new FormData()
 
@@ -11,45 +15,38 @@ function tweetFormData(target: FeedbackTarget): FormData {
   return tweetData
 }
 
-export const postTweet = async (api: Api, target: FeedbackTarget, chrome: typeof global.chrome, dispatchBackgroundActions: Dispatchers<BackgroundAction>) => {
+export async function postTweet(target: FeedbackTarget): Promise<void> {
   const targetId: FeedbackTargetId = target.id
-  dispatchBackgroundActions.postTweetStart({ targetId })
+  dispatch('postTweetStart', { targetId })
 
   const result = await api.postFeedback(tweetFormData(target))
   if (result.ok) {
     chrome.tabs.create({ url: result.data.url, active: true })
-    return dispatchBackgroundActions.postTweetSuccess({ targetId })
+    return dispatch('postTweetSuccess', { targetId })
   }
 
-  return dispatchBackgroundActions.postTweetFailure({ targetId, failure: result })
+  return dispatch('postTweetFailure', { targetId, failure: result })
 }
 
-export const fetchTwitterHandle = async (
-  api: Api,
-  tabId: number,
-  domain: string,
-  dispatchBackgroundActions: Dispatchers<BackgroundAction>,
-  handleCache: TwitterHandleCache
-) => {
-  dispatchBackgroundActions.fetchHandleStart({ tabId })
+export async function fetchTwitterHandle(tabId: number, domain: string): Promise<void> {
+  dispatch('fetchHandleStart', { tabId })
 
   const cachedHandle = await handleCache.get(domain)
-  if (cachedHandle) return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: cachedHandle })
+  if (cachedHandle) return dispatch('fetchHandleSuccess', { tabId, domain, handle: cachedHandle })
 
   // If we didn't find the handle in the cache, fetch the request from the server
   const result = await api.getWebsite(domain)
   if (result.ok) {
     if (result.data.twitter_handle) handleCache.set(domain, result.data.twitter_handle)
-    return dispatchBackgroundActions.fetchHandleSuccess({ tabId, domain, handle: result.data.twitter_handle })
+    return dispatch('fetchHandleSuccess', { tabId, domain, handle: result.data.twitter_handle })
   }
 
-  // TODO: handle different types of errors differently with a common function
-  return dispatchBackgroundActions.fetchHandleFailure({ tabId, domain, failure: result })
+  return dispatch('fetchHandleFailure', { tabId, domain, failure: result })
 }
 
-export async function detectLogin(api: Api, dispatchActions: Dispatchers<Action>, opts: { dispatchSuccessOnly?: boolean } = {}): Promise<void> {
-  const result = await api.getMe()
-  if (result.ok || !opts.dispatchSuccessOnly) {
-    dispatchActions.detectLoginResult(result)
-  }
+export async function detectLogin(): Promise<void> {
+  dispatch('detectLoginStart')
+  dispatch('detectLoginResult', await api.getMe())
 }
+
+export const makeLogoutRequest = api.makeLogoutRequest

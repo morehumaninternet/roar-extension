@@ -1,27 +1,12 @@
-import { AppStore } from './store'
-import * as images from './images'
-import { detectLogin, fetchTwitterHandle, postTweet } from './api-handlers'
-import { whenState } from '../redux-utils'
+import { dispatch, whenState } from './store'
 import { ensureActiveTab, tabById } from '../selectors'
+import * as apiHandlers from './api-handlers'
+import * as images from './images'
+import { maxApiRequestMilliseconds } from './settings'
+import { onLogin } from '../copy'
 
-type ListenerDependencies = {
-  window: Window
-  api: Api
-  store: AppStore
-  browser: typeof global.browser
-  chrome: typeof global.chrome
-  handleCache: TwitterHandleCache
-}
-
-export function popupConnect({ api, store, browser, handleCache }: ListenerDependencies): void {
-  store.on('popupConnect', state => {
-    // We open a separate tab that the user authenticates with. So if they open the popup back up
-    // when they're in the authenticating state, we detect if they're logged in and consider it a failure if they
-    // aren't logged in
-    if (state.auth.state === 'authenticating' || state.auth.state === 'not_authed') {
-      detectLogin(api, store.dispatchers)
-    }
-
+export const listeners: Listeners<Action> = {
+  popupConnect: state => {
     const target = ensureActiveTab(state)
     if (target.feedbackState.isTweeting) return
 
@@ -31,60 +16,42 @@ export function popupConnect({ api, store, browser, handleCache }: ListenerDepen
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        fetchTwitterHandle(api, tab.id, tab.domain, store.dispatchers, handleCache)
+        apiHandlers.fetchTwitterHandle(tab.id, tab.domain)
       }
     }
 
     // Take an automatic screenshot if we didn't take one before
     if (target.feedbackState.takeAutoSnapshot) {
-      images.takeScreenshot(target, browser.tabs, store.dispatchers)
-      store.dispatchers.disableAutoSnapshot({ targetId: target.id })
+      images.takeScreenshot(target)
+      dispatch('disableAutoSnapshot', { targetId: target.id })
     }
-  })
-}
-
-export function clickLogout({ api, store, browser }: ListenerDependencies): void {
-  store.on('clickLogout', state => {
+  },
+  clickLogout: state => {
     if (state.auth.state === 'not_authed') {
-      api.makeLogoutRequest()
+      apiHandlers.makeLogoutRequest()
     }
-  })
-}
-
-export function clickTakeScreenshot({ store, browser }: ListenerDependencies): void {
-  store.on('clickTakeScreenshot', state => {
+  },
+  clickTakeScreenshot: state => {
     const target = ensureActiveTab(state)
-    images.takeScreenshot(target, browser.tabs, store.dispatchers)
-  })
-}
-
-export function imageUpload({ store }: ListenerDependencies): void {
-  store.on('imageUpload', state => {
+    images.takeScreenshot(target)
+  },
+  imageUpload: state => {
     const target = ensureActiveTab(state)
     const { file } = state.mostRecentAction.payload
-    images.imageUpload(target.id, file, store.dispatchers)
-  })
-}
-
-export function onInstall({ window, store, chrome }: ListenerDependencies): void {
-  store.on('onInstall', state => {
-    chrome.tabs.create({ url: `${window.roarServerUrl}/welcome`, active: true })
-  })
-}
-
-export function signInWithTwitter({ window, store, chrome }: ListenerDependencies): void {
-  store.on('signInWithTwitter', state => {
-    chrome.tabs.create({ url: `${window.roarServerUrl}/v1/auth/twitter`, active: true })
-  })
-}
-
-// Even if the post button is clicked we may not be ready to tweet yet.
-// We have to wait for any in-flight images to be added and for the twitter
-// handle to have been fetched. While waiting an alert my fire or we may lose
-// the target (perhaps the tab closed). If that happens we say we are ready even
-// though we won't actually post the tweet.
-export function clickPost({ api, store, chrome }: ListenerDependencies): void {
-  store.on('clickPost', state => {
+    images.imageUpload(target.id, file)
+  },
+  onInstall: state => {
+    chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/welcome`, active: true })
+  },
+  signInWithTwitter: state => {
+    chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
+  },
+  // Even if the post button is clicked we may not be ready to tweet yet.
+  // We have to wait for any in-flight images to be added and for the twitter
+  // handle to have been fetched. While waiting an alert my fire or we may lose
+  // the target (perhaps the tab closed). If that happens we say we are ready even
+  // though we won't actually post the tweet.
+  clickPost: state => {
     const targetId = ensureActiveTab(state).id
 
     function ready(state: StoreState): boolean {
@@ -95,17 +62,33 @@ export function clickPost({ api, store, chrome }: ListenerDependencies): void {
       return imagesReady && twitterHandleReady
     }
 
-    whenState(store, ready, 30000)
+    whenState(ready, maxApiRequestMilliseconds)
       .then(state => {
         const target = tabById(state, targetId)
         if (!state.alert && target) {
-          return postTweet(api, target, chrome, store.dispatchers)
+          return apiHandlers.postTweet(target)
         }
       })
       .catch(error => {
         if (error.message === 'timeout') {
-          store.dispatchers.postTweetFailure({ targetId, failure: { reason: 'timeout' } })
+          dispatch('postTweetFailure', { targetId, failure: { reason: 'timeout' } })
         }
       })
-  })
+  },
+  // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
+  authSuccess: ({ mostRecentAction }) => {
+    chrome.tabs.remove(mostRecentAction.payload.tabId)
+    apiHandlers.detectLogin()
+    whenState(({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
+      .then(state => {
+        if (state.auth.state === 'authenticated') {
+          chrome.notifications.create({
+            type: 'basic',
+            iconUrl: '/img/roar_128.png',
+            ...onLogin,
+          })
+        }
+      })
+      .catch(global.CONSOLE_ERROR)
+  },
 }

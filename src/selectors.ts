@@ -53,7 +53,7 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         signInWithTwitter: dispatchUserActions.signInWithTwitter,
       }
     }
-    case 'authenticating': {
+    case 'detectLogin': {
       return {
         view: 'Authenticating',
       }

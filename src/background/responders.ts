@@ -31,16 +31,6 @@ function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdat
   return setTab(state, nextTarget)
 }
 
-function updateFeedbackByTargetId(
-  state: StoreState,
-  targetId: FeedbackTargetId,
-  callback: (target: FeedbackTarget) => Partial<FeedbackState>
-): Partial<StoreState> {
-  const target = tabById(state, targetId)
-  if (!target) return {}
-  return updateFeedback(state, target, callback(target))
-}
-
 function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
   const tab = state.tabs.get(tabId)
   if (!tab) return {}
@@ -82,10 +72,16 @@ export const responders: Responders<Action> = {
     return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   signInWithTwitter(): Partial<StoreState> {
-    return { auth: { state: 'authenticating' } }
+    return {}
   },
   onInstall(): Partial<StoreState> {
-    return { auth: { state: 'authenticating' } }
+    return {}
+  },
+  authSuccess(): Partial<StoreState> {
+    return {}
+  },
+  detectLoginStart(): Partial<StoreState> {
+    return { auth: { state: 'detectLogin' } }
   },
   detectLoginResult(state, result): Partial<StoreState> {
     if (result.ok) {
@@ -166,12 +162,12 @@ export const responders: Responders<Action> = {
     }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, target => ({
+    return updateTabFeedbackIfExists(state, targetId, target => ({
       addingImages: target.feedbackState.addingImages + 1,
     }))
   },
   imageCaptureSuccess(state, { targetId, image }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, target => ({
+    return updateTabFeedbackIfExists(state, targetId, target => ({
       addingImages: target.feedbackState.addingImages - 1,
       images: target.feedbackState.images.concat([image]),
     }))
@@ -181,13 +177,13 @@ export const responders: Responders<Action> = {
       failure.reason === 'file size limit exceeded' ? { message: failure.message } : { message: copy.alerts.standard, contactSupport: true }
     return {
       alert,
-      ...updateFeedbackByTargetId(state, targetId, target => ({
+      ...updateTabFeedbackIfExists(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
     }
   },
   postTweetStart(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
+    return updateTabFeedbackIfExists(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, targetId, tab => {
@@ -229,7 +225,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   disableAutoSnapshot(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, () => ({ takeAutoSnapshot: false }))
+    return updateTabFeedbackIfExists(state, targetId, () => ({ takeAutoSnapshot: false }))
   },
   'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
     const focusedWindow = windows.find(win => win.focused)

@@ -1,20 +1,26 @@
 // tslint:disable:no-let
 import { expect } from 'chai'
 import { range } from 'lodash'
-import { createHandleCache } from '../../background/handle-cache'
+import * as handleCache from '../../background/handle-cache'
 
 describe('handle-cache', () => {
-  it('only retains the latest 50 cached handles', async () => {
-    let localStorage = {}
-    const handleCache = createHandleCache({
+  let localStorage = {}
+  before(() => {
+    global.chrome = {
       storage: {
         local: {
           get: cb => cb(localStorage),
           set: updates => (localStorage = { ...localStorage, ...updates }),
         },
       },
-    } as any)
+    } as any
+  })
 
+  after(() => {
+    delete (global as any)['chrome']
+  })
+
+  it('only retains the latest 50 cached handles', async () => {
     for (const i of range(51)) {
       await handleCache.set(`domain-${i}`, `@${i}`)
     }

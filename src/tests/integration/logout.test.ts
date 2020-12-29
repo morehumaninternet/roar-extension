@@ -1,7 +1,6 @@
 import { createMocks } from './mocks'
 import { runBackground } from './steps/run-background'
 import { mountPopup } from './steps/mount-popup'
-import { whenState } from '../../redux-utils'
 import * as fetchMock from 'fetch-mock'
 
 describe('logout', () => {
@@ -18,7 +17,7 @@ describe('logout', () => {
     it('transitions to a not_authed state and makes a POST to v1/logout when clicked', async () => {
       const logoutButton = mocks.app().querySelector('.logout-btn')! as HTMLButtonElement
       logoutButton.click()
-      await whenState(mocks.backgroundWindow.store, state => state.auth.state === 'not_authed')
+      await mocks.whenState(state => state.auth.state === 'not_authed')
     })
   })
 })

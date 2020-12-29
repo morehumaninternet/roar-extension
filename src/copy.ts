@@ -8,3 +8,8 @@ export const alerts = {
 }
 
 export const fetchHandleFailure = (domain: string) => `We tried to fetch the twitter handle for ${domain} but something went wrong.`
+
+export const onLogin = {
+  title: 'Successful login',
+  message: "You're in! Click the icon to start giving feedback",
+}

@@ -11,42 +11,29 @@
   for various events including changes to tabs/windows and dispatches them to the store.
 */
 import { AppStore, create } from './store'
-import * as listeners from './listeners'
-import { detectLogin } from './api-handlers'
-import { monitorTabs } from './monitorTabs'
-import { createHandleCache } from './handle-cache'
-import { createApi } from './api'
+import { listeners } from './listeners'
+import * as apiHandlers from './api-handlers'
+import { monitorChrome } from './monitorChrome'
 
 declare global {
   interface Window {
-    roarServerUrl: string
     store: AppStore
   }
 }
 
-export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome, navigator: typeof window.navigator): void {
-  // Create an api object with functions to make API calls to the roar server
-  const api = createApi(backgroundWindow)
-
-  // Create an object with get/set functions to cache twitter handles, reducing the number of API calls
-  const handleCache = createHandleCache(chrome)
-
+export function run(backgroundWindow: Window): void {
   // Attach the store to the window so the popup can access it see src/popup/mount.tsx
   const store = (backgroundWindow.store = create())
 
   // Add a subscription for each listener, passing dependencies to each
-  for (const listener of Object.values(listeners)) {
-    listener({ window: backgroundWindow, api, store, browser, chrome, handleCache })
+  for (const listener of Object.keys(listeners) as ReadonlyArray<Action['type']>) {
+    store.on(listener, listeners[listener]!)
   }
 
-  // Monitor tabs & windows, dispatching relevant information to the store
-  monitorTabs(store.dispatchers, chrome)
+  // Monitor various events managed by the chrome API, dispatching relevant information to the store
+  // see https://developer.chrome.com/docs/extensions/reference/
+  monitorChrome()
 
-  // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
-  detectLogin(api, store.dispatchers, { dispatchSuccessOnly: true })
-
-  // When the extension is first installed, open the /welcome page
-  chrome.runtime.onInstalled.addListener(details => {
-    if (details.reason === 'install') store.dispatchers.onInstall()
-  })
+  // When a chrome window is created, detect whether the user is already logged in
+  apiHandlers.detectLogin()
 }
