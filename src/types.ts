@@ -69,7 +69,22 @@ type CharacterLimit = {
 
 type User = { photoUrl: null | string }
 
-type Auth = { state: 'not_authed' } | { state: 'authenticating' } | { state: 'detectLogin' } | { state: 'authenticated'; user: User }
+type Auth =
+  // The user is not authed and not actively authenticating.
+  | { state: 'not_authed' }
+  // The user is not authed, but authenticating outside the popup window.
+  // If they open the popup again before detectLogin is called they are transitioned to a not_authed state
+  | { state: 'authenticating' }
+  // The user may or may not be authenticated.
+  // We enter this state either because chrome is booting up, in which case we may still have an active
+  // cookie or because we detected a redirect to the /auth-success page
+  // Importantly if the user opens the popup while in this state we don't transition them into another
+  // state until we have a detectLoginResult, rendering a spinner in the Authenticating view in the meanwhile.
+  // In practice, we transition into this state while the popup isn't mounted so the user should generally be
+  // none the wiser.
+  | { state: 'detectLogin' }
+  // The user is authenticated and we have their user data.
+  | { state: 'authenticated'; user: User }
 
 type TabInfo = {
   feedbackTargetType: 'tab'
