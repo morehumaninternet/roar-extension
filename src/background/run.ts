@@ -13,7 +13,7 @@
 import { AppStore, create } from './store'
 import { createListeners } from './listeners'
 import { createHandlers } from './api-handlers'
-import { monitorTabs } from './monitorTabs'
+import { monitorChrome } from './monitorChrome'
 import { createHandleCache } from './handle-cache'
 import { createApi } from './api'
 import { whenState } from '../redux-utils'
@@ -41,7 +41,7 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
 
   const images = createImages(browser.tabs, store.dispatchers)
 
-  const listeners = createListeners({ apiHandlers, store, images, createTab: chrome.tabs.create })
+  const listeners = createListeners({ apiHandlers, store, images, chrome })
 
   // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.keys(listeners) as ReadonlyArray<Action['type']>) {
@@ -49,31 +49,8 @@ export function run(backgroundWindow: Window, browser: typeof global.browser, ch
   }
 
   // Monitor tabs & windows, dispatching relevant information to the store
-  monitorTabs(store.dispatchers, chrome)
+  monitorChrome(store.dispatchers, chrome)
 
   // When a chrome window is created, detect whether the user is already logged in, only changing the user's auth state on success
   apiHandlers.detectLogin()
-
-  // When the extension is first installed, open the /welcome page
-  chrome.runtime.onInstalled.addListener(details => {
-    if (details.reason === 'install') store.dispatchers.onInstall()
-  })
-
-  // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
-  chrome.webNavigation.onCommitted.addListener(details => {
-    if (details.url === `${global.ROAR_SERVER_URL}/auth-success` && details.transitionQualifiers.includes('server_redirect')) {
-      chrome.tabs.remove(details.tabId)
-      apiHandlers.detectLogin()
-      whenState(store, ({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1).then(state => {
-        if (state.auth.state === 'authenticated') {
-          const notificationId = 'logged-in'
-          chrome.notifications.create(notificationId, {
-            type: 'basic',
-            iconUrl: '/img/roar_128.png',
-            ...onLogin,
-          })
-        }
-      })
-    }
-  })
 }

@@ -44,9 +44,8 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
     if (!opts.unauthorized) {
       it('launches a notification explaining the user is logged in', async () => {
         expect(mocks.chrome.notifications.create).to.have.callCount(1)
-        const [notificationId, details] = mocks.chrome.notifications.create.firstCall.args
-        expect(notificationId).to.equal('logged-in')
-        expect(details).to.have.property('title', 'Successful login')
+        const [notification] = mocks.chrome.notifications.create.firstCall.args
+        expect(notification).to.have.property('title', 'Successful login')
       })
     }
   })

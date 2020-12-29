@@ -2,15 +2,16 @@ import { AppStore } from './store'
 import { whenState } from '../redux-utils'
 import { ensureActiveTab, tabById } from '../selectors'
 import { maxApiRequestMilliseconds } from './settings'
+import { onLogin } from '../copy'
 
 type ListenerDependencies = {
   apiHandlers: ApiHandlers
   store: AppStore
   images: Images
-  createTab: typeof chrome.tabs.create
+  chrome: typeof global.chrome
 }
 
-export function createListeners({ apiHandlers, store, images, createTab }: ListenerDependencies): Listeners<Action> {
+export function createListeners({ apiHandlers, store, images, chrome }: ListenerDependencies): Listeners<Action> {
   return {
     popupConnect: state => {
       // We open a separate tab that the user authenticates with. So if they open the popup back up
@@ -53,10 +54,10 @@ export function createListeners({ apiHandlers, store, images, createTab }: Liste
       images.imageUpload(target.id, file)
     },
     onInstall: state => {
-      createTab({ url: `${global.ROAR_SERVER_URL}/welcome`, active: true })
+      chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/welcome`, active: true })
     },
     signInWithTwitter: state => {
-      createTab({ url: `${global.ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
+      chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
     },
     // Even if the post button is clicked we may not be ready to tweet yet.
     // We have to wait for any in-flight images to be added and for the twitter
@@ -86,6 +87,22 @@ export function createListeners({ apiHandlers, store, images, createTab }: Liste
             store.dispatchers.postTweetFailure({ targetId, failure: { reason: 'timeout' } })
           }
         })
+    },
+    // When redirected to the /auth-success page, close the tab and detect whether the user is logged in, launching a notification if so
+    authSuccess: ({ mostRecentAction }) => {
+      chrome.tabs.remove(mostRecentAction.payload.tabId)
+      apiHandlers.detectLogin()
+      whenState(store, ({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
+        .then(state => {
+          if (state.auth.state === 'authenticated') {
+            chrome.notifications.create({
+              type: 'basic',
+              iconUrl: '/img/roar_128.png',
+              ...onLogin,
+            })
+          }
+        })
+        .catch(global.CONSOLE_ERROR)
     },
   }
 }

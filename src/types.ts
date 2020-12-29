@@ -155,6 +155,7 @@ type UserAction =
   | { type: 'imageUpload'; payload: { file: File } }
 
 type BackgroundAction =
+  | { type: 'authSuccess'; payload: { tabId: number } }
   | { type: 'detectLoginStart' }
   | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }

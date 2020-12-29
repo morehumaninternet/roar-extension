@@ -41,7 +41,7 @@ function updateFeedbackByTargetId(
   return updateFeedback(state, target, callback(target))
 }
 
-function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
+function updateTabIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
   const tab = state.tabs.get(tabId)
   if (!tab) return {}
   return updateFeedback(state, tab, callback(tab))
@@ -86,6 +86,9 @@ export const responders: Responders<Action> = {
   },
   onInstall(): Partial<StoreState> {
     return { auth: { state: 'authenticating' } }
+  },
+  authSuccess(): Partial<StoreState> {
+    return {}
   },
   detectLoginStart(): Partial<StoreState> {
     return { auth: { state: 'detectLogin' } }
@@ -135,12 +138,12 @@ export const responders: Responders<Action> = {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
   fetchHandleStart(state, { tabId }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => ({
+    return updateTabIfExists(state, tabId, tab => ({
       twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
     }))
   },
   fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => {
+    return updateTabIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return {
         editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
@@ -153,7 +156,7 @@ export const responders: Responders<Action> = {
     })
   },
   fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
+    const tabUpdates = updateTabIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
     })
@@ -193,7 +196,7 @@ export const responders: Responders<Action> = {
     return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, targetId, tab => {
+    return updateTabIfExists(state, targetId, tab => {
       const { handle } = tab.feedbackState.twitterHandle
       return {
         isTweeting: false,
