@@ -31,17 +31,7 @@ function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdat
   return setTab(state, nextTarget)
 }
 
-function updateFeedbackByTargetId(
-  state: StoreState,
-  targetId: FeedbackTargetId,
-  callback: (target: FeedbackTarget) => Partial<FeedbackState>
-): Partial<StoreState> {
-  const target = tabById(state, targetId)
-  if (!target) return {}
-  return updateFeedback(state, target, callback(target))
-}
-
-function updateTabIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
+function updateTabFeedbackIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<FeedbackState>): Partial<StoreState> {
   const tab = state.tabs.get(tabId)
   if (!tab) return {}
   return updateFeedback(state, tab, callback(tab))
@@ -138,12 +128,12 @@ export const responders: Responders<Action> = {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
   fetchHandleStart(state, { tabId }): Partial<StoreState> {
-    return updateTabIfExists(state, tabId, tab => ({
+    return updateTabFeedbackIfExists(state, tabId, tab => ({
       twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
     }))
   },
   fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
-    return updateTabIfExists(state, tabId, tab => {
+    return updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return {
         editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
@@ -156,7 +146,7 @@ export const responders: Responders<Action> = {
     })
   },
   fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    const tabUpdates = updateTabIfExists(state, tabId, tab => {
+    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
     })
@@ -172,12 +162,12 @@ export const responders: Responders<Action> = {
     }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, target => ({
+    return updateTabFeedbackIfExists(state, targetId, target => ({
       addingImages: target.feedbackState.addingImages + 1,
     }))
   },
   imageCaptureSuccess(state, { targetId, image }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, target => ({
+    return updateTabFeedbackIfExists(state, targetId, target => ({
       addingImages: target.feedbackState.addingImages - 1,
       images: target.feedbackState.images.concat([image]),
     }))
@@ -187,16 +177,16 @@ export const responders: Responders<Action> = {
       failure.reason === 'file size limit exceeded' ? { message: failure.message } : { message: copy.alerts.standard, contactSupport: true }
     return {
       alert,
-      ...updateFeedbackByTargetId(state, targetId, target => ({
+      ...updateTabFeedbackIfExists(state, targetId, target => ({
         addingImages: target.feedbackState.addingImages - 1,
       })),
     }
   },
   postTweetStart(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, () => ({ isTweeting: true }))
+    return updateTabFeedbackIfExists(state, targetId, () => ({ isTweeting: true }))
   },
   postTweetSuccess(state, { targetId }): Partial<StoreState> {
-    return updateTabIfExists(state, targetId, tab => {
+    return updateTabFeedbackIfExists(state, targetId, tab => {
       const { handle } = tab.feedbackState.twitterHandle
       return {
         isTweeting: false,
@@ -235,7 +225,7 @@ export const responders: Responders<Action> = {
     return {}
   },
   disableAutoSnapshot(state, { targetId }): Partial<StoreState> {
-    return updateFeedbackByTargetId(state, targetId, () => ({ takeAutoSnapshot: false }))
+    return updateTabFeedbackIfExists(state, targetId, () => ({ takeAutoSnapshot: false }))
   },
   'chrome.windows.getAll'(state, { windows }): Partial<StoreState> {
     const focusedWindow = windows.find(win => win.focused)

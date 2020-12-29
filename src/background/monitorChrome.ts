@@ -3,6 +3,7 @@ import { dispatch } from './store'
 export function monitorChrome(): void {
   chrome.windows.getAll(windows => dispatch('chrome.windows.getAll', { windows }))
   chrome.tabs.query({}, tabs => dispatch('chrome.tabs.query', { tabs }))
+
   chrome.tabs.onCreated.addListener(tab => dispatch('chrome.tabs.onCreated', { tab }))
   chrome.tabs.onRemoved.addListener((tabId, removeInfo) => dispatch('chrome.tabs.onRemoved', { tabId, removeInfo }))
   // Tabs trigger onUpdate events constantly. We want to listen only when the URL changes.
