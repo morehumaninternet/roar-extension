@@ -11,12 +11,9 @@
   for various events including changes to tabs/windows and dispatches them to the store.
 */
 import { AppStore, create } from './store'
-import { createListeners } from './listeners'
-import { createHandlers } from './api-handlers'
+import { listeners } from './listeners'
+import * as apiHandlers from './api-handlers'
 import { monitorChrome } from './monitorChrome'
-import { createHandleCache } from './handle-cache'
-import { createApi } from './api'
-import { createImages } from './images'
 
 declare global {
   interface Window {
@@ -24,21 +21,9 @@ declare global {
   }
 }
 
-export function run(backgroundWindow: Window, browser: typeof global.browser, chrome: typeof global.chrome, navigator: typeof window.navigator): void {
-  // Create an api object with functions to make API calls to the roar server
-  const api = createApi(backgroundWindow)
-
-  // Create an object with get/set functions to cache twitter handles, reducing the number of API calls
-  const handleCache = createHandleCache(chrome)
-
+export function run(backgroundWindow: Window): void {
   // Attach the store to the window so the popup can access it see src/popup/mount.tsx
   const store = (backgroundWindow.store = create())
-
-  const apiHandlers = createHandlers(api, handleCache, chrome, store.dispatchers)
-
-  const images = createImages(browser.tabs, store.dispatchers)
-
-  const listeners = createListeners({ apiHandlers, store, images, chrome })
 
   // Add a subscription for each listener, passing dependencies to each
   for (const listener of Object.keys(listeners) as ReadonlyArray<Action['type']>) {

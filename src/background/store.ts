@@ -9,6 +9,8 @@ export type AppStore = Store<StoreState, Action> & {
   whenState(predicate: (state: StoreState) => boolean, timeoutMillis?: number): Promise<StoreState>
 }
 
+let store: AppStore
+
 function reducer(state: StoreState, action: Action): StoreState {
   // Redux initially sends a @@redux/INIT action
   if (action.type.startsWith('@@redux/INIT')) return state
@@ -33,7 +35,7 @@ function reducer(state: StoreState, action: Action): StoreState {
 }
 
 export function create(): AppStore {
-  const store: AppStore = createStore(reducer, newStoreState())
+  store = createStore(reducer, newStoreState())
 
   // Create dispatchers for each action type, one for each key in responders
   store.dispatchers = Object.keys(responders).reduce(
@@ -64,4 +66,12 @@ export function create(): AppStore {
   store.whenState = (callback, timeoutMillis) => whenState(store, callback, timeoutMillis)
 
   return store
+}
+
+export function getStore(): AppStore {
+  return store
+}
+
+export function getDispatcher<T extends Action['type']>(key: T): AppStore['dispatchers'][T] {
+  return store.dispatchers[key]
 }

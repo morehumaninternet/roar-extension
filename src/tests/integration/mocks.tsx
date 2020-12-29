@@ -66,23 +66,14 @@ export type Mocks = {
   rejectLatestCaptureVisibleTab(): void
 }
 
+let activeMocks = false
+
 const popupHTML = readFileSync(`${process.cwd()}/html/popup.html`, { encoding: 'utf-8' })
 const screenshotUri = readFileSync(`${__dirname}/screenshotUri`, { encoding: 'utf-8' })
 
 fetchMock.config.overwriteRoutes = true
 
 export function createMocks(): Mocks {
-  const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
-
-  // TODO: use dependency injection in the codebase to access these
-  const backgroundWindowGlobals = {
-    Blob: backgroundWindow.Blob,
-    FormData: backgroundWindow.FormData,
-  }
-
-  let popupWindow: any
-  let popupWindowGlobals
-
   const captureVisibleTabResolvers: any[] = []
   const captureVisibleTabRejecters: any[] = []
   const resolveLatestCaptureVisibleTab = () => {
@@ -106,7 +97,27 @@ export function createMocks(): Mocks {
     },
   } as any
 
+  const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
+
+  // TODO: use dependency injection in the codebase to access these
+  const backgroundWindowGlobals = {
+    chrome,
+    browser,
+    AbortController: backgroundWindow.AbortController,
+    Blob: backgroundWindow.Blob,
+    FormData: backgroundWindow.FormData,
+  }
+
+  let popupWindow: any
+  let popupWindowGlobals
+
   const setup = () => {
+    if (activeMocks) {
+      throw new Error(
+        'Cannot setup mocks as teardown of previous mocks is not complete.\nCheck that you called createMocks() within a top-level describe block.'
+      )
+    }
+    activeMocks = true
     Object.assign(global, backgroundWindowGlobals)
     chrome.tabs.create.callsFake(() => popupWindow?.close())
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
@@ -143,6 +154,7 @@ export function createMocks(): Mocks {
     sinon.restore()
     const logError: sinon.SinonStub = global.CONSOLE_ERROR as any
     logError.reset()
+    activeMocks = false
   }
 
   // ReactDOM needs a global window to work with

@@ -240,23 +240,3 @@ type WebsiteResponseData = {
   domain: string
   twitter_handle: null | string
 }
-
-type Api = {
-  fetchRoar<T extends object>(path: string, init: RequestInit, decoder: any): Promise<FetchRoarResult<T>>
-  postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>>
-  getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>>
-  getMe(): Promise<FetchRoarResult<User>>
-  makeLogoutRequest(): Promise<Response>
-}
-
-type ApiHandlers = {
-  postTweet(target: FeedbackTarget): Promise<any>
-  fetchTwitterHandle(tabId: number, domain: string): Promise<any>
-  detectLogin(): Promise<void>
-  makeLogoutRequest(): Promise<Response>
-}
-
-type Images = {
-  takeScreenshot(target: FeedbackTarget): Promise<void>
-  imageUpload(targetId: FeedbackTargetId, file: File): Promise<void>
-}
