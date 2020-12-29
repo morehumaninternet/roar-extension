@@ -104,7 +104,6 @@ type AuthenticatedState = {
   view: 'Authenticated'
   feedback: Maybe<FeedbackState>
   user: User
-  tweeting: null | { at: string }
   darkModeOn: boolean
   pickingEmoji: boolean
   addImageDisabled: boolean

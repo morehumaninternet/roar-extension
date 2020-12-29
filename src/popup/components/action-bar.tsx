@@ -13,6 +13,7 @@ type ActionBarProps = {
   addImageDisabled: boolean
   characterLimit: CharacterLimit
   postTweetDisabled: boolean
+  isTweeting: boolean
 }
 
 export const ActionBar = ({
@@ -26,6 +27,7 @@ export const ActionBar = ({
   addImageDisabled,
   characterLimit,
   postTweetDisabled,
+  isTweeting,
 }: ActionBarProps) => {
   const imageRef: React.MutableRefObject<HTMLInputElement> = React.useRef() as any
 
@@ -47,8 +49,8 @@ export const ActionBar = ({
         }}
       />
       <CharacterCountdown characterLimit={characterLimit} />
-      <button className="post-btn" onClick={clickPost} disabled={postTweetDisabled}>
-        Post
+      <button className="post-btn" onClick={clickPost} disabled={isTweeting || postTweetDisabled}>
+        {isTweeting ? 'Posting...' : 'Post'}
       </button>
     </div>
   )

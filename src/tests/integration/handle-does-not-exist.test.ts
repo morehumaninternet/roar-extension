@@ -7,7 +7,7 @@ import { takingScreenshots } from './steps/taking-screenshots'
 import { postingFeedback } from './steps/posting-feedback'
 import { feedbackEditing } from './steps/feedback-editing'
 
-describe('twitter handle does not exist for the domain', () => {
+describe.only('twitter handle does not exist for the domain', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })

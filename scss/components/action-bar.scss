@@ -57,7 +57,7 @@ $svg-btn-height: $svg-height + 18px;
   > .post-btn {
     flex-grow: 0;
     height: 40px;
-    width: 90px;
+    padding: 0 24px;
     font-size: 16px;
     font-weight: bold;
     background-color: var(--post-btn-background-color);

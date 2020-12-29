@@ -47,8 +47,9 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
       expect(screenshot.name.startsWith('zing.com')).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
-      const tweetInProgress = mocks.app().querySelector('.tweet-in-progress')!
-      expect(tweetInProgress).to.have.property('innerHTML', `Tweeting your feedback to ${opts.handle}`)
+      const disabledPostButton = mocks.app().querySelector('.post-btn')!
+      expect(disabledPostButton).to.have.property('innerHTML', 'Posting...')
+      expect(disabledPostButton).to.have.property('disabled', true)
     })
 
     if (opts.result === 'success') {
