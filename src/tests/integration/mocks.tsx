@@ -99,7 +99,6 @@ export function createMocks(): Mocks {
 
   const backgroundWindow: DOMWindow = new JSDOM('', { url: 'https://should-not-appear.com' }).window
 
-  // TODO: use dependency injection in the codebase to access these
   const backgroundWindowGlobals = {
     chrome,
     browser,

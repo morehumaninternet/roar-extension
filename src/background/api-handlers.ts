@@ -41,7 +41,6 @@ export async function fetchTwitterHandle(tabId: number, domain: string): Promise
     return dispatch('fetchHandleSuccess', { tabId, domain, handle: result.data.twitter_handle })
   }
 
-  // TODO: handle different types of errors differently with a common function
   return dispatch('fetchHandleFailure', { tabId, domain, failure: result })
 }
 

@@ -11,12 +11,6 @@ type FeedbackEditorProps = {
   twitterHandle: FeedbackState['twitterHandle']
 }
 
-const styleMap = {
-  'HUMAN-PINK': {
-    color: '#fa759e', // TODO - import human pink
-  },
-}
-
 export function FeedbackEditor({ editorState, hovering, updateEditorState, hoverOver, twitterHandle }: FeedbackEditorProps): JSX.Element {
   React.useEffect(() => {
     const listener = event => {
@@ -35,12 +29,7 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
 
   return (
     <>
-      <Editor
-        placeholder="What's your feedback?"
-        editorState={editorState}
-        onChange={editorState => updateEditorState({ editorState })}
-        customStyleMap={styleMap}
-      />
+      <Editor placeholder="What's your feedback?" editorState={editorState} onChange={editorState => updateEditorState({ editorState })} />
       <ToolTip visible={hovering.active} hovering={hovering} twitterHandle={twitterHandle} />
     </>
   )
