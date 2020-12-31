@@ -66,10 +66,10 @@ function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial
 
 export const responders: Responders<Action> = {
   popupConnect(): Partial<StoreState> {
-    return {}
+    return { popupConnected: true }
   },
   popupDisconnect(): Partial<StoreState> {
-    return { pickingEmoji: false, alert: null } // closing the popup dismisses any alert
+    return { popupConnected: false, pickingEmoji: false, alert: null } // closing the popup dismisses any alert
   },
   signInWithTwitter(): Partial<StoreState> {
     return {}

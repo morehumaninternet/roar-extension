@@ -7,14 +7,22 @@ import { captureFirstScreenshot } from './steps/capture-first-screenshot'
 import { postingFeedback } from './steps/posting-feedback'
 import { feedbackEditing } from './steps/feedback-editing'
 
-describe('unauthorized', () => {
-  const mocks = createMocks()
+unauthorized({ mountEarly: true })
+unauthorized({ mountEarly: false })
 
-  runBackground(mocks, { allowActionFailure: true })
-  mountPopup(mocks, { handle: 'exists' })
-  signInViaTwitter(mocks)
-  authenticateViaTwitter(mocks)
-  captureFirstScreenshot(mocks)
-  feedbackEditing(mocks, { handle: '@zing' })
-  postingFeedback(mocks, { handle: '@zing', result: 'unauthorized' })
-})
+function unauthorized({ mountEarly }: { mountEarly: boolean }): void {
+  let description = 'unauthorized' // tslint:disable-line:no-let
+  if (mountEarly) description += ' (mount early)'
+
+  describe(description, () => {
+    const mocks = createMocks()
+
+    runBackground(mocks, { allowActionFailure: true })
+    mountPopup(mocks, { handle: 'exists' })
+    signInViaTwitter(mocks)
+    authenticateViaTwitter(mocks, { mountEarly })
+    captureFirstScreenshot(mocks)
+    feedbackEditing(mocks, { handle: '@zing' })
+    postingFeedback(mocks, { handle: '@zing', result: 'unauthorized' })
+  })
+}
