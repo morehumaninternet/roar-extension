@@ -4,9 +4,17 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
   flex-direction: column;
   position: relative;
+
+  .centered {
+    margin-top: -2px;
+  }
+
+  svg.roar-logo {
+    margin-bottom: 16px;
+  }
 
   .sign-in-btn {
     border-radius: 25px;
@@ -26,5 +34,10 @@
     path {
       fill: var(--twitter-button-text-color);
     }
+  }
+
+  .built-with-love {
+    position: absolute;
+    bottom: 10px;
   }
 }

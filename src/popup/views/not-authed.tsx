@@ -58,11 +58,13 @@ function BuiltWithLove(): JSX.Element {
 export function NotAuthed({ signInWithTwitter }: Pick<Dispatchers<UserAction>, 'signInWithTwitter'>): JSX.Element {
   return (
     <div className="not-authed">
-      <RoarLogo />
-      <button className="sign-in-btn" onClick={signInWithTwitter}>
-        <TwitterLogo />
-        Log in with Twitter
-      </button>
+      <div className="centered">
+        <RoarLogo />
+        <button className="sign-in-btn" onClick={signInWithTwitter}>
+          <TwitterLogo />
+          Log in with Twitter
+        </button>
+      </div>
       <BuiltWithLove />
     </div>
   )
