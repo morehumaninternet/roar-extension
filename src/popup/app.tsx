@@ -9,32 +9,27 @@ type AppProps = {
   dispatchUserActions: Dispatchers<UserAction>
 }
 
-export function AppContents({ popupWindow, storeState, dispatchUserActions }: AppProps): JSX.Element {
-  const appState = toAppState(popupWindow, storeState, dispatchUserActions)
-
-  switch (appState.view) {
+export function AppContents(props: AppState): JSX.Element {
+  switch (props.view) {
     case 'NotWebPage':
       return <views.NotWebPage />
-    case 'NotAuthed':
-      return <views.NotAuthed {...appState} />
     case 'Authenticating':
       return <views.Authenticating />
+    case 'NotAuthed':
+      return <views.NotAuthed {...props} />
     case 'Authenticated':
-      return <views.Authenticated {...appState} />
+      return <views.Authenticated {...props} />
   }
 }
 
-export function App(props: AppProps): JSX.Element {
-  const theme = props.storeState.darkModeOn ? 'dark-theme' : ''
+export function App({ popupWindow, storeState, dispatchUserActions }: AppProps): JSX.Element {
+  const appState = toAppState(popupWindow, storeState, dispatchUserActions)
+  const theme = storeState.darkModeOn && appState.view !== 'NotAuthed' ? 'dark-theme' : ''
   return (
     <div className={`app ${theme}`}>
-      <AppContents {...props} />
-      {props.storeState.alert && (
-        <Alert
-          alertMessage={props.storeState.alert.message}
-          contactSupport={props.storeState.alert.contactSupport}
-          onClose={props.dispatchUserActions.dismissAlert}
-        />
+      <AppContents {...appState} />
+      {storeState.alert && (
+        <Alert alertMessage={storeState.alert.message} contactSupport={storeState.alert.contactSupport} onClose={dispatchUserActions.dismissAlert} />
       )}
     </div>
   )
