@@ -1,0 +1,14 @@
+.authenticating {
+  background-color: var(--background-color);
+
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authenticating-spinner {
+  @include loader07($size: 16px, $color: $human-pink, $duration: 1s, $align: middle);
+}
