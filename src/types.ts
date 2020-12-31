@@ -98,6 +98,7 @@ type FeedbackTarget = TabInfo
 type FeedbackTargetId = FeedbackTarget['id']
 
 type StoreState = {
+  popupConnected: boolean
   focusedWindowId: number
   tabs: Immutable.Map<number, TabInfo>
   auth: Auth

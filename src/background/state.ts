@@ -39,6 +39,7 @@ export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState
 }
 
 export const newStoreState = (): StoreState => ({
+  popupConnected: false,
   focusedWindowId: -1,
   tabs: Map(),
   auth: { state: 'not_authed' },

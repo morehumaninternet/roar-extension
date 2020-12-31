@@ -81,7 +81,7 @@ export const listeners: Listeners<Action> = {
     apiHandlers.detectLogin()
     whenState(({ auth }) => auth.state !== 'detectLogin', maxApiRequestMilliseconds + 1)
       .then(state => {
-        if (state.auth.state === 'authenticated') {
+        if (state.auth.state === 'authenticated' && !state.popupConnected) {
           chrome.notifications.create({
             type: 'basic',
             iconUrl: '/img/roar_128.png',

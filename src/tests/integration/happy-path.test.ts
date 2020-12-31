@@ -8,15 +8,23 @@ import { takingScreenshots } from './steps/taking-screenshots'
 import { postingFeedback } from './steps/posting-feedback'
 import { feedbackEditing } from './steps/feedback-editing'
 
-describe('happy path', () => {
-  const mocks = createMocks()
+happyPath({ mountEarly: true })
+happyPath({ mountEarly: false })
 
-  runBackground(mocks)
-  mountPopup(mocks, { handle: 'exists' })
-  signInViaTwitter(mocks)
-  authenticateViaTwitter(mocks)
-  captureFirstScreenshot(mocks)
-  takingScreenshots(mocks)
-  feedbackEditing(mocks, { handle: '@zing' })
-  postingFeedback(mocks, { handle: '@zing', result: 'success' })
-})
+function happyPath({ mountEarly }: { mountEarly: boolean }): void {
+  let description = 'happy path' // tslint:disable-line:no-let
+  if (mountEarly) description += ' (mount early)'
+
+  describe(description, () => {
+    const mocks = createMocks()
+
+    runBackground(mocks)
+    mountPopup(mocks, { handle: 'exists' })
+    signInViaTwitter(mocks)
+    authenticateViaTwitter(mocks, { mountEarly })
+    captureFirstScreenshot(mocks)
+    takingScreenshots(mocks)
+    feedbackEditing(mocks, { handle: '@zing' })
+    postingFeedback(mocks, { handle: '@zing', result: 'success' })
+  })
+}

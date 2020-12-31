@@ -3,11 +3,13 @@ import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 
 type AuthenticateViaTwitterOpts = {
+  mountEarly?: boolean
   unauthorized?: boolean
 }
 
 export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitterOpts = {}): void {
-  const description = opts.unauthorized ? 'unauthorized' : 'authorized'
+  let description = opts.unauthorized ? 'unauthorized' : 'authorized' // tslint:disable-line:no-let
+  if (opts.mountEarly) description += ' & mounted early'
 
   describe(`authentication via twitter (${description})`, () => {
     let resolveResponse: () => void // tslint:disable-line:no-let
@@ -36,22 +38,36 @@ export function authenticateViaTwitter(mocks: Mocks, opts: AuthenticateViaTwitte
       expect(mocks.chrome.notifications.create).to.have.callCount(0)
     })
 
+    if (opts.mountEarly) {
+      it('mounts the popup', mocks.mount)
+
+      it('renders the authenticating view', () => {
+        expect(mocks.app().querySelector('.authenticating > .authenticating-spinner')).to.have.property('tagName', 'DIV')
+      })
+    }
+
     it('transitions out of a detectLogin auth state when the response from the call to /v1/me has come back', async () => {
       resolveResponse()
       await mocks.whenState(({ auth }) => auth.state !== 'detectLogin')
     })
 
-    if (!opts.unauthorized) {
+    if (!opts.unauthorized && !opts.mountEarly) {
       it('launches a notification explaining the user is logged in', async () => {
         expect(mocks.chrome.notifications.create).to.have.callCount(1)
         const [notification] = mocks.chrome.notifications.create.firstCall.args
         expect(notification).to.have.property('title', 'Successful login')
       })
+    } else {
+      it('has launched no notification', () => {
+        expect(mocks.chrome.notifications.create).to.have.callCount(0)
+      })
     }
   })
 
-  describe(`mounting the popup after authentication via twitter (${description})`, () => {
-    before(mocks.mount)
+  describe(`after authentication via twitter (${description})`, () => {
+    if (!opts.mountEarly) {
+      before(mocks.mount)
+    }
 
     if (opts.unauthorized) {
       it('goes back to the not-authed view', () => {
