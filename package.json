@@ -87,7 +87,7 @@
   "homepage": "https://github.com/morehumaninternet/roar-extension#readme",
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged --pattern \"src/**/*.*(ts|tsx)\""
+      "pre-commit": "npm run lint && pretty-quick --staged --pattern \"src/**/*.*(ts|tsx)\""
     }
   }
 }
