@@ -2,6 +2,7 @@ import { dispatch, whenState } from './store'
 import { ensureActiveTab, tabById } from '../selectors'
 import * as apiHandlers from './api-handlers'
 import * as images from './images'
+import { parseUrl } from './parse-url'
 import { maxApiRequestMilliseconds } from './settings'
 import { onLogin } from '../copy'
 
@@ -12,11 +13,13 @@ export const listeners: Listeners<Action> = {
 
     if (target.feedbackTargetType === 'tab') {
       const tab = target
-      if (!tab.domain) return
-      // it the handle wasn't fetched before and the tab domain exists,
-      // start the fetch process
+
+      const parsed = parseUrl(tab.url)
+      if (!parsed.success) return
+
+      // it the handle wasn't fetched before and the tab url could be parsed, start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        apiHandlers.fetchTwitterHandle(tab.id, tab.domain)
+        apiHandlers.fetchTwitterHandle(tab.id, parsed.fullWithFirstPath)
       }
     }
 

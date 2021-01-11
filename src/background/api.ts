@@ -60,7 +60,7 @@ export function postFeedback(formData: FormData): Promise<FetchRoarResult<Feedba
 }
 
 const WebsiteResponseDataDecoder = JsonDecoder.object<WebsiteResponseData>(
-  { domain: JsonDecoder.string, twitter_handle: JsonDecoder.nullable(JsonDecoder.string) },
+  { matching_url: JsonDecoder.string, twitter_handle: JsonDecoder.nullable(JsonDecoder.string) },
   'WebsiteResponseData'
 )
 

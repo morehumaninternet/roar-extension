@@ -1,3 +1,4 @@
+import { parseUrl } from './background/parse-url'
 import { getLength } from './draft-js-utils'
 
 export function activeTab(state: StoreState): null | TabInfo {
@@ -41,7 +42,7 @@ export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): Charac
 export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
   const feedbackTarget = activeTab(storeState)
   if (feedbackTarget) {
-    if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.domain) {
+    if (feedbackTarget.feedbackTargetType === 'tab' && !parseUrl(feedbackTarget.url).success) {
       return { view: 'NotWebPage' }
     }
   }

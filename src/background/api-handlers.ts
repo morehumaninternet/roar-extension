@@ -7,7 +7,7 @@ function tweetFormData(target: FeedbackTarget): FormData {
 
   const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
-  tweetData.append('domain', target.domain!)
+  tweetData.append('matching_url', target.feedbackState.twitterHandle.matchingUrl!)
 
   // Adding all the screenshot files under the same form key - 'images'.
   target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
@@ -28,20 +28,20 @@ export async function postTweet(target: FeedbackTarget): Promise<void> {
   return dispatch('postTweetFailure', { targetId, failure: result })
 }
 
-export async function fetchTwitterHandle(tabId: number, domain: string): Promise<void> {
+export async function fetchTwitterHandle(tabId: number, fullWithFirstPath: string): Promise<void> {
   dispatch('fetchHandleStart', { tabId })
 
-  const cachedHandle = await handleCache.get(domain)
-  if (cachedHandle) return dispatch('fetchHandleSuccess', { tabId, domain, handle: cachedHandle })
+  const cachedHandle = await handleCache.get(fullWithFirstPath)
+  if (cachedHandle) return dispatch('fetchHandleSuccess', { tabId, matching_url: fullWithFirstPath, handle: cachedHandle })
 
   // If we didn't find the handle in the cache, fetch the request from the server
-  const result = await api.getWebsite(domain)
+  const result = await api.getWebsite(fullWithFirstPath)
   if (result.ok) {
-    if (result.data.twitter_handle) handleCache.set(domain, result.data.twitter_handle)
-    return dispatch('fetchHandleSuccess', { tabId, domain, handle: result.data.twitter_handle })
+    if (result.data.twitter_handle) handleCache.set(result.data.matching_url, result.data.twitter_handle)
+    return dispatch('fetchHandleSuccess', { tabId, matching_url: result.data.matching_url, handle: result.data.twitter_handle })
   }
 
-  return dispatch('fetchHandleFailure', { tabId, domain, failure: result })
+  return dispatch('fetchHandleFailure', { tabId, fullWithFirstPath, failure: result })
 }
 
 export async function detectLogin(): Promise<void> {

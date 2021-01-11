@@ -1,14 +1,14 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
-import { domainOf } from './domain'
+import { parseUrl, ensureHostname } from './parse-url'
 import { newFeedbackState } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import * as copy from '../copy'
-import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
-  const domain = domainOf(tab.url)
+  const parsed = parseUrl(tab.url)
+  const hostname = parsed.success ? parsed.host : 'Not a webpage'
 
   return {
     feedbackTargetType: 'tab',
@@ -16,8 +16,7 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     windowId: tab.windowId!,
     active: tab.active,
     url: tab.url,
-    domain,
-    feedbackState: newFeedbackState({ domain }),
+    feedbackState: newFeedbackState({ hostname }),
   }
 }
 
@@ -129,37 +128,49 @@ export const responders: Responders<Action> = {
   },
   fetchHandleStart(state, { tabId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, tabId, tab => ({
-      twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
+      twitterHandle: {
+        status: 'IN_PROGRESS',
+        matchingUrl: null,
+        isActualAccount: false,
+        handle: tab.feedbackState.twitterHandle.handle,
+      },
     }))
   },
-  fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
+  fetchHandleSuccess(state, { tabId, matching_url, handle }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
+      const parsed = parseUrl(tab.url!)
+      if (!parsed.success) return {}
+      if (!parsed.fullWithFirstPath.startsWith(matching_url)) return {}
+
       return {
         editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
         twitterHandle: {
           status: 'DONE',
+          matchingUrl: matching_url,
           handle: handle || tab.feedbackState.twitterHandle.handle,
           isActualAccount: !!handle,
         },
       }
     })
   },
-  fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
-      return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
+  fetchHandleFailure(state, { tabId, fullWithFirstPath, failure }): Partial<StoreState> {
+    return updateTabFeedbackIfExists(state, tabId, tab => {
+      const parsed = parseUrl(tab.url!)
+      if (!parsed.success) return {}
+      if (parsed.fullWithFirstPath !== fullWithFirstPath) return {}
+      return {
+        twitterHandle: {
+          status: 'DONE',
+          matchingUrl: fullWithFirstPath,
+          isActualAccount: false,
+          handle: tab.feedbackState.twitterHandle.handle,
+        },
+        alert: {
+          message: copy.fetchHandleFailure(parsed.host),
+          contactSupport: true,
+        },
+      }
     })
-    if (isEmpty(tabUpdates)) {
-      return {}
-    }
-    return {
-      alert: {
-        message: copy.fetchHandleFailure(domain),
-        contactSupport: true,
-      },
-      ...tabUpdates,
-    }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, targetId, target => ({
@@ -247,13 +258,12 @@ export const responders: Responders<Action> = {
     if (!changeInfo.url) return {}
     const tab = { ...state.tabs.get(tabId)! }
     const nextURL = changeInfo.url
-    const nextDomain = domainOf(nextURL)
+    const parsed = parseUrl(nextURL)
     tab.url = nextURL
 
     // If the domain has changed, delete the feedback
-    if (tab.domain !== nextDomain) {
-      tab.domain = nextDomain
-      tab.feedbackState = newFeedbackState({ domain: nextDomain })
+    if (tab.feedbackState.twitterHandle.matchingUrl && parsed.success && !parsed.fullWithFirstPath.startsWith(tab.feedbackState.twitterHandle.matchingUrl)) {
+      tab.feedbackState = newFeedbackState({ hostname: parsed.host })
     }
 
     return setTab(state, tab)

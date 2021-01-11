@@ -1,4 +1,4 @@
-import { domainOf } from './domain'
+import { ensureHostname } from './parse-url'
 import { dispatch } from './store'
 
 function dataURItoBlob(dataURI: string): Blob {
@@ -40,7 +40,7 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
     const moreTabInfo = await gettingTab
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
-    const domain = domainOf(tab.url)
+    const hostname = ensureHostname(tab.url)
     dispatch('imageCaptureSuccess', {
       image: {
         type: 'screenshot',
@@ -50,7 +50,7 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
           width: moreTabInfo.width!,
           height: moreTabInfo.height!,
         },
-        name: `${domain} - ${new Date().toISOString()}.png`,
+        name: `${hostname} - ${new Date().toISOString()}.png`,
         uri: screenshotUri,
         blob: screenshotBlob,
       },

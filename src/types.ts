@@ -41,6 +41,11 @@ type EditingImageState = {
   image: Image
 }
 
+type TwitterHandleState =
+  | { status: 'NEW'; handle: string; isActualAccount: false; matchingUrl: null }
+  | { status: 'IN_PROGRESS'; handle: string; isActualAccount: false; matchingUrl: null }
+  | { status: 'DONE'; handle: string; isActualAccount: boolean; matchingUrl: string }
+
 type FeedbackState = {
   isTweeting: boolean
   takeAutoSnapshot: boolean
@@ -55,11 +60,7 @@ type FeedbackState = {
     height: number
     width: number
   }
-  twitterHandle: {
-    status: 'NEW' | 'IN_PROGRESS' | 'DONE'
-    handle: string
-    isActualAccount: boolean
-  }
+  twitterHandle: TwitterHandleState
 }
 
 type CharacterLimit = {
@@ -89,7 +90,6 @@ type TabInfo = {
   windowId: number
   active: boolean
   url?: string
-  domain?: string
   feedbackState: FeedbackState
 }
 
@@ -171,8 +171,8 @@ type BackgroundAction =
   | { type: 'detectLoginStart' }
   | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; matching_url: string; handle: null | string } }
+  | { type: 'fetchHandleFailure'; payload: { tabId: number; fullWithFirstPath: string; failure: FetchRoarFailure } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; failure: FetchRoarFailure | { reason: 'timeout' } } }
@@ -234,6 +234,49 @@ type FeedbackResponseData = {
 }
 
 type WebsiteResponseData = {
-  domain: string
+  matching_url: string
   twitter_handle: null | string
+}
+
+type ParseUrlSuccess = {
+  success: true
+  host: string
+  hostWithoutSubDomain: string
+  subdomain?: string
+  firstPath?: string
+  fullWithFirstPath: string
+}
+
+type ParseUrlFailure = {
+  success: false
+  reason: string
+}
+
+type ParseUrlResult = ParseUrlSuccess | ParseUrlFailure
+
+type ParseDomainListed = {
+  type: 'LISTED'
+  hostname: string
+  labels: string
+  icann: {
+    subDomains: ReadonlyArray<string>
+    domain: string
+    topLevelDomains: ReadonlyArray<string>
+  }
+  subDomains: ReadonlyArray<string>
+  domain: string
+  topLevelDomains: ReadonlyArray<string>
+}
+
+type ParseDomainError = {
+  type: 'INVALID'
+  errors: ReadonlyArray<{
+    type: string
+    message: string
+  }>
+}
+
+type ParseDomainResult = ParseDomainListed | ParseDomainError | { type: 'IP' } | { type: 'RESERVED' } | { type: 'NOT_LISTED' }
+declare module 'parse-domain' {
+  export function parseDomain(hostname: string): ParseDomainResult
 }
