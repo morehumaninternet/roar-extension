@@ -68,18 +68,18 @@ const WebsiteNonDefaultTwitterHandleDecoder = JsonDecoder.object<WebsiteNonDefau
   'WebsiteNonDefaultTwitterHandle'
 )
 
-const WebsiteResponseDataDecoder = JsonDecoder.object<WebsiteResponseData>(
+const WebsiteDecoder = JsonDecoder.object<Website>(
   {
     domain: JsonDecoder.string,
     twitter_handle: JsonDecoder.nullable(JsonDecoder.string),
     non_default_twitter_handles: JsonDecoder.array(WebsiteNonDefaultTwitterHandleDecoder, 'non_default_twitter_handles'),
   },
-  'WebsiteResponseData'
+  'Website'
 )
 
-export function getWebsite(domain: string): Promise<FetchRoarResult<WebsiteResponseData>> {
+export function getWebsite(domain: string): Promise<FetchRoarResult<Website>> {
   const search = new URLSearchParams({ domain })
-  return fetchRoar(`v1/website?${search}`, {}, WebsiteResponseDataDecoder)
+  return fetchRoar(`v1/website?${search}`, {}, WebsiteDecoder)
 }
 
 const UserDecoder = JsonDecoder.object<User>({ photoUrl: JsonDecoder.nullable(JsonDecoder.string) }, 'User')

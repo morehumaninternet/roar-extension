@@ -56,7 +56,6 @@ type FeedbackState = {
     width: number
   }
   twitterHandle: {
-    status: 'NEW' | 'IN_PROGRESS' | 'DONE'
     handle: string
     isActualAccount: boolean
   }
@@ -88,8 +87,8 @@ type TabInfo = {
   id: number
   windowId: number
   active: boolean
-  url?: string
-  domain?: string
+  parsedUrl: null | ParseUrlSuccess
+  website: null | 'in progress' | Website
   feedbackState: FeedbackState
 }
 
@@ -170,9 +169,9 @@ type BackgroundAction =
   | { type: 'authSuccess'; payload: { tabId: number } }
   | { type: 'detectLoginStart' }
   | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
-  | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; website: WebsiteResponseData } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
+  | { type: 'fetchWebsiteStart'; payload: { tabId: number } }
+  | { type: 'fetchWebsiteSuccess'; payload: { tabId: number; website: Website } }
+  | { type: 'fetchWebsiteFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; failure: FetchRoarFailure | { reason: 'timeout' } } }
@@ -240,7 +239,7 @@ type WebsiteNonDefaultTwitterHandle = {
   twitter_handle: string
 }
 
-type WebsiteResponseData = {
+type Website = {
   domain: string
   twitter_handle: null | string
   non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
@@ -274,7 +273,6 @@ declare module 'parse-domain' {
 }
 
 type ParseUrlSuccess = {
-  success: true
   host: string
   hostWithoutSubDomain: string
   subdomain?: string
@@ -282,9 +280,4 @@ type ParseUrlSuccess = {
   fullWithFirstPath: string
 }
 
-type ParseUrlFailure = {
-  success: false
-  reason: string
-}
-
-type ParseUrlResult = ParseUrlSuccess | ParseUrlFailure
+type ParseUrlResult = null | ParseUrlSuccess

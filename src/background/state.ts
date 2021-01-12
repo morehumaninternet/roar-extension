@@ -17,7 +17,6 @@ export const emptyFeedbackState = (): FeedbackState => ({
   },
   editorState: EditorState.createEmpty(),
   twitterHandle: {
-    status: 'NEW',
     handle: '@mhi-roar-placeholder',
     isActualAccount: false,
   },
@@ -31,7 +30,6 @@ export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState
     ...empty,
     editorState: prependHandle(empty.editorState, domainHandle),
     twitterHandle: {
-      status: 'NEW',
       handle: domainHandle,
       isActualAccount: false,
     },

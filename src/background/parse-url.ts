@@ -19,26 +19,11 @@ export const urlOf = (urlString: string): null | URL => {
 export const parseUrl = (urlString?: string): ParseUrlResult => {
   const url = urlString && urlOf(urlString)
 
-  if (!url) {
-    return {
-      success: false,
-      reason: 'Not a url',
-    }
-  }
+  if (!url) return null
 
   const parsed = parseDomain(url.hostname)
 
-  if (parsed.type === 'INVALID') {
-    return {
-      success: false,
-      reason: parsed.errors[0].message,
-    }
-  } else if (parsed.type !== 'LISTED') {
-    return {
-      success: false,
-      reason: 'Must specify a listed hostname',
-    }
-  }
+  if (parsed.type !== 'LISTED') return null
 
   const tld = parsed.topLevelDomains.join('.')
 
@@ -48,13 +33,18 @@ export const parseUrl = (urlString?: string): ParseUrlResult => {
 
   const [, firstPath] = url.pathname.split('/')
   const fullWithFirstPath = firstPath ? `${host}/${firstPath}` : host
-  return { success: true, host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
+  return { host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
+}
+
+export const hostname = (urlString?: string): undefined | string => {
+  const parsed = parseUrl(urlString)
+  return parsed?.host
 }
 
 export const ensureHostname = (urlString?: string): string => {
   const parsed = parseUrl(urlString)
-  if (!parsed.success) {
-    throw new Error(parsed.reason)
+  if (!parsed) {
+    throw new Error(`Expected to be able to parse ${urlString}`)
   }
   return parsed.host
 }

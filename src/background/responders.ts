@@ -1,6 +1,6 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
-import { domainOf } from './domain'
+import { parseUrl } from './parse-url'
 import { newFeedbackState } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
@@ -8,21 +8,33 @@ import * as copy from '../copy'
 import { isEmpty } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
-  const domain = domainOf(tab.url)
+  const parsedUrl = parseUrl(tab.url)
 
   return {
     feedbackTargetType: 'tab',
     id: tab.id!,
     windowId: tab.windowId!,
     active: tab.active,
-    url: tab.url,
-    domain,
-    feedbackState: newFeedbackState({ domain }),
+    parsedUrl,
+    website: null,
+    feedbackState: newFeedbackState({ domain: parsedUrl?.host }),
   }
 }
 
 function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
   return { tabs: state.tabs.set(tab.id, tab) }
+}
+
+function updateTabIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<TabInfo>): Partial<StoreState> {
+  const tab = state.tabs.get(tabId)
+  if (!tab) return {}
+  return setTab(state, { ...tab, ...callback(tab) })
+}
+
+function updateTab(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<TabInfo>): Partial<StoreState> {
+  const tab = state.tabs.get(tabId)
+  if (!tab) throw new Error(`Expected tab with id ${tabId} to exist`)
+  return setTab(state, { ...tab, ...callback(tab) })
 }
 
 function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdates: Partial<FeedbackState>): Partial<StoreState> {
@@ -127,15 +139,18 @@ export const responders: Responders<Action> = {
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
-  fetchHandleStart(state, { tabId }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => ({
-      twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
-    }))
+  fetchWebsiteStart(state, { tabId }): Partial<StoreState> {
+    return updateTab(state, tabId, tab => ({ website: 'in progress' }))
   },
-  fetchHandleSuccess(state, { tabId, website }): Partial<StoreState> {
+  fetchWebsiteSuccess(state, { tabId, website }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
+      if (!tab.parsedUrl) return {}
+      if (tab.parsedUrl.hostWithoutSubDomain !== website.domain) return {}
+
+      // tab.parsedUrl
+
       return {
+        website,
         editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
         twitterHandle: {
           status: 'DONE',
@@ -145,7 +160,7 @@ export const responders: Responders<Action> = {
       }
     })
   },
-  fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
+  fetchWebsiteFailure(state, { tabId, domain, failure }): Partial<StoreState> {
     const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
@@ -155,7 +170,7 @@ export const responders: Responders<Action> = {
     }
     return {
       alert: {
-        message: copy.fetchHandleFailure(domain),
+        message: copy.fetchWebsiteFailure(domain),
         contactSupport: true,
       },
       ...tabUpdates,
@@ -247,14 +262,26 @@ export const responders: Responders<Action> = {
     if (!changeInfo.url) return {}
     const tab = { ...state.tabs.get(tabId)! }
     const nextURL = changeInfo.url
-    const nextDomain = domainOf(nextURL)
-    tab.url = nextURL
+    const nextParsed = parseUrl(nextURL)
 
-    // If the domain has changed, delete the feedback
-    if (tab.domain !== nextDomain) {
-      tab.domain = nextDomain
-      tab.feedbackState = newFeedbackState({ domain: nextDomain })
+    if (nextParsed) {
+      const matchingWebsite = nextParsed.host === tab.website?.domain
+      if (!matchingWebsite) {
+        tab.website = null
+        tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
+      } else {
+        return {}
+      }
+
+      // tab.parsed = nextParsed
+
+      // If the domain has changed, delete the feedback
+      if (tab.domain !== nextDomain) {
+        return {}
+      }
     }
+
+    tab.parsedUrl = nextParsed
 
     return setTab(state, tab)
   },

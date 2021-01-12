@@ -28,11 +28,11 @@ export async function postTweet(target: FeedbackTarget): Promise<void> {
   return dispatch('postTweetFailure', { targetId, failure: result })
 }
 
-export async function fetchTwitterHandle(tabId: number, domain: string): Promise<void> {
-  dispatch('fetchHandleStart', { tabId })
+export async function fetchWebsite(tabId: number, domain: string): Promise<void> {
+  dispatch('fetchWebsiteStart', { tabId })
 
   const cachedHandle = await handleCache.get(domain)
-  if (cachedHandle) return dispatch('fetchHandleSuccess', { tabId, website: { domain, ...cachedHandle } })
+  if (cachedHandle) return dispatch('fetchWebsiteSuccess', { tabId, website: { domain, ...cachedHandle } })
 
   // If we didn't find the handle in the cache, fetch the request from the server
   const result = await api.getWebsite(domain)
@@ -44,10 +44,10 @@ export async function fetchTwitterHandle(tabId: number, domain: string): Promise
         twitter_handle: data.twitter_handle,
       })
     }
-    return dispatch('fetchHandleSuccess', { tabId, website: data })
+    return dispatch('fetchWebsiteSuccess', { tabId, website: data })
   }
 
-  return dispatch('fetchHandleFailure', { tabId, domain, failure: result })
+  return dispatch('fetchWebsiteFailure', { tabId, domain, failure: result })
 }
 
 export async function detectLogin(): Promise<void> {

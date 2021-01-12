@@ -16,7 +16,7 @@ export const listeners: Listeners<Action> = {
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
       if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        apiHandlers.fetchTwitterHandle(tab.id, tab.domain)
+        apiHandlers.fetchWebsite(tab.id, tab.domain)
       }
     }
 

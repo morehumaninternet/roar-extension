@@ -20,7 +20,7 @@ type MountPopupOpts = {
     | keyof typeof handleDescriptions
     | {
         domain: string
-        response: WebsiteResponseData
+        response: Website
         expectedTwitterHandle: string
       }
 }
