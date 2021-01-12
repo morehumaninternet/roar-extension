@@ -273,7 +273,8 @@ declare module 'parse-domain' {
   export function parseDomain(hostname: string): ParseDomainResult
 }
 
-type ParsedUrl = {
+type ParseUrlSuccess = {
+  success: true
   host: string
   hostWithoutSubdomain: string
   subdomain?: string

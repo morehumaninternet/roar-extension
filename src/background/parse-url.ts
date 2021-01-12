@@ -16,35 +16,51 @@ export const urlOf = (urlString: string): null | URL => {
   }
 }
 
-const parseHost = (url: URL): { host: string; subdomain?: string; hostWithoutSubdomain: string } => {
+export const foo = (urlString?: string): ParseUrlResult => {
+  const url = urlString && urlOf(urlString)
+
+  if (!url) {
+    return {
+      success: false,
+      reason: 'Not a url',
+    }
+  }
+
   const parsed = parseDomain(url.hostname)
 
   if (parsed.type === 'INVALID') {
-    throw {
-      status: 400,
-      message: parsed.errors[0].message,
+    return {
+      success: false,
+      reason: parsed.errors[0].message,
     }
   } else if (parsed.type !== 'LISTED') {
-    throw {
-      status: 400,
-      message: 'Must specify a listed hostname',
+    return {
+      success: false,
+      reason: 'Must specify a listed hostname',
     }
   }
 
   const tld = parsed.topLevelDomains.join('.')
 
-  return {
-    host: url.host,
-    subdomain: parsed.subDomains.length ? parsed.subDomains.join('.') : undefined,
-    hostWithoutSubdomain: `${parsed.domain}.${tld}`,
-  }
-}
+  const host = url.host
+  const subdomain = parsed.subDomains.length ? parsed.subDomains.join('.') : undefined
+  const hostWithoutSubDomain = `${parsed.domain}.${tld}`
 
-export const parseUrl = (urlString: string): null | ParsedUrl => {
-  const url = urlOf(urlString)
-  if (!url) return null
-  const { host, subdomain, hostWithoutSubdomain } = parseHost(url)
   const [, firstPath] = url.pathname.split('/')
   const fullWithFirstPath = firstPath ? `${host}/${firstPath}` : host
-  return { host, hostWithoutSubdomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
+  return { success: true, host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
+}
+
+export function parseUrl(urlString?: string): ParseUrlResult {
+  const res = foo(urlString)
+  console.log('parseUrl', urlString, res)
+  return res
+}
+
+export const ensureHostname = (urlString?: string): string => {
+  const parsed = parseUrl(urlString)
+  if (!parsed.success) {
+    throw new Error(parsed.reason)
+  }
+  return parsed.host
 }
