@@ -276,8 +276,15 @@ declare module 'parse-domain' {
 type ParseUrlSuccess = {
   success: true
   host: string
-  hostWithoutSubdomain: string
+  hostWithoutSubDomain: string
   subdomain?: string
   firstPath?: string
   fullWithFirstPath: string
 }
+
+type ParseUrlFailure = {
+  success: false
+  reason: string
+}
+
+type ParseUrlResult = ParseUrlSuccess | ParseUrlFailure

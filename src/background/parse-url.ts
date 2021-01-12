@@ -16,7 +16,7 @@ export const urlOf = (urlString: string): null | URL => {
   }
 }
 
-export const foo = (urlString?: string): ParseUrlResult => {
+export const parseUrl = (urlString?: string): ParseUrlResult => {
   const url = urlString && urlOf(urlString)
 
   if (!url) {
@@ -49,12 +49,6 @@ export const foo = (urlString?: string): ParseUrlResult => {
   const [, firstPath] = url.pathname.split('/')
   const fullWithFirstPath = firstPath ? `${host}/${firstPath}` : host
   return { success: true, host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
-}
-
-export function parseUrl(urlString?: string): ParseUrlResult {
-  const res = foo(urlString)
-  console.log('parseUrl', urlString, res)
-  return res
 }
 
 export const ensureHostname = (urlString?: string): string => {
