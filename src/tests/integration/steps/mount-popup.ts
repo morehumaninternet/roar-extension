@@ -6,7 +6,7 @@ import { getPlainText } from '../../../draft-js-utils'
 
 const handleDescriptions = {
   cached: 'is cached',
-  exists: 'exists for the domain',
+  fetched: 'is fetched over the API',
   'does not exist': 'does not exist for the domain',
   '500': 'cannot be fetched due to a server error',
   'resolves later': 'is resolved later',
@@ -15,7 +15,14 @@ const handleDescriptions = {
 
 type MountPopupOpts = {
   alreadyAuthenticated?: boolean
-  handle: keyof typeof handleDescriptions
+
+  handle:
+    | keyof typeof handleDescriptions
+    | {
+        domain: string
+        response: WebsiteResponseData
+        expectedTwitterHandle: string
+      }
 }
 
 type MountPopupReturn = {
@@ -24,7 +31,22 @@ type MountPopupReturn = {
 
 export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn {
   const authDescription = opts.alreadyAuthenticated ? 'when already authed' : 'when not yet authed'
-  const handleDescription = handleDescriptions[opts.handle]
+  const handle = typeof opts.handle === 'string' ? opts.handle : 'fetched'
+
+  const domain = typeof opts.handle === 'string' ? 'zing.com' : opts.handle.domain
+
+  const twitter_handle = handle === 'does not exist' ? null : typeof opts.handle === 'string' ? '@zing' : opts.handle.expectedTwitterHandle
+  const expectedEditorHandle = ['cached', 'fetched'].includes(handle) ? twitter_handle : `@${domain}`
+  const handleCache = handle === 'cached' ? [{ domain, twitter_handle, non_default_twitter_handles: [] }] : []
+
+  const response =
+    typeof opts.handle !== 'string'
+      ? { status: 200, body: opts.handle.response }
+      : handle === '500'
+      ? { status: 500, body: 'I made a huge mistake' }
+      : { status: 200, body: { twitter_handle, domain, non_default_twitter_handles: [] } }
+
+  const handleDescription = handleDescriptions[handle]
   const description = `popup mount ${authDescription} and the twitter handle ${handleDescription}`
 
   // Use indirection here so we may pass a resolveHandle callback immediatedly
@@ -33,24 +55,17 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
   const resolveHandle = () => handleResolver()
 
   describe(description, () => {
-    const domain = 'zing.com'
-    const twitter_handle = opts.handle === 'does not exist' ? null : '@zing'
-    const expectedEditorHandle = ['cached', 'exists'].includes(opts.handle) ? twitter_handle : `@${domain}`
-    const handleCache = opts.handle === 'cached' ? [{ domain, twitter_handle }] : []
-
     before(() => mocks.chrome.storage.local.get.callsArgWith(0, { handleCache }))
 
     // Expect an API call if the handle is not cached and
-    if (opts.handle !== 'cached' && opts.handle !== 'never fetched') {
+    if (handle !== 'cached' && handle !== 'never fetched') {
       before(() => {
-        const response = opts.handle === '500' ? { status: 500, body: 'I made a huge mistake' } : { status: 200, body: { twitter_handle, domain } }
-
         // We either provide the response directly or return a promise that resolves with the
         // respnose when the caller calls the handleResolver directly
         const mockResponse: fetchMock.MockResponse | fetchMock.MockResponseFunction =
-          opts.handle !== 'resolves later' ? response : new Promise(resolve => (handleResolver = () => resolve(response)))
+          handle !== 'resolves later' ? response : new Promise(resolve => (handleResolver = () => resolve(response)))
 
-        fetchMock.mock('https://test-roar-server.com/v1/website?domain=zing.com', mockResponse)
+        fetchMock.mock(`https://test-roar-server.com/v1/website?domain=${domain}`, mockResponse)
       })
     }
 
@@ -64,7 +79,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    if (opts.handle !== 'never fetched') {
+    if (handle !== 'never fetched') {
       it('fetches the twitter handle', () => {
         const activeTab = ensureActiveTab(mocks.getState())
         expect(activeTab.feedbackState.twitterHandle.handle).to.equal(expectedEditorHandle)
@@ -76,9 +91,11 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    if (opts.handle === 'exists') {
+    if (handle === 'fetched') {
       it('caches the handle in chrome.storage.local', () => {
-        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({ handleCache: [{ domain, twitter_handle: '@zing' }] })
+        expect(mocks.chrome.storage.local.set).to.have.been.calledOnceWith({
+          handleCache: [response.body],
+        })
       })
     } else {
       it('does not cache the handle', () => {
@@ -86,7 +103,7 @@ export function mountPopup(mocks: Mocks, opts: MountPopupOpts): MountPopupReturn
       })
     }
 
-    if (opts.handle !== 'never fetched') {
+    if (handle !== 'never fetched') {
       it('has the appropriate handle in the editor state', () => {
         const activeTab = ensureActiveTab(mocks.getState())
         const plainText = getPlainText(activeTab.feedbackState.editorState)

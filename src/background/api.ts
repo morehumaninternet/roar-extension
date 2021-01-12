@@ -59,8 +59,21 @@ export function postFeedback(formData: FormData): Promise<FetchRoarResult<Feedba
   return fetchRoar('v1/feedback', { method: 'POST', body: formData }, FeedbackResponseDataDecoder)
 }
 
+const WebsiteNonDefaultTwitterHandleDecoder = JsonDecoder.object<WebsiteNonDefaultTwitterHandle>(
+  {
+    subdomain: JsonDecoder.nullable(JsonDecoder.string),
+    path: JsonDecoder.nullable(JsonDecoder.string),
+    twitter_handle: JsonDecoder.string,
+  },
+  'WebsiteNonDefaultTwitterHandle'
+)
+
 const WebsiteResponseDataDecoder = JsonDecoder.object<WebsiteResponseData>(
-  { domain: JsonDecoder.string, twitter_handle: JsonDecoder.nullable(JsonDecoder.string) },
+  {
+    domain: JsonDecoder.string,
+    twitter_handle: JsonDecoder.nullable(JsonDecoder.string),
+    non_default_twitter_handles: JsonDecoder.array(WebsiteNonDefaultTwitterHandleDecoder, 'non_default_twitter_handles'),
+  },
   'WebsiteResponseData'
 )
 

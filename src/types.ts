@@ -171,7 +171,7 @@ type BackgroundAction =
   | { type: 'detectLoginStart' }
   | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
   | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
+  | { type: 'fetchHandleSuccess'; payload: { tabId: number; website: WebsiteResponseData } }
   | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
@@ -209,9 +209,10 @@ type Listeners<A extends Action> = {
   [T in A['type']]?: Listener<A, T>
 }
 
-type TwitterHandleCache = {
-  get(domain: string): Promise<Maybe<string>>
-  set(domain: string, handle: string): Promise<void>
+type HandleCacheEntry = {
+  domain: string
+  twitter_handle: string
+  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
 }
 
 type FetchRoarFailure =
@@ -233,7 +234,49 @@ type FeedbackResponseData = {
   url: string
 }
 
+type WebsiteNonDefaultTwitterHandle = {
+  subdomain: null | string
+  path: null | string
+  twitter_handle: string
+}
+
 type WebsiteResponseData = {
   domain: string
   twitter_handle: null | string
+  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
+}
+
+type ParseDomainListed = {
+  type: 'LISTED'
+  hostname: string
+  labels: string
+  icann: {
+    subDomains: ReadonlyArray<string>
+    domain: string
+    topLevelDomains: ReadonlyArray<string>
+  }
+  subDomains: ReadonlyArray<string>
+  domain: string
+  topLevelDomains: ReadonlyArray<string>
+}
+
+type ParseDomainError = {
+  type: 'INVALID'
+  errors: ReadonlyArray<{
+    type: string
+    message: string
+  }>
+}
+
+type ParseDomainResult = ParseDomainListed | ParseDomainError | { type: 'IP' } | { type: 'RESERVED' } | { type: 'NOT_LISTED' }
+declare module 'parse-domain' {
+  export function parseDomain(hostname: string): ParseDomainResult
+}
+
+type ParsedUrl = {
+  host: string
+  hostWithoutSubdomain: string
+  subdomain?: string
+  firstPath?: string
+  fullWithFirstPath: string
 }

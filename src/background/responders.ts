@@ -132,7 +132,7 @@ export const responders: Responders<Action> = {
       twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
     }))
   },
-  fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
+  fetchHandleSuccess(state, { tabId, website }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, tabId, tab => {
       if (tab.domain !== domain) return {}
       return {
