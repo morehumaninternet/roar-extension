@@ -74,6 +74,10 @@ $svg-btn-height: $svg-height + 18px;
 }
 
 .svg-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   height: $svg-btn-height;
   width: $svg-btn-height;
   border-radius: $svg-btn-height / 2;
