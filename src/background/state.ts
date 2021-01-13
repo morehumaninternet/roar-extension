@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import { EditorState } from 'draft-js'
+import { ContentState, EditorState } from 'draft-js'
 import { prependHandle } from '../draft-js-utils'
 
 export const emptyFeedbackState = (): FeedbackState => ({

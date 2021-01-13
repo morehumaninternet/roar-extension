@@ -5,7 +5,7 @@ import { newFeedbackState, feedbackStateWithHandle, emptyFeedbackState } from '.
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import * as copy from '../copy'
-import { sortBy } from 'lodash'
+import { isEmpty, sortBy } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const parsedUrl = parseUrl(tab.url)
@@ -177,7 +177,7 @@ export const responders: Responders<Action> = {
       tabId,
       (tab): Partial<TabInfo> => {
         if (!tab.parsedUrl) return {}
-        if (tab.parsedUrl.hostWithoutSubDomain !== website.domain) return {}
+        if (tab.parsedUrl.hostWithoutSubdomain !== website.domain) return {}
 
         const twitterHandle = findMatchingHandle(tab.parsedUrl, website)
 
@@ -196,17 +196,19 @@ export const responders: Responders<Action> = {
     )
   },
   fetchWebsiteFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    return updateTabIfExists(state, tabId, tab => {
+    const tabUpdates = updateTabIfExists(state, tabId, tab => {
       if (!tab.parsedUrl) return {}
-      if (tab.parsedUrl.hostWithoutSubDomain !== domain) return {}
-      return {
-        website: 'failure',
-        alert: {
-          message: copy.fetchWebsiteFailure(domain),
-          contactSupport: true,
-        },
-      }
+      if (tab.parsedUrl.hostWithoutSubdomain !== domain) return {}
+      return { website: 'failure' }
     })
+    if (isEmpty(tabUpdates)) return {}
+    return {
+      ...tabUpdates,
+      alert: {
+        message: copy.fetchWebsiteFailure(domain),
+        contactSupport: true,
+      },
+    }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, targetId, target => ({
@@ -297,17 +299,18 @@ export const responders: Responders<Action> = {
 
     if (nextParsed) {
       if (typeof tab.website === 'object') {
-        const matchingWebsite = nextParsed.hostWithoutSubDomain === tab.website.domain
+        const matchingWebsite = nextParsed.hostWithoutSubdomain === tab.website.domain
         if (!matchingWebsite) {
           tab.website = 'not fetched'
           tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
         } else {
           const twitterHandle = findMatchingHandle(nextParsed, tab.website)
-          console.log('IN HERE', twitterHandle, nextParsed, tab.website)
           if (twitterHandle && twitterHandle.handle !== tab.feedbackState.twitterHandle.handle) {
             tab.feedbackState = feedbackStateWithHandle(twitterHandle)
           }
         }
+      } else {
+        tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
       }
     } else {
       tab.website = 'not fetched'

@@ -30,4 +30,8 @@ export function monitorChrome(): void {
       dispatch('authSuccess', { tabId: details.tabId })
     }
   })
+
+  if (chrome.runtime.getManifest().name === 'Roar Local') {
+    handleCache.clear()
+  }
 }

@@ -17,13 +17,15 @@ const mockResponse = (result: PostFeedbackResult): fetchMock.MockResponse => {
   }
 }
 
-export function postingFeedback(mocks: Mocks, opts: { handle: string; result: PostFeedbackResult }): void {
-  describe(`post feedback (${opts.result})`, () => {
+type PostFeedbackOpts = { handle: string; result: PostFeedbackResult; domain?: string }
+
+export function postingFeedback(mocks: Mocks, { handle, result, domain = 'zing.com' }: PostFeedbackOpts): void {
+  describe(`post feedback (${result})`, () => {
     let priorChromeTabsCreateCallCount: number // tslint:disable-line:no-let
 
     before(() => {
       priorChromeTabsCreateCallCount = mocks.chrome.tabs.create.callCount
-      const response = mockResponse(opts.result)
+      const response = mockResponse(result)
       fetchMock.mock('https://test-roar-server.com/v1/feedback', response)
     })
 
@@ -41,10 +43,10 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
       expect(initOpts).to.have.property('credentials', 'include')
 
       const body: FormData = initOpts!.body! as any
-      expect(body.get('status')).to.equal(`${opts.handle} This is some feedback`)
-      expect(body.get('domain')).to.equal('zing.com')
+      expect(body.get('status')).to.equal(`${handle} This is some feedback`)
+      expect(body.get('domain')).to.equal(domain)
       const screenshot: any = body.get('images') as any
-      expect(screenshot.name.startsWith('zing.com')).to.equal(true)
+      expect(screenshot.name.startsWith(domain)).to.equal(true)
       expect(screenshot.name.endsWith('.png')).to.equal(true)
 
       const disabledPostButton = mocks.app().querySelector('.post-btn')!
@@ -52,7 +54,7 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
       expect(disabledPostButton).to.have.property('disabled', true)
     })
 
-    if (opts.result === 'success') {
+    if (result === 'success') {
       it('creates a new tab with the tweet upon completion and clears the existing feedback', async () => {
         const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
         expect(mocks.chrome.tabs.create).to.have.callCount(1 + priorChromeTabsCreateCallCount)
@@ -65,7 +67,7 @@ export function postingFeedback(mocks: Mocks, opts: { handle: string; result: Po
         const activeTab = ensureActiveTab(state)
         expect(getPlainText(activeTab.feedbackState.editorState)).to.equal(`${activeTab.feedbackState.twitterHandle.handle} `)
       })
-    } else if (opts.result === 'unauthorized') {
+    } else if (result === 'unauthorized') {
       it('transitions to an unauthed state with a dismissable alert explaining what happened', async () => {
         const state = await mocks.whenState(state => !ensureActiveTab(state).feedbackState.isTweeting)
         expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)

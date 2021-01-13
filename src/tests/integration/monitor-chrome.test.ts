@@ -23,7 +23,7 @@ describe('monitorChrome', () => {
       expect(tab.windowId).to.equal(1)
       expect(tab.parsedUrl).to.eql({
         host: 'new.com',
-        hostWithoutSubDomain: 'new.com',
+        hostWithoutSubdomain: 'new.com',
         subdomain: undefined,
         firstPath: 'abc',
         fullWithFirstPath: 'new.com/abc',
@@ -61,7 +61,7 @@ describe('monitorChrome', () => {
       expect(tab.windowId).to.equal(changeInfo.windowId)
       expect(tab.parsedUrl).to.eql({
         host: 'new.com',
-        hostWithoutSubDomain: 'new.com',
+        hostWithoutSubdomain: 'new.com',
         subdomain: 'foo',
         firstPath: 'abc',
         fullWithFirstPath: 'new.com/abc',

@@ -277,7 +277,7 @@ declare module 'parse-domain' {
 
 type ParseUrlSuccess = {
   host: string
-  hostWithoutSubDomain: string
+  hostWithoutSubdomain: string
   subdomain?: string
   firstPath?: string
   fullWithFirstPath: string

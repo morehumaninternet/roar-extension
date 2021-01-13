@@ -8,7 +8,7 @@ import { takingScreenshots } from './steps/taking-screenshots'
 import { postingFeedback } from './steps/posting-feedback'
 import { feedbackEditing } from './steps/feedback-editing'
 
-describe('switching subdomains', () => {
+describe('match subdomain', () => {
   const mocks = createMocks()
 
   runBackground(mocks, {
@@ -40,6 +40,6 @@ describe('switching subdomains', () => {
   authenticateViaTwitter(mocks)
   captureFirstScreenshot(mocks)
   takingScreenshots(mocks)
-  feedbackEditing(mocks, { handle: '@zing' })
-  postingFeedback(mocks, { handle: '@zing', result: 'success' })
+  feedbackEditing(mocks, { handle: '@googledocs' })
+  postingFeedback(mocks, { domain: 'docs.google.com', handle: '@googledocs', result: 'success' })
 })
