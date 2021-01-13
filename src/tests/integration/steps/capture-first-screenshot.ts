@@ -21,7 +21,7 @@ export function captureFirstScreenshot(mocks: Mocks): void {
       const [image] = activeTab.feedbackState.images
       if (image.type === 'imageupload') throw new Error('Expected screenshot')
       expect(image.tab.id).to.equal(activeTab.id)
-      expect(image.tab.url).to.equal(activeTab.url)
+      expect(image.tab.url).to.equal(activeTab.parsedUrl!.fullWithoutQuery)
       expect(image.tab.width).to.equal(1200)
       expect(image.tab.height).to.equal(900)
       expect(image.blob).to.be.an.instanceof(Blob)

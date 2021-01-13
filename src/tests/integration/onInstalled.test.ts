@@ -28,7 +28,7 @@ describe('authenticated when popup mounted in between onInstalled when reason is
   const mocks = createMocks()
   runBackground(mocks)
   onInstalled(mocks, { reason: 'install' })
-  mountPopup(mocks, { handle: 'exists' })
+  mountPopup(mocks, { handle: 'fetched' })
 
   describe('first detectLogin', () => {
     it('is now in a not_authed state', () => {

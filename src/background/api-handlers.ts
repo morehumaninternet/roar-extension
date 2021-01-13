@@ -7,7 +7,9 @@ function tweetFormData(target: FeedbackTarget): FormData {
 
   const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
-  tweetData.append('domain', target.domain!)
+
+  const domain = target.feedbackState.twitterHandle.matchingDomain || target.parsedUrl!.host
+  tweetData.append('domain', domain)
 
   // Adding all the screenshot files under the same form key - 'images'.
   target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
@@ -28,20 +30,26 @@ export async function postTweet(target: FeedbackTarget): Promise<void> {
   return dispatch('postTweetFailure', { targetId, failure: result })
 }
 
-export async function fetchTwitterHandle(tabId: number, domain: string): Promise<void> {
-  dispatch('fetchHandleStart', { tabId })
+export async function fetchWebsite(tabId: number, domain: string): Promise<void> {
+  dispatch('fetchWebsiteStart', { tabId })
 
   const cachedHandle = await handleCache.get(domain)
-  if (cachedHandle) return dispatch('fetchHandleSuccess', { tabId, domain, handle: cachedHandle })
+  if (cachedHandle) return dispatch('fetchWebsiteSuccess', { tabId, website: { domain, ...cachedHandle } })
 
   // If we didn't find the handle in the cache, fetch the request from the server
   const result = await api.getWebsite(domain)
   if (result.ok) {
-    if (result.data.twitter_handle) handleCache.set(domain, result.data.twitter_handle)
-    return dispatch('fetchHandleSuccess', { tabId, domain, handle: result.data.twitter_handle })
+    const { data } = result
+    if (data.twitter_handle) {
+      handleCache.set({
+        ...data,
+        twitter_handle: data.twitter_handle,
+      }) // For some reason typescript isn't understanding that twitter_handle is a string unless I do this
+    }
+    return dispatch('fetchWebsiteSuccess', { tabId, website: data })
   }
 
-  return dispatch('fetchHandleFailure', { tabId, domain, failure: result })
+  return dispatch('fetchWebsiteFailure', { tabId, domain, failure: result })
 }
 
 export async function detectLogin(): Promise<void> {

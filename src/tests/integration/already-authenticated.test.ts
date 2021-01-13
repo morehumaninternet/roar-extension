@@ -6,5 +6,5 @@ describe('already authenticated when extension loads', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
-  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'exists' })
+  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'fetched' })
 })

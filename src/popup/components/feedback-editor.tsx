@@ -9,9 +9,10 @@ type FeedbackEditorProps = {
   updateEditorState: Dispatchers<UserAction>['updateEditorState']
   hoverOver: Dispatchers<UserAction>['hoverOver']
   twitterHandle: FeedbackState['twitterHandle']
+  websiteFetched: boolean
 }
 
-export function FeedbackEditor({ editorState, hovering, updateEditorState, hoverOver, twitterHandle }: FeedbackEditorProps): JSX.Element {
+export function FeedbackEditor({ editorState, hovering, updateEditorState, hoverOver, twitterHandle, websiteFetched }: FeedbackEditorProps): JSX.Element {
   React.useEffect(() => {
     const listener = event => {
       if (hasParent(event.target, '.twitter-handle')) {
@@ -30,7 +31,7 @@ export function FeedbackEditor({ editorState, hovering, updateEditorState, hover
   return (
     <>
       <Editor placeholder="What's your feedback?" editorState={editorState} onChange={editorState => updateEditorState({ editorState })} />
-      <ToolTip visible={hovering.active} hovering={hovering} twitterHandle={twitterHandle} />
+      <ToolTip visible={hovering.active} hovering={hovering} twitterHandle={twitterHandle} websiteFetched={websiteFetched} />
     </>
   )
 }

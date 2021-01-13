@@ -42,6 +42,11 @@ type EditingImageState = {
   image: Image
 }
 
+type TwitterHandleState = {
+  handle: string
+  matchingDomain?: string
+}
+
 type FeedbackState = {
   isTweeting: boolean
   takeAutoSnapshot: boolean
@@ -56,11 +61,7 @@ type FeedbackState = {
     height: number
     width: number
   }
-  twitterHandle: {
-    status: 'NEW' | 'IN_PROGRESS' | 'DONE'
-    handle: string
-    isActualAccount: boolean
-  }
+  twitterHandle: TwitterHandleState
 }
 
 type CharacterLimit = {
@@ -89,8 +90,8 @@ type TabInfo = {
   id: number
   windowId: number
   active: boolean
-  url?: string
-  domain?: string
+  parsedUrl: null | ParseUrlSuccess
+  website: 'not fetched' | 'fetching' | 'failure' | Website
   feedbackState: FeedbackState
 }
 
@@ -133,6 +134,7 @@ type AuthenticatedState = {
   pickingEmoji: boolean
   addImageDisabled: boolean
   postTweetDisabled: boolean
+  websiteFetched: boolean
   characterLimit: CharacterLimit
   dispatchUserActions: Dispatchers<UserAction>
 }
@@ -171,9 +173,9 @@ type BackgroundAction =
   | { type: 'authSuccess'; payload: { tabId: number } }
   | { type: 'detectLoginStart' }
   | { type: 'detectLoginResult'; payload: FetchRoarResult<{ photoUrl: null | string }> }
-  | { type: 'fetchHandleStart'; payload: { tabId: number } }
-  | { type: 'fetchHandleSuccess'; payload: { tabId: number; domain: string; handle: null | string } }
-  | { type: 'fetchHandleFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
+  | { type: 'fetchWebsiteStart'; payload: { tabId: number } }
+  | { type: 'fetchWebsiteSuccess'; payload: { tabId: number; website: Website } }
+  | { type: 'fetchWebsiteFailure'; payload: { tabId: number; domain: string; failure: FetchRoarFailure } }
   | { type: 'postTweetStart'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetSuccess'; payload: { targetId: FeedbackTargetId } }
   | { type: 'postTweetFailure'; payload: { targetId: FeedbackTargetId; failure: FetchRoarFailure | { reason: 'timeout' } } }
@@ -210,11 +212,6 @@ type Listeners<A extends Action> = {
   [T in A['type']]?: Listener<A, T>
 }
 
-type TwitterHandleCache = {
-  get(domain: string): Promise<Maybe<string>>
-  set(domain: string, handle: string): Promise<void>
-}
-
 type FetchRoarFailure =
   | { ok: false; reason: 'response not json'; text: string; details: string }
   | { ok: false; reason: 'response not expected data type'; text: string; details: string }
@@ -234,7 +231,58 @@ type FeedbackResponseData = {
   url: string
 }
 
-type WebsiteResponseData = {
+type WebsiteNonDefaultTwitterHandle = {
+  subdomain: null | string
+  path: null | string
+  twitter_handle: string
+}
+
+type Website = {
   domain: string
   twitter_handle: null | string
+  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
 }
+
+type HandleCacheEntry = {
+  domain: string
+  twitter_handle: string
+  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
+}
+
+type ParseDomainListed = {
+  type: 'LISTED'
+  hostname: string
+  labels: string
+  icann: {
+    subDomains: ReadonlyArray<string>
+    domain: string
+    topLevelDomains: ReadonlyArray<string>
+  }
+  subDomains: ReadonlyArray<string>
+  domain: string
+  topLevelDomains: ReadonlyArray<string>
+}
+
+type ParseDomainError = {
+  type: 'INVALID'
+  errors: ReadonlyArray<{
+    type: string
+    message: string
+  }>
+}
+
+type ParseDomainResult = ParseDomainListed | ParseDomainError | { type: 'IP' } | { type: 'RESERVED' } | { type: 'NOT_LISTED' }
+declare module 'parse-domain' {
+  export function parseDomain(hostname: string): ParseDomainResult
+}
+
+type ParseUrlSuccess = {
+  host: string
+  hostWithoutSubdomain: string
+  subdomain?: string
+  firstPath?: string
+  fullWithFirstPath: string
+  fullWithoutQuery: string
+}
+
+type ParseUrlResult = null | ParseUrlSuccess

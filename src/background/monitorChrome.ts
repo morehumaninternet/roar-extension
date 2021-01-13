@@ -1,4 +1,5 @@
 import { dispatch } from './store'
+import * as handleCache from './handle-cache'
 
 export function monitorChrome(): void {
   chrome.windows.getAll(windows => dispatch('chrome.windows.getAll', { windows }))
@@ -19,6 +20,8 @@ export function monitorChrome(): void {
   chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {
       dispatch('onInstall')
+    } else if (details.reason === 'update') {
+      handleCache.ensureTypecheck()
     }
   })
 

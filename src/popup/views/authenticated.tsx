@@ -14,6 +14,7 @@ export function Authenticated({
   dispatchUserActions,
   characterLimit,
   postTweetDisabled,
+  websiteFetched,
 }: AuthenticatedState): JSX.Element | null {
   if (!feedback) {
     return null
@@ -32,6 +33,7 @@ export function Authenticated({
             updateEditorState={dispatchUserActions.updateEditorState}
             hoverOver={dispatchUserActions.hoverOver}
             twitterHandle={feedback.twitterHandle}
+            websiteFetched={websiteFetched}
           />
           <Images feedback={feedback} startEditingImage={dispatchUserActions.startEditingImage} clickDeleteImage={dispatchUserActions.clickDeleteImage} />
           <ActionBar

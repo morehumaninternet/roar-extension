@@ -7,7 +7,7 @@ export const alerts = {
   'network down': 'You are offline. Please check your network connection and try again.',
 }
 
-export const fetchHandleFailure = (domain: string) => `We tried to fetch the twitter handle for ${domain} but something went wrong.`
+export const fetchWebsiteFailure = (domain: string) => `We tried to fetch the twitter handle for ${domain} but something went wrong.`
 
 export const onLogin = {
   title: 'Successful login',

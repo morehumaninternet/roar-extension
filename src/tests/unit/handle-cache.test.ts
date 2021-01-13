@@ -22,11 +22,15 @@ describe('handle-cache', () => {
 
   it('only retains the latest 50 cached handles', async () => {
     for (const i of range(51)) {
-      await handleCache.set(`domain-${i}`, `@${i}`)
+      await handleCache.set({
+        domain: `domain-${i}`,
+        twitter_handle: `@${i}`,
+        non_default_twitter_handles: [],
+      })
     }
 
-    expect(await handleCache.get('domain-0')).to.equal(undefined)
-    expect(await handleCache.get('domain-1')).to.equal('@1')
-    expect(await handleCache.get('domain-50')).to.equal('@50')
+    expect(await handleCache.get('domain-0')).to.equal(null)
+    expect(await handleCache.get('domain-1')).to.have.property('twitter_handle', '@1')
+    expect(await handleCache.get('domain-50')).to.have.property('twitter_handle', '@50')
   })
 })

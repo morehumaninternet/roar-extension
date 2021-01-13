@@ -2,7 +2,7 @@
   "version": "1.0.0",
   "name": "Roar Local",
   "short_name": "Roar Local",
-  "description": "Public Feedback Tool",
+  "description": "See something broken online? Tell the world and get help with Roar! by More Human Internet.",
   "background": {
     "page": "html/background-page.html"
   },

@@ -7,7 +7,7 @@ describe('handle tooltip', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
-  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'exists' })
+  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'fetched' })
 
   describe('when we are not hovering over the handle', () => {
     it('does not render the tooltip to the screen', () => {

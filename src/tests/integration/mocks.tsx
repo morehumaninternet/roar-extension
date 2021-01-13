@@ -45,6 +45,7 @@ import * as sinon from 'sinon'
 import * as chrome from 'sinon-chrome'
 import { JSDOM, DOMWindow } from 'jsdom'
 import { mount } from '../../popup/mount'
+import { ensureActiveTab } from '../../selectors'
 
 type MockBrowser = typeof global.browser & {
   tabs: {
@@ -62,6 +63,7 @@ export type Mocks = {
   app(): HTMLDivElement
   getState(): StoreState
   whenState(cb: (state: StoreState) => boolean): Promise<StoreState>
+  ensureActiveTab(): TabInfo
   resolveLatestCaptureVisibleTab(): void
   rejectLatestCaptureVisibleTab(): void
 }
@@ -118,6 +120,7 @@ export function createMocks(): Mocks {
     }
     activeMocks = true
     Object.assign(global, backgroundWindowGlobals)
+    chrome.runtime.getManifest.returns({ name: 'Roar Test' })
     chrome.tabs.create.callsFake(() => popupWindow?.close())
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
   }
@@ -221,5 +224,6 @@ export function createMocks(): Mocks {
     resolveLatestCaptureVisibleTab,
     rejectLatestCaptureVisibleTab,
     whenState: cb => backgroundWindow.store.whenState(cb),
+    ensureActiveTab: () => ensureActiveTab(getState()),
   }
 }

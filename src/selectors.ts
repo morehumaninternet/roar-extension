@@ -41,7 +41,7 @@ export function getCharacterLimit(feedbackTarget: null | FeedbackTarget): Charac
 export function toAppState(popupWindow: Window, storeState: StoreState, dispatchUserActions: Dispatchers<UserAction>): AppState {
   const feedbackTarget = activeTab(storeState)
   if (feedbackTarget) {
-    if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.domain) {
+    if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.parsedUrl) {
       return { view: 'NotWebPage' }
     }
   }
@@ -68,6 +68,7 @@ export function toAppState(popupWindow: Window, storeState: StoreState, dispatch
         addImageDisabled: addImageDisabled(feedbackTarget),
         postTweetDisabled: postTweetDisabled(feedbackTarget),
         characterLimit: getCharacterLimit(feedbackTarget),
+        websiteFetched: feedbackTarget ? typeof feedbackTarget.website === 'object' : false,
         dispatchUserActions,
       }
     }

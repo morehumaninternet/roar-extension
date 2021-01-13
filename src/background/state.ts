@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import { EditorState } from 'draft-js'
+import { ContentState, EditorState } from 'draft-js'
 import { prependHandle } from '../draft-js-utils'
 
 export const emptyFeedbackState = (): FeedbackState => ({
@@ -17,25 +17,21 @@ export const emptyFeedbackState = (): FeedbackState => ({
   },
   editorState: EditorState.createEmpty(),
   twitterHandle: {
-    status: 'NEW',
     handle: '@mhi-roar-placeholder',
-    isActualAccount: false,
   },
 })
 
-export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
+export const feedbackStateWithHandle = (twitterHandle: TwitterHandleState): FeedbackState => {
   const empty = emptyFeedbackState()
-  if (!domain) return empty
-  const domainHandle = `@${domain}`
   return {
     ...empty,
-    editorState: prependHandle(empty.editorState, domainHandle),
-    twitterHandle: {
-      status: 'NEW',
-      handle: domainHandle,
-      isActualAccount: false,
-    },
+    editorState: prependHandle(empty.editorState, twitterHandle.handle),
+    twitterHandle,
   }
+}
+
+export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
+  return domain ? feedbackStateWithHandle({ handle: `@${domain}` }) : emptyFeedbackState()
 }
 
 export const newStoreState = (): StoreState => ({

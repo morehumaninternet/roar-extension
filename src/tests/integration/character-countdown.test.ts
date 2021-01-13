@@ -9,7 +9,7 @@ describe('character countdown', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
-  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'exists' })
+  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'fetched' })
 
   describe('when there are many characters remaining', () => {
     it("renders a progress circle that is filled in according to Twitter's 280 character limit", () => {

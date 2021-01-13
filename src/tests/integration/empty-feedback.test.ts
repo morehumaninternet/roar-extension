@@ -8,7 +8,7 @@ describe('empty feedback', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
-  mountPopup(mocks, { handle: 'exists', alreadyAuthenticated: true })
+  mountPopup(mocks, { handle: 'fetched', alreadyAuthenticated: true })
 
   describe('deleting all feedback', () => {
     it('disables the post button when there is no feedback', () => {

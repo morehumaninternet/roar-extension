@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import { parseUrl } from '../../background/parse-url'
 import { responders } from '../../background/responders'
 import { newStoreState, newFeedbackState } from '../../background/state'
 import { getPlainText } from '../../draft-js-utils'
@@ -28,8 +29,8 @@ describe('responders', () => {
         id: 17,
         windowId: 5,
         active: false,
-        url: 'https://original-url.com',
-        domain: 'original-url.com',
+        parsedUrl: parseUrl('https://original-url.com'),
+        website: 'not fetched',
         feedbackState: newFeedbackState({ domain: 'original-url.com' }),
       })
 
@@ -42,8 +43,7 @@ describe('responders', () => {
 
       const updatedTab = stateUpdates.tabs!.get(17)!
 
-      expect(updatedTab.url).to.equal('https://updated.com/abc')
-      expect(updatedTab.domain).to.equal('updated.com')
+      expect(updatedTab.parsedUrl!.host).to.equal('updated.com')
       expect(getPlainText(updatedTab.feedbackState.editorState)).to.equal('@updated.com ')
     })
   })

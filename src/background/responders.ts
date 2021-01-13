@@ -1,28 +1,41 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
-import { domainOf } from './domain'
-import { newFeedbackState } from './state'
+import { isEmpty } from 'lodash'
+import { parseUrl } from './parse-url'
+import { newFeedbackState, feedbackStateWithHandle } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import * as copy from '../copy'
-import { isEmpty } from 'lodash'
+import findMatchingHandle from './find-matching-handle'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
-  const domain = domainOf(tab.url)
+  const parsedUrl = parseUrl(tab.url)
 
   return {
     feedbackTargetType: 'tab',
     id: tab.id!,
     windowId: tab.windowId!,
     active: tab.active,
-    url: tab.url,
-    domain,
-    feedbackState: newFeedbackState({ domain }),
+    parsedUrl,
+    website: 'not fetched',
+    feedbackState: newFeedbackState({ domain: parsedUrl?.host }),
   }
 }
 
 function setTab(state: StoreState, tab: TabInfo): Partial<StoreState> {
   return { tabs: state.tabs.set(tab.id, tab) }
+}
+
+function updateTabIfExists(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<TabInfo>): Partial<StoreState> {
+  const tab = state.tabs.get(tabId)
+  if (!tab) return {}
+  return setTab(state, { ...tab, ...callback(tab) })
+}
+
+function updateTab(state: StoreState, tabId: number, callback: (tab: TabInfo) => Partial<TabInfo>): Partial<StoreState> {
+  const tab = state.tabs.get(tabId)
+  if (!tab) throw new Error(`Expected tab with id ${tabId} to exist`)
+  return setTab(state, { ...tab, ...callback(tab) })
 }
 
 function updateFeedback(state: StoreState, target: FeedbackTarget, feedbackUpdates: Partial<FeedbackState>): Partial<StoreState> {
@@ -127,38 +140,46 @@ export const responders: Responders<Action> = {
   clickPost(state): Partial<StoreState> {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
-  fetchHandleStart(state, { tabId }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => ({
-      twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'IN_PROGRESS' },
-    }))
+  fetchWebsiteStart(state, { tabId }): Partial<StoreState> {
+    return updateTab(state, tabId, tab => ({ website: 'fetching' }))
   },
-  fetchHandleSuccess(state, { tabId, domain, handle }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
-      return {
-        editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
-        twitterHandle: {
-          status: 'DONE',
-          handle: handle || tab.feedbackState.twitterHandle.handle,
-          isActualAccount: !!handle,
-        },
+  fetchWebsiteSuccess(state, { tabId, website }): Partial<StoreState> {
+    return updateTabIfExists(
+      state,
+      tabId,
+      (tab): Partial<TabInfo> => {
+        if (!tab.parsedUrl) return {}
+        if (tab.parsedUrl.hostWithoutSubdomain !== website.domain) return {}
+
+        const twitterHandle = findMatchingHandle(tab.parsedUrl, website)
+
+        return {
+          website,
+          feedbackState: {
+            ...tab.feedbackState,
+            editorState: twitterHandle ? replaceHandle(tab.feedbackState.editorState, twitterHandle.handle) : tab.feedbackState.editorState,
+            twitterHandle: {
+              handle: twitterHandle?.handle || tab.feedbackState.twitterHandle.handle,
+              matchingDomain: twitterHandle?.matchingDomain,
+            },
+          },
+        }
       }
-    })
+    )
   },
-  fetchHandleFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
-      return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
+  fetchWebsiteFailure(state, { tabId, domain, failure }): Partial<StoreState> {
+    const tabUpdates = updateTabIfExists(state, tabId, tab => {
+      if (!tab.parsedUrl) return {}
+      if (tab.parsedUrl.hostWithoutSubdomain !== domain) return {}
+      return { website: 'failure' }
     })
-    if (isEmpty(tabUpdates)) {
-      return {}
-    }
+    if (isEmpty(tabUpdates)) return {}
     return {
+      ...tabUpdates,
       alert: {
-        message: copy.fetchHandleFailure(domain),
+        message: copy.fetchWebsiteFailure(domain),
         contactSupport: true,
       },
-      ...tabUpdates,
     }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
@@ -246,15 +267,22 @@ export const responders: Responders<Action> = {
   'chrome.tabs.onUpdated'(state, { tabId, changeInfo }): Partial<StoreState> {
     if (!changeInfo.url) return {}
     const tab = { ...state.tabs.get(tabId)! }
-    const nextURL = changeInfo.url
-    const nextDomain = domainOf(nextURL)
-    tab.url = nextURL
+    const nextParsed = parseUrl(changeInfo.url)
 
-    // If the domain has changed, delete the feedback
-    if (tab.domain !== nextDomain) {
-      tab.domain = nextDomain
-      tab.feedbackState = newFeedbackState({ domain: nextDomain })
+    // If the url parsed, there is an existing website, and the hostWithoutSubdomain matches the existing website domain
+    // we leave the website in place and will only clear the feedbackState if there's a new twitter handle.
+    // In all other cases, clear the existing website and feedback state.
+    if (nextParsed && typeof tab.website === 'object' && nextParsed.hostWithoutSubdomain === tab.website.domain) {
+      const twitterHandle = findMatchingHandle(nextParsed, tab.website)
+      if (twitterHandle && twitterHandle.handle !== tab.feedbackState.twitterHandle.handle) {
+        tab.feedbackState = feedbackStateWithHandle(twitterHandle)
+      }
+    } else {
+      tab.website = 'not fetched'
+      tab.feedbackState = newFeedbackState({ domain: nextParsed?.host })
     }
+
+    tab.parsedUrl = nextParsed
 
     return setTab(state, tab)
   },
