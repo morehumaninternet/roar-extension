@@ -16,7 +16,6 @@ export async function get(
 ): Promise<null | { twitter_handle: string; non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle> }> {
   const handleCache = await getHandleCache()
   const matchingEntry = find(handleCache, { domain })
-  console.log('matchingEntry', matchingEntry)
   if (matchingEntry) {
     return {
       twitter_handle: matchingEntry.twitter_handle,

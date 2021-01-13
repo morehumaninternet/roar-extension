@@ -29,8 +29,8 @@ describe('handle-cache', () => {
       })
     }
 
-    expect(await handleCache.get('domain-0')).to.equal(undefined)
-    expect(await handleCache.get('domain-1')).to.have.property('@1')
-    expect(await handleCache.get('domain-50')).to.have.property('@50')
+    expect(await handleCache.get('domain-0')).to.equal(null)
+    expect(await handleCache.get('domain-1')).to.have.property('twitter_handle', '@1')
+    expect(await handleCache.get('domain-50')).to.have.property('twitter_handle', '@50')
   })
 })

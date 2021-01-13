@@ -118,6 +118,7 @@ export function createMocks(): Mocks {
     }
     activeMocks = true
     Object.assign(global, backgroundWindowGlobals)
+    chrome.runtime.getManifest.returns({ name: 'Roar Test' })
     chrome.tabs.create.callsFake(() => popupWindow?.close())
     chrome.runtime.getBackgroundPage.callsArgWith(0, backgroundWindow)
   }

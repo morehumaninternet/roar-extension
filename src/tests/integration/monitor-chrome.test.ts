@@ -42,13 +42,11 @@ describe('monitorChrome', () => {
   })
 
   describe('chrome.tabs.onUpdated', () => {
-    it("updates a tab change to store's state", () => {
+    it("updates the appropriate tab change to store's state", () => {
       const [callback] = mocks.chrome.tabs.onUpdated.addListener.firstCall.args
 
       const changeInfo = {
         id: 16,
-        windowId: 3,
-        active: false,
         url: 'https://foo.changeinfo.com/abc/def',
       }
 
@@ -58,14 +56,13 @@ describe('monitorChrome', () => {
       const tab = state.tabs.get(changeInfo.id)!
 
       expect(tab.id).to.equal(changeInfo.id)
-      expect(tab.windowId).to.equal(changeInfo.windowId)
       expect(tab.parsedUrl).to.eql({
-        host: 'new.com',
-        hostWithoutSubdomain: 'new.com',
+        host: 'foo.changeinfo.com',
+        hostWithoutSubdomain: 'changeinfo.com',
         subdomain: 'foo',
         firstPath: 'abc',
-        fullWithFirstPath: 'new.com/abc',
-        fullWithoutQuery: 'new.com/abc/def',
+        fullWithFirstPath: 'foo.changeinfo.com/abc',
+        fullWithoutQuery: 'foo.changeinfo.com/abc/def',
       })
     })
   })

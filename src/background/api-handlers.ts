@@ -8,10 +8,8 @@ function tweetFormData(target: FeedbackTarget): FormData {
   const status = target.feedbackState.editorState.getCurrentContent().getPlainText('\u0001')
   tweetData.append('status', status)
 
-  if (!target.feedbackState.twitterHandle.matchingDomain) {
-    throw new Error('Expected matching domain')
-  }
-  tweetData.append('domain', target.feedbackState.twitterHandle.matchingDomain)
+  const domain = target.feedbackState.twitterHandle.matchingDomain || target.parsedUrl!.host
+  tweetData.append('domain', domain)
 
   // Adding all the screenshot files under the same form key - 'images'.
   target.feedbackState.images.forEach(image => tweetData.append('images', image.blob, image.name))
