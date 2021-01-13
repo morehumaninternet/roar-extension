@@ -5,6 +5,7 @@
 declare module NodeJS {
   interface Global {
     ROAR_SERVER_URL: string
+    ROAR_WELCOME_PAGE_URL: string
   }
 
   interface Global {

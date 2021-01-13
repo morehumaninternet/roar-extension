@@ -20,6 +20,7 @@ process.argv.slice(2).forEach(flag => {
 
 const watchFlag = watchMode ? '--watch' : ''
 const ROAR_SERVER_URL = pointToLocalServer ? 'https://localhost:5004' : 'https://roar.morehumaninternet.org'
+const ROAR_WELCOME_PAGE_URL = pointToLocalServer ? 'http://localhost:8000/roar/welcome' : 'https://morehumaninternet.org/roar/welcome'
 const ENV = process.env.ENV || 'local'
 assert.oneOf(ENV, ['local', 'stage', 'production'])
 
@@ -35,7 +36,7 @@ const emphasis = pink.bold
 const bundleCommand = (entrypoint, color) => ({
   name: color(`bundle:${entrypoint}`),
   command: `npm run rollup -- src/${entrypoint}/index.ts ${watchFlag} --file bundled/${entrypoint}.js`,
-  env: { ENV, ROAR_SERVER_URL }
+  env: { ENV, ROAR_SERVER_URL, ROAR_WELCOME_PAGE_URL }
 })
 
 // The commands to run, give each a color so that they appear distinct in the terminal

@@ -41,7 +41,7 @@ export const listeners: Listeners<Action> = {
     images.imageUpload(target.id, file)
   },
   onInstall: state => {
-    chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/welcome`, active: true })
+    chrome.tabs.create({ url: `${global.ROAR_WELCOME_PAGE_URL}`, active: true })
   },
   signInWithTwitter: state => {
     chrome.tabs.create({ url: `${global.ROAR_SERVER_URL}/v1/auth/twitter`, active: true })
