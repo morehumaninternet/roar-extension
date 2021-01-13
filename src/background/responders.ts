@@ -297,24 +297,17 @@ export const responders: Responders<Action> = {
     const tab = { ...state.tabs.get(tabId)! }
     const nextParsed = parseUrl(changeInfo.url)
 
-    if (nextParsed) {
-      if (typeof tab.website === 'object') {
-        const matchingWebsite = nextParsed.hostWithoutSubdomain === tab.website.domain
-        if (!matchingWebsite) {
-          tab.website = 'not fetched'
-          tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
-        } else {
-          const twitterHandle = findMatchingHandle(nextParsed, tab.website)
-          if (twitterHandle && twitterHandle.handle !== tab.feedbackState.twitterHandle.handle) {
-            tab.feedbackState = feedbackStateWithHandle(twitterHandle)
-          }
-        }
-      } else {
-        tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
+    // If the url parsed, there is an existing website, and the hostWithoutSubdomain matches the existing website domain
+    // we leave the website in place and will only clear the feedbackState if there's a new twitter handle.
+    // In all other cases, clear the existing website and feedback state.
+    if (nextParsed && typeof tab.website === 'object' && nextParsed.hostWithoutSubdomain === tab.website.domain) {
+      const twitterHandle = findMatchingHandle(nextParsed, tab.website)
+      if (twitterHandle && twitterHandle.handle !== tab.feedbackState.twitterHandle.handle) {
+        tab.feedbackState = feedbackStateWithHandle(twitterHandle)
       }
     } else {
       tab.website = 'not fetched'
-      tab.feedbackState = emptyFeedbackState()
+      tab.feedbackState = newFeedbackState({ domain: nextParsed?.host })
     }
 
     tab.parsedUrl = nextParsed
