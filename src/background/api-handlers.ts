@@ -44,7 +44,7 @@ export async function fetchWebsite(tabId: number, domain: string): Promise<void>
       handleCache.set({
         ...data,
         twitter_handle: data.twitter_handle,
-      })
+      }) // For some reason typescript isn't understanding that twitter_handle is a string unless I do this
     }
     return dispatch('fetchWebsiteSuccess', { tabId, website: data })
   }

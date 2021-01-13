@@ -35,16 +35,3 @@ export const parseUrl = (urlString?: string): ParseUrlResult => {
   const fullWithFirstPath = firstPath ? `${host}/${firstPath}` : host
   return { host, hostWithoutSubdomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined, fullWithoutQuery: `${host}${url.pathname}` }
 }
-
-export const hostname = (urlString?: string): undefined | string => {
-  const parsed = parseUrl(urlString)
-  return parsed?.host
-}
-
-export const ensureHostname = (urlString?: string): string => {
-  const parsed = parseUrl(urlString)
-  if (!parsed) {
-    throw new Error(`Expected to be able to parse ${urlString}`)
-  }
-  return parsed.host
-}

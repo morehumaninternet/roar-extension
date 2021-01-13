@@ -1,4 +1,3 @@
-import { ensureHostname } from './parse-url'
 import { dispatch } from './store'
 
 function dataURItoBlob(dataURI: string): Blob {
