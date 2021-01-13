@@ -20,8 +20,8 @@ export function monitorChrome(): void {
   chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {
       dispatch('onInstall')
-    } else if (details.reason === 'update' && details.previousVersion === '0.9.0') {
-      handleCache.clear()
+    } else if (details.reason === 'update') {
+      handleCache.ensureTypecheck()
     }
   })
 
@@ -30,8 +30,4 @@ export function monitorChrome(): void {
       dispatch('authSuccess', { tabId: details.tabId })
     }
   })
-
-  if (chrome.runtime.getManifest().name === 'Roar Local') {
-    handleCache.clear()
-  }
 }

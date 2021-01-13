@@ -212,12 +212,6 @@ type Listeners<A extends Action> = {
   [T in A['type']]?: Listener<A, T>
 }
 
-type HandleCacheEntry = {
-  domain: string
-  twitter_handle: string
-  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
-}
-
 type FetchRoarFailure =
   | { ok: false; reason: 'response not json'; text: string; details: string }
   | { ok: false; reason: 'response not expected data type'; text: string; details: string }
@@ -246,6 +240,12 @@ type WebsiteNonDefaultTwitterHandle = {
 type Website = {
   domain: string
   twitter_handle: null | string
+  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
+}
+
+type HandleCacheEntry = {
+  domain: string
+  twitter_handle: string
   non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
 }
 

@@ -1,5 +1,6 @@
 import { JsonDecoder } from 'ts.data.json'
 import { maxApiRequestMilliseconds } from './settings'
+import { FeedbackResponseDataDecoder, WebsiteDecoder, UserDecoder } from './decoders'
 
 export async function fetchRoar<T extends object>(path: string, init: RequestInit, decoder: JsonDecoder.Decoder<T>): Promise<FetchRoarResult<T>> {
   try {
@@ -53,36 +54,14 @@ export async function fetchRoar<T extends object>(path: string, init: RequestIni
   }
 }
 
-const FeedbackResponseDataDecoder = JsonDecoder.object<FeedbackResponseData>({ url: JsonDecoder.string }, 'FeedbackResponseData')
-
 export function postFeedback(formData: FormData): Promise<FetchRoarResult<FeedbackResponseData>> {
   return fetchRoar('v1/feedback', { method: 'POST', body: formData }, FeedbackResponseDataDecoder)
 }
-
-const WebsiteNonDefaultTwitterHandleDecoder = JsonDecoder.object<WebsiteNonDefaultTwitterHandle>(
-  {
-    subdomain: JsonDecoder.nullable(JsonDecoder.string),
-    path: JsonDecoder.nullable(JsonDecoder.string),
-    twitter_handle: JsonDecoder.string,
-  },
-  'WebsiteNonDefaultTwitterHandle'
-)
-
-const WebsiteDecoder = JsonDecoder.object<Website>(
-  {
-    domain: JsonDecoder.string,
-    twitter_handle: JsonDecoder.nullable(JsonDecoder.string),
-    non_default_twitter_handles: JsonDecoder.array(WebsiteNonDefaultTwitterHandleDecoder, 'non_default_twitter_handles'),
-  },
-  'Website'
-)
 
 export function getWebsite(domain: string): Promise<FetchRoarResult<Website>> {
   const search = new URLSearchParams({ domain })
   return fetchRoar(`v1/website?${search}`, {}, WebsiteDecoder)
 }
-
-const UserDecoder = JsonDecoder.object<User>({ photoUrl: JsonDecoder.nullable(JsonDecoder.string) }, 'User')
 
 export function getMe(): Promise<FetchRoarResult<User>> {
   return fetchRoar('v1/me', {}, UserDecoder)

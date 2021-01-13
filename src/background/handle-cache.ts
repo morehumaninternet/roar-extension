@@ -1,10 +1,5 @@
 import { find } from 'lodash'
-
-type HandleCacheEntry = {
-  domain: string
-  twitter_handle: string
-  non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle>
-}
+import { HandleCacheEntryDecoder } from './decoders'
 
 // All the Twitter handles are cached under the 'handleCache' key.
 function getHandleCache(): Promise<ReadonlyArray<HandleCacheEntry>> {
@@ -34,4 +29,12 @@ export async function set(entry: HandleCacheEntry): Promise<void> {
 
 export async function clear(): Promise<void> {
   chrome.storage.local.set({ handleCache: [] })
+}
+
+// Clear the existing cache if it doesn't typecheck
+export async function ensureTypecheck(): Promise<void> {
+  const handleCache = await getHandleCache()
+  if (!HandleCacheEntryDecoder.decode(handleCache).isOk) {
+    await clear()
+  }
 }
