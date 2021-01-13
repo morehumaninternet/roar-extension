@@ -6,7 +6,7 @@ type ActionButtonKind = keyof typeof svgs
 
 type ActionButtonProps = {
   kind: ActionButtonKind
-  onClick(): void
+  onClick?(): void
   disabled?: boolean
   additionalClassNames?: string
 }

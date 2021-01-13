@@ -73,7 +73,7 @@ export function postingFeedback(mocks: Mocks, { handle, result, domain = 'zing.c
         expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)
         expect(state.auth.state).to.equal('not_authed')
         const alertMessage = mocks.app().querySelector('.alert .alert-message')! as HTMLDivElement
-        expect(alertMessage.innerHTML).to.include('Your session ended. Please log in to try again.')
+        expect(alertMessage.innerHTML).to.include('Your session ended. Please log in again.')
       })
     } else {
       it('stays authenticated and displays an alert', async () => {
@@ -81,7 +81,7 @@ export function postingFeedback(mocks: Mocks, { handle, result, domain = 'zing.c
         expect(mocks.chrome.tabs.create).to.have.callCount(priorChromeTabsCreateCallCount)
         expect(state.auth.state).to.equal('authenticated')
         const alertMessage = mocks.app().querySelector('.alert-message')?.innerHTML
-        expect(alertMessage).to.include('We encountered a problem on our end. Please try again later.')
+        expect(alertMessage).to.include('Roar encountered a problem. Please try again later.')
       })
     }
   })
