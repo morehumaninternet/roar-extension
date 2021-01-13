@@ -14,6 +14,8 @@ export default {
       'process.env.NODE_ENV': JSON.stringify(process.env.ENV === 'production' ? 'production' : 'development'),
       // Point to a ROAR_SERVER_URL that depends on the build
       'global.ROAR_SERVER_URL': JSON.stringify(process.env.ROAR_SERVER_URL),
+      // Point to a ROAR_WELCOME_PAGE_URL that depends on the build
+      'global.ROAR_WELCOME_PAGE_URL': JSON.stringify(process.env.ROAR_WELCOME_PAGE_URL),
       // Use the console for errors. In tests we use a stub, see src/tests/setup.js
       'global.CONSOLE_ERROR': 'console.error',
     }),

@@ -14,10 +14,10 @@ export function onInstalled(mocks: Mocks, opts: { reason: 'update' | 'install' }
         expect(mocks.getState().auth.state).to.equal('not_authed')
       })
     } else {
-      it('opens the /welcome page when the reason is "install"', () => {
+      it('opens the /roar/welcome page when the reason is "install"', () => {
         expect(mocks.chrome.tabs.create).to.have.been.calledOnceWithExactly({
           active: true,
-          url: 'https://test-roar-server.com/welcome',
+          url: 'https://test-mhi.org/roar/welcome',
         })
       })
     }
