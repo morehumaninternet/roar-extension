@@ -11,7 +11,7 @@ describe('removing the first screenshot', () => {
   const mocks = createMocks()
 
   runBackground(mocks)
-  mountPopup(mocks, { handle: 'exists' })
+  mountPopup(mocks, { handle: 'fetched' })
   signInViaTwitter(mocks)
   authenticateViaTwitter(mocks)
   captureFirstScreenshot(mocks)

@@ -23,9 +23,10 @@ type ToolTipProps = {
   visible: boolean
   hovering: FeedbackState['hovering']
   twitterHandle: FeedbackState['twitterHandle']
+  websiteFetched: boolean
 }
 
-const ToolTip = ({ visible, hovering, twitterHandle }: ToolTipProps): JSX.Element | null => {
+const ToolTip = ({ visible, hovering, twitterHandle, websiteFetched }: ToolTipProps): JSX.Element | null => {
   return visible ? (
     <div
       className="link-tooltip"
@@ -36,10 +37,10 @@ const ToolTip = ({ visible, hovering, twitterHandle }: ToolTipProps): JSX.Elemen
         left: hovering.left,
       }}
     >
-      {twitterHandle.isActualAccount ? (
+      {twitterHandle.matchingDomain ? (
         <TwitterLink handle={twitterHandle.handle} />
       ) : (
-        <div className="link-tooltip__error">{twitterHandle.status === 'DONE' ? 'No twitter account could be found' : 'Searching for twitter account...'}</div>
+        <div className="link-tooltip__error">{websiteFetched ? 'No twitter account could be found' : 'Searching for twitter account...'}</div>
       )}
     </div>
   ) : null

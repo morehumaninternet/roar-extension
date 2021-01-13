@@ -33,7 +33,7 @@ export const parseUrl = (urlString?: string): ParseUrlResult => {
 
   const [, firstPath] = url.pathname.split('/')
   const fullWithFirstPath = firstPath ? `${host}/${firstPath}` : host
-  return { host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined }
+  return { host, hostWithoutSubDomain, subdomain, fullWithFirstPath, firstPath: firstPath || undefined, fullWithoutQuery: `${host}${url.pathname}` }
 }
 
 export const hostname = (urlString?: string): undefined | string => {

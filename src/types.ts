@@ -41,6 +41,11 @@ type EditingImageState = {
   image: Image
 }
 
+type TwitterHandleState = {
+  handle: string
+  matchingDomain?: string
+}
+
 type FeedbackState = {
   isTweeting: boolean
   takeAutoSnapshot: boolean
@@ -55,10 +60,7 @@ type FeedbackState = {
     height: number
     width: number
   }
-  twitterHandle: {
-    handle: string
-    isActualAccount: boolean
-  }
+  twitterHandle: TwitterHandleState
 }
 
 type CharacterLimit = {
@@ -88,7 +90,7 @@ type TabInfo = {
   windowId: number
   active: boolean
   parsedUrl: null | ParseUrlSuccess
-  website: null | 'in progress' | Website
+  website: 'not fetched' | 'fetching' | 'failure' | Website
   feedbackState: FeedbackState
 }
 
@@ -131,6 +133,7 @@ type AuthenticatedState = {
   pickingEmoji: boolean
   addImageDisabled: boolean
   postTweetDisabled: boolean
+  websiteFetched: boolean
   characterLimit: CharacterLimit
   dispatchUserActions: Dispatchers<UserAction>
 }
@@ -278,6 +281,7 @@ type ParseUrlSuccess = {
   subdomain?: string
   firstPath?: string
   fullWithFirstPath: string
+  fullWithoutQuery: string
 }
 
 type ParseUrlResult = null | ParseUrlSuccess

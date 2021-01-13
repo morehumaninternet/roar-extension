@@ -4,7 +4,7 @@ import { createMocks } from './mocks'
 import { mountPopup } from './steps/mount-popup'
 import { runBackground } from './steps/run-background'
 
-describe('twitter handle fetching in progress', () => {
+describe('website fetching in progress', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
@@ -23,7 +23,7 @@ describe('twitter handle fetching in progress', () => {
 
     it('renders a link when fetching is done', async () => {
       resolveHandle()
-      await mocks.whenState(state => ensureActiveTab(state).feedbackState.twitterHandle.status === 'DONE')
+      await mocks.whenState(state => typeof ensureActiveTab(state).website === 'object')
 
       const handle = mocks.app().querySelector('.twitter-handle')! as HTMLDivElement
       const popupWindow = mocks.popupWindow()

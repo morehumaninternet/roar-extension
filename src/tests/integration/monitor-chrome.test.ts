@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { createMocks } from './mocks'
 import { runBackground } from './steps/run-background'
 
-describe('monitor tabs', () => {
+describe('monitorChrome', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
@@ -15,14 +15,20 @@ describe('monitor tabs', () => {
         id: 18,
         windowId: 1,
         active: false,
-        url: 'https://new.com/abc',
+        url: 'https://www.new.com/abc/def',
       })
       const state = mocks.getState()
       const tab = state.tabs.get(18)!
       expect(tab.id).to.equal(18)
       expect(tab.windowId).to.equal(1)
-      expect(tab.domain).to.equal('new.com')
-      expect(tab.url).to.equal('https://new.com/abc')
+      expect(tab.parsedUrl).to.eql({
+        host: 'new.com',
+        hostWithoutSubDomain: 'new.com',
+        subdomain: undefined,
+        firstPath: 'abc',
+        fullWithFirstPath: 'new.com/abc',
+        fullWithoutQuery: 'new.com/abc/def',
+      })
     })
   })
 
@@ -43,7 +49,7 @@ describe('monitor tabs', () => {
         id: 16,
         windowId: 3,
         active: false,
-        url: 'https://changeinfo.com/abc',
+        url: 'https://foo.changeinfo.com/abc/def',
       }
 
       callback(changeInfo.id, changeInfo)
@@ -53,8 +59,14 @@ describe('monitor tabs', () => {
 
       expect(tab.id).to.equal(changeInfo.id)
       expect(tab.windowId).to.equal(changeInfo.windowId)
-      expect(tab.domain).to.equal('changeinfo.com')
-      expect(tab.url).to.equal('https://changeinfo.com/abc')
+      expect(tab.parsedUrl).to.eql({
+        host: 'new.com',
+        hostWithoutSubDomain: 'new.com',
+        subdomain: 'foo',
+        firstPath: 'abc',
+        fullWithFirstPath: 'new.com/abc',
+        fullWithoutQuery: 'new.com/abc/def',
+      })
     })
   })
 
@@ -109,7 +121,7 @@ describe('monitor tabs', () => {
       expect(tabs.get(newTabId)).to.have.property('id', newTabId)
       expect(tabs.get(newTabId)).to.have.property('windowId', existingTab.windowId)
       expect(tabs.get(newTabId)).to.have.property('active', existingTab.active)
-      expect(tabs.get(newTabId)).to.have.property('url', existingTab.url)
+      expect(tabs.get(newTabId)).to.have.property('parsedUrl').that.eql(existingTab.parsedUrl)
     })
   })
 

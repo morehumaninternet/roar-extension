@@ -1,11 +1,11 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
 import { parseUrl } from './parse-url'
-import { newFeedbackState } from './state'
+import { newFeedbackState, feedbackStateWithHandle, emptyFeedbackState } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import * as copy from '../copy'
-import { isEmpty } from 'lodash'
+import { sortBy } from 'lodash'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const parsedUrl = parseUrl(tab.url)
@@ -16,7 +16,7 @@ const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
     windowId: tab.windowId!,
     active: tab.active,
     parsedUrl,
-    website: null,
+    website: 'not fetched',
     feedbackState: newFeedbackState({ domain: parsedUrl?.host }),
   }
 }
@@ -74,6 +74,35 @@ function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial
     updates.auth = { state: 'not_authed' }
   }
   return updates
+}
+
+function findMatchingHandle(parsedUrl: ParseUrlSuccess, website: Website): Maybe<{ handle: string; matchingDomain: string }> {
+  if (website.non_default_twitter_handles?.length && (parsedUrl.subdomain || parsedUrl.firstPath)) {
+    const nonDefaultHandles = sortBy(website.non_default_twitter_handles, ({ subdomain, path }) => [subdomain, path]).reverse()
+
+    const matchingHandle = nonDefaultHandles.find(({ subdomain, path }) => {
+      const subdomainMatch = !subdomain || parsedUrl.subdomain === subdomain
+      const pathMatch = !path || parsedUrl.firstPath === path
+      return subdomainMatch && pathMatch
+    })
+
+    if (matchingHandle) {
+      const subdomain = matchingHandle.subdomain ? `${matchingHandle.subdomain}.` : ''
+      const path = matchingHandle.path ? `/${matchingHandle.path}` : ''
+
+      return {
+        handle: matchingHandle.twitter_handle,
+        matchingDomain: `${subdomain}${website.domain}${path}`,
+      }
+    }
+  }
+
+  if (website.twitter_handle) {
+    return {
+      handle: website.twitter_handle,
+      matchingDomain: website.domain,
+    }
+  }
 }
 
 export const responders: Responders<Action> = {
@@ -140,41 +169,44 @@ export const responders: Responders<Action> = {
     return updateActiveFeedback(state, () => ({ isTweeting: true }))
   },
   fetchWebsiteStart(state, { tabId }): Partial<StoreState> {
-    return updateTab(state, tabId, tab => ({ website: 'in progress' }))
+    return updateTab(state, tabId, tab => ({ website: 'fetching' }))
   },
   fetchWebsiteSuccess(state, { tabId, website }): Partial<StoreState> {
-    return updateTabFeedbackIfExists(state, tabId, tab => {
+    return updateTabIfExists(
+      state,
+      tabId,
+      (tab): Partial<TabInfo> => {
+        if (!tab.parsedUrl) return {}
+        if (tab.parsedUrl.hostWithoutSubDomain !== website.domain) return {}
+
+        const twitterHandle = findMatchingHandle(tab.parsedUrl, website)
+
+        return {
+          website,
+          feedbackState: {
+            ...tab.feedbackState,
+            editorState: twitterHandle ? replaceHandle(tab.feedbackState.editorState, twitterHandle.handle) : tab.feedbackState.editorState,
+            twitterHandle: {
+              handle: twitterHandle?.handle || tab.feedbackState.twitterHandle.handle,
+              matchingDomain: twitterHandle?.matchingDomain,
+            },
+          },
+        }
+      }
+    )
+  },
+  fetchWebsiteFailure(state, { tabId, domain, failure }): Partial<StoreState> {
+    return updateTabIfExists(state, tabId, tab => {
       if (!tab.parsedUrl) return {}
-      if (tab.parsedUrl.hostWithoutSubDomain !== website.domain) return {}
-
-      // tab.parsedUrl
-
+      if (tab.parsedUrl.hostWithoutSubDomain !== domain) return {}
       return {
-        website,
-        editorState: handle ? replaceHandle(tab.feedbackState.editorState, handle) : tab.feedbackState.editorState,
-        twitterHandle: {
-          status: 'DONE',
-          handle: handle || tab.feedbackState.twitterHandle.handle,
-          isActualAccount: !!handle,
+        website: 'failure',
+        alert: {
+          message: copy.fetchWebsiteFailure(domain),
+          contactSupport: true,
         },
       }
     })
-  },
-  fetchWebsiteFailure(state, { tabId, domain, failure }): Partial<StoreState> {
-    const tabUpdates = updateTabFeedbackIfExists(state, tabId, tab => {
-      if (tab.domain !== domain) return {}
-      return { twitterHandle: { ...tab.feedbackState.twitterHandle, status: 'DONE' } }
-    })
-    if (isEmpty(tabUpdates)) {
-      return {}
-    }
-    return {
-      alert: {
-        message: copy.fetchWebsiteFailure(domain),
-        contactSupport: true,
-      },
-      ...tabUpdates,
-    }
   },
   imageCaptureStart(state, { targetId }): Partial<StoreState> {
     return updateTabFeedbackIfExists(state, targetId, target => ({
@@ -261,24 +293,25 @@ export const responders: Responders<Action> = {
   'chrome.tabs.onUpdated'(state, { tabId, changeInfo }): Partial<StoreState> {
     if (!changeInfo.url) return {}
     const tab = { ...state.tabs.get(tabId)! }
-    const nextURL = changeInfo.url
-    const nextParsed = parseUrl(nextURL)
+    const nextParsed = parseUrl(changeInfo.url)
 
     if (nextParsed) {
-      const matchingWebsite = nextParsed.host === tab.website?.domain
-      if (!matchingWebsite) {
-        tab.website = null
-        tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
-      } else {
-        return {}
+      if (typeof tab.website === 'object') {
+        const matchingWebsite = nextParsed.hostWithoutSubDomain === tab.website.domain
+        if (!matchingWebsite) {
+          tab.website = 'not fetched'
+          tab.feedbackState = newFeedbackState({ domain: nextParsed.host })
+        } else {
+          const twitterHandle = findMatchingHandle(nextParsed, tab.website)
+          console.log('IN HERE', twitterHandle, nextParsed, tab.website)
+          if (twitterHandle && twitterHandle.handle !== tab.feedbackState.twitterHandle.handle) {
+            tab.feedbackState = feedbackStateWithHandle(twitterHandle)
+          }
+        }
       }
-
-      // tab.parsed = nextParsed
-
-      // If the domain has changed, delete the feedback
-      if (tab.domain !== nextDomain) {
-        return {}
-      }
+    } else {
+      tab.website = 'not fetched'
+      tab.feedbackState = emptyFeedbackState()
     }
 
     tab.parsedUrl = nextParsed

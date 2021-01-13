@@ -40,17 +40,17 @@ export async function takeScreenshot(target: FeedbackTarget): Promise<void> {
     const moreTabInfo = await gettingTab
 
     const screenshotBlob = dataURItoBlob(screenshotUri)
-    const domain = ensureHostname(tab.url)
+
     dispatch('imageCaptureSuccess', {
       image: {
         type: 'screenshot',
         tab: {
           id: tab.id,
-          url: tab.url!,
+          url: tab.parsedUrl!.fullWithoutQuery,
           width: moreTabInfo.width!,
           height: moreTabInfo.height!,
         },
-        name: `${domain} - ${new Date().toISOString()}.png`,
+        name: `${tab.parsedUrl!.host} - ${new Date().toISOString()}.png`,
         uri: screenshotUri,
         blob: screenshotBlob,
       },

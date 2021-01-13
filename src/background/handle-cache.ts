@@ -14,15 +14,16 @@ function getHandleCache(): Promise<ReadonlyArray<HandleCacheEntry>> {
 export async function get(
   domain: string
 ): Promise<null | { twitter_handle: string; non_default_twitter_handles: ReadonlyArray<WebsiteNonDefaultTwitterHandle> }> {
-  const handleCache = await getHandleCache()
-  const matchingEntry = find(handleCache, { domain })
-  if (matchingEntry) {
-    return {
-      twitter_handle: matchingEntry.twitter_handle,
-      non_default_twitter_handles: matchingEntry.non_default_twitter_handles,
-    }
-  }
   return null
+  // const handleCache = await getHandleCache()
+  // const matchingEntry = find(handleCache, { domain })
+  // if (matchingEntry) {
+  //   return {
+  //     twitter_handle: matchingEntry.twitter_handle,
+  //     non_default_twitter_handles: matchingEntry.non_default_twitter_handles,
+  //   }
+  // }
+  // return null
 }
 
 export async function set(entry: HandleCacheEntry): Promise<void> {

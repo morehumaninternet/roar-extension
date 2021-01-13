@@ -11,7 +11,7 @@ describe('post feedback 500', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { allowActionFailure: true })
-  mountPopup(mocks, { handle: 'exists' })
+  mountPopup(mocks, { handle: 'fetched' })
   signInViaTwitter(mocks)
   authenticateViaTwitter(mocks)
   captureFirstScreenshot(mocks)

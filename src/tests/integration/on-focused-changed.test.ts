@@ -7,7 +7,7 @@ describe('another window is opened', () => {
   const mocks = createMocks()
 
   runBackground(mocks, { alreadyAuthenticated: true })
-  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'exists' })
+  mountPopup(mocks, { alreadyAuthenticated: true, handle: 'fetched' })
 
   describe('when another window is focused on', () => {
     it('does not close the popup if the window ID is -1', () => {

@@ -18,22 +18,20 @@ export const emptyFeedbackState = (): FeedbackState => ({
   editorState: EditorState.createEmpty(),
   twitterHandle: {
     handle: '@mhi-roar-placeholder',
-    isActualAccount: false,
   },
 })
 
-export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
+export const feedbackStateWithHandle = (twitterHandle: TwitterHandleState): FeedbackState => {
   const empty = emptyFeedbackState()
-  if (!domain) return empty
-  const domainHandle = `@${domain}`
   return {
     ...empty,
-    editorState: prependHandle(empty.editorState, domainHandle),
-    twitterHandle: {
-      handle: domainHandle,
-      isActualAccount: false,
-    },
+    editorState: prependHandle(empty.editorState, twitterHandle.handle),
+    twitterHandle,
   }
+}
+
+export const newFeedbackState = ({ domain }: { domain?: string }): FeedbackState => {
+  return domain ? feedbackStateWithHandle({ handle: `@${domain}` }) : emptyFeedbackState()
 }
 
 export const newStoreState = (): StoreState => ({

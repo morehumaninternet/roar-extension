@@ -17,7 +17,7 @@ describe('switching subdomains', () => {
       {
         id: 11,
         windowId: 1,
-        active: false,
+        active: true,
         url: 'https://docs.google.com/document/u/blah',
       },
     ],

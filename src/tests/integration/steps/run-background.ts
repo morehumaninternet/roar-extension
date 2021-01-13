@@ -4,7 +4,7 @@ import { Map } from 'immutable'
 import * as fetchMock from 'fetch-mock'
 import { Mocks } from '../mocks'
 import { run } from '../../../background/run'
-import { domainOf } from '../../../background/domain'
+import { parseUrl } from '../../../background/parse-url'
 import { ensureActiveTab } from '../../../selectors'
 import { getPlainText } from '../../../draft-js-utils'
 
@@ -37,7 +37,7 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
 
   const focusedWindowId = find(windows, { focused: true })!.id
   const activeTab = find(tabs, { windowId: focusedWindowId, active: true })!
-  const activeTabDomain = domainOf(activeTab.url)
+  const activeTabParsedUrl = parseUrl(activeTab.url)
 
   describe('run background script', () => {
     before(() => {
@@ -98,16 +98,16 @@ export function runBackground(mocks: Mocks, opts: RunBackgroundOpts = {}): void 
       expect(activeTab).to.have.property('id', activeTab.id)
       expect(activeTab).to.have.property('windowId', activeTab.windowId)
       expect(activeTab).to.have.property('active', true)
-      expect(activeTab).to.have.property('url', activeTab.url)
+      expect(activeTab).to.have.property('parsedUrl', activeTab.parsedUrl)
       expect(activeTab.feedbackState).to.have.property('isTweeting', false)
       expect(activeTab.feedbackState).to.have.property('images').that.eql([])
     })
 
-    if (activeTabDomain) {
-      it("uses the tab's domain as the handle as a placeholder prior to fetching the actual twitter handle", () => {
+    if (activeTabParsedUrl) {
+      it("uses the tab's host as the handle as a placeholder prior to fetching the actual twitter handle", () => {
         const state = mocks.getState()
         const activeTab = ensureActiveTab(state)
-        expect(getPlainText(activeTab.feedbackState.editorState)).to.equal(`@${activeTabDomain} `)
+        expect(getPlainText(activeTab.feedbackState.editorState)).to.equal(`@${activeTabParsedUrl.host} `)
       })
     }
   })

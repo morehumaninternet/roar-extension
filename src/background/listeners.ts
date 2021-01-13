@@ -12,11 +12,11 @@ export const listeners: Listeners<Action> = {
 
     if (target.feedbackTargetType === 'tab') {
       const tab = target
-      if (!tab.domain) return
+      if (!tab.parsedUrl) return
       // it the handle wasn't fetched before and the tab domain exists,
       // start the fetch process
-      if (tab.feedbackState.twitterHandle.status === 'NEW') {
-        apiHandlers.fetchWebsite(tab.id, tab.domain)
+      if (tab.website === 'not fetched') {
+        apiHandlers.fetchWebsite(tab.id, tab.parsedUrl.host)
       }
     }
 
@@ -58,7 +58,7 @@ export const listeners: Listeners<Action> = {
       const target = tabById(state, targetId)
       if (state.alert || !target) return true
       const imagesReady = !target.feedbackState.addingImages
-      const twitterHandleReady = target.feedbackState.twitterHandle.status === 'DONE'
+      const twitterHandleReady = typeof target.website === 'object'
       return imagesReady && twitterHandleReady
     }
 
