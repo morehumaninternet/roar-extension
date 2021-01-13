@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as svgs from './action-svgs'
 import { ActionButton } from './action-button'
 import { CharacterCountdown } from './character-countdown'
 
@@ -38,6 +39,9 @@ export const ActionBar = ({
         <ActionButton kind="AddImage" onClick={() => imageRef.current!.click()} disabled={addImageDisabled} />
         <ActionButton kind="AddEmoji" onClick={togglePickingEmoji} additionalClassNames={pickingEmoji ? 'on' : 'off'} />
         <ActionButton kind={darkModeOn ? 'DarkMode' : 'LightMode'} onClick={toggleDarkMode} />
+        <a title="Get Help" className="svg-btn Help" role="button" href="mailto:support@morehumaninternet.org?subject=Roar! extension">
+          {svgs.Help}
+        </a>
       </div>
       <input
         ref={imageRef}
