@@ -27,7 +27,7 @@ export const parseUrl = (urlString?: string): ParseUrlResult => {
 
   const tld = parsed.topLevelDomains.join('.')
 
-  const host = url.host
+  const host = url.hostname
   const subdomain = parsed.subDomains.length ? parsed.subDomains.join('.') : undefined
   const hostWithoutSubdomain = `${parsed.domain}.${tld}`
 

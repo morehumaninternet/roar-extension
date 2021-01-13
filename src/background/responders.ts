@@ -1,11 +1,12 @@
 import { Map } from 'immutable'
 import { EditorState } from 'draft-js'
+import { isEmpty } from 'lodash'
 import { parseUrl } from './parse-url'
-import { newFeedbackState, feedbackStateWithHandle, emptyFeedbackState } from './state'
+import { newFeedbackState, feedbackStateWithHandle } from './state'
 import { tabById, ensureActiveTab } from '../selectors'
 import { appendEntity, prependHandle, replaceHandle } from '../draft-js-utils'
 import * as copy from '../copy'
-import { isEmpty, sortBy } from 'lodash'
+import findMatchingHandle from './find-matching-handle'
 
 const newTabInfo = (tab: chrome.tabs.Tab): TabInfo => {
   const parsedUrl = parseUrl(tab.url)
@@ -74,35 +75,6 @@ function handleFailure(failure: { reason: FetchRoarFailure['reason'] }): Partial
     updates.auth = { state: 'not_authed' }
   }
   return updates
-}
-
-function findMatchingHandle(parsedUrl: ParseUrlSuccess, website: Website): Maybe<{ handle: string; matchingDomain: string }> {
-  if (website.non_default_twitter_handles?.length && (parsedUrl.subdomain || parsedUrl.firstPath)) {
-    const nonDefaultHandles = sortBy(website.non_default_twitter_handles, ({ subdomain, path }) => [subdomain, path]).reverse()
-
-    const matchingHandle = nonDefaultHandles.find(({ subdomain, path }) => {
-      const subdomainMatch = !subdomain || parsedUrl.subdomain === subdomain
-      const pathMatch = !path || parsedUrl.firstPath === path
-      return subdomainMatch && pathMatch
-    })
-
-    if (matchingHandle) {
-      const subdomain = matchingHandle.subdomain ? `${matchingHandle.subdomain}.` : ''
-      const path = matchingHandle.path ? `/${matchingHandle.path}` : ''
-
-      return {
-        handle: matchingHandle.twitter_handle,
-        matchingDomain: `${subdomain}${website.domain}${path}`,
-      }
-    }
-  }
-
-  if (website.twitter_handle) {
-    return {
-      handle: website.twitter_handle,
-      matchingDomain: website.domain,
-    }
-  }
 }
 
 export const responders: Responders<Action> = {
