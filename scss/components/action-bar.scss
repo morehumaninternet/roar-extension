@@ -18,6 +18,23 @@ $svg-btn-height: $svg-height + 18px;
     display: none;
   }
 
+  .separator {
+    height: $svg-btn-height;
+    display: flex;
+    align-items: center;
+
+    margin-left: 12px;
+    margin-right: 5px;
+
+    > svg {
+      height: 3px;
+      width: 3px;
+      circle {
+        fill: $human-pink;
+      }
+    }
+  }
+
   .character-countdown {
     svg.circular-chart {
       height: $svg-height;
@@ -81,7 +98,7 @@ $svg-btn-height: $svg-height + 18px;
   height: $svg-btn-height;
   width: $svg-btn-height;
   border-radius: $svg-btn-height / 2;
-  margin-right: -2px;
+  margin-right: -4px;
 
   svg {
     height: $svg-height;
@@ -94,12 +111,21 @@ $svg-btn-height: $svg-height + 18px;
     }
   }
 
+  &.DarkMode > svg {
+    position: relative;
+    left: 2px;
+  }
+
   svg > path:not(.circle-outline) {
     fill: $human-pink;
   }
 
   svg > path.circle-outline {
     stroke: $human-pink;
+  }
+
+  &.Help {
+    margin-left: -2px;
   }
 
   &.Help.on {
