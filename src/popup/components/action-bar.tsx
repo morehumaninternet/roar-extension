@@ -19,8 +19,8 @@ type ActionBarProps = {
 
 const Separator = (): JSX.Element => (
   <div className="separator">
-    <svg viewBox="0 0 2 2">
-      <circle cx="1" cy="1" r="1" />
+    <svg viewBox="0 0 2 100">
+      <line x1="1" y1="0" x2="1" y2="100" />
     </svg>
   </div>
 )
