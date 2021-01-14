@@ -37,15 +37,46 @@
     > .image-image {
       @include image-grid-item;
       object-fit: cover;
+      cursor: pointer;
     }
 
     > .close-btn {
       display: none;
       position: absolute;
       top: 5px;
-      left: 5px;
+      right: 5px;
       background: none;
+
       opacity: 0.7;
+      circle {
+        fill: black
+      };
+      path {
+        fill: white;
+      }
+    }
+
+    $expand-btn-radius: 22px;
+
+    > .expand-btn {
+      display: none;
+
+      position: absolute;
+      height: 2 * $expand-btn-radius;
+      width: 2 * $expand-btn-radius;
+      left: calc(50% - #{$expand-btn-radius});
+      top: calc(50% - #{$expand-btn-radius});
+      border-radius: $expand-btn-radius;
+
+      background-color: black;
+      opacity: 0.7;
+
+      svg {
+        height: 36px;
+        path {
+          fill: white;
+        }
+      }
     }
 
     > .edit-btn {
@@ -64,8 +95,10 @@
     // On image hovering, display the edit button
     .image-image:hover ~ .edit-btn,
     .image-image:hover ~ .close-btn,
+    .image-image:hover ~ .expand-btn,
     .edit-btn:hover,
-    .close-btn:hover {
+    .close-btn:hover,
+    .expand-btn:hover {
       display: inline-block;
     }
   }
