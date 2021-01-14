@@ -27,10 +27,11 @@ $svg-btn-height: $svg-height + 18px;
     margin-right: 5px;
 
     > svg {
-      height: 3px;
-      width: 3px;
-      circle {
-        fill: $human-pink;
+      height: 20px;
+      width: 4px;
+      line {
+        stroke: $human-pink;
+        stroke-width: 4px;
       }
     }
   }
