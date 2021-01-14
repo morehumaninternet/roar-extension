@@ -22,9 +22,9 @@ export function takingScreenshots(mocks: Mocks): void {
       await mocks.whenState(state => ensureActiveTab(state).feedbackState.images.length === 1)
     })
 
-    it('disable the take screenshot button when there are 9 images', async () => {
+    it('disable the take screenshot button when there are 4 images', async () => {
       let imagesLength: number = 1 // tslint:disable-line:no-let
-      while (imagesLength < 9) {
+      while (imagesLength < 4) {
         const takeScreenshotButton = mocks.app().querySelector('.TakeScreenshot')! as HTMLButtonElement
         takeScreenshotButton.click()
         expect(mocks.app().querySelectorAll('.image-spinner')).to.have.length(1)

@@ -23,7 +23,7 @@ export function totalImages(feedbackTarget: FeedbackTarget): number {
 }
 
 export function addImageDisabled(feedbackTarget: null | FeedbackTarget): boolean {
-  return feedbackTarget ? totalImages(feedbackTarget) >= 9 : false
+  return feedbackTarget ? totalImages(feedbackTarget) >= 4 : false
 }
 
 export function postTweetDisabled(feedbackTarget: null | FeedbackTarget): boolean {
