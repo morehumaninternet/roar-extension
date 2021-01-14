@@ -18,6 +18,7 @@ export const CharacterCountdown = ({ characterLimit }: { characterLimit: Charact
   return (
     <div
       className="character-countdown"
+      title="Characters Remaining"
       role="progressbar"
       aria-valuemax={100}
       aria-valuemin={0}
