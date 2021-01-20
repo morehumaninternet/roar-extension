@@ -30,6 +30,7 @@ const pink = chalk.hex('#fa759e')
 const green = chalk.hex('#6FCF97')
 const gold = chalk.hex('#FFCA00')
 const lightBlue = chalk.hex('#4a81bc')
+const purple = chalk.hex('#00f000')
 const normalText = blue
 const emphasis = pink.bold
 
@@ -46,6 +47,7 @@ const commands = [
     command: `npm run scss -- ${watchFlag}`
   },
   bundleCommand('popup', gold),
+  bundleCommand('not-a-webpage', gold),
   bundleCommand('background', lightBlue),
 ]
 
