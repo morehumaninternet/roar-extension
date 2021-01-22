@@ -13,6 +13,7 @@
 import { AppStore, create } from './store'
 import { listeners } from './listeners'
 import * as apiHandlers from './api-handlers'
+import { activeTab } from '../selectors'
 import { monitorChrome } from './monitorChrome'
 
 declare global {
@@ -29,6 +30,17 @@ export function run(backgroundWindow: Window): void {
   for (const listener of Object.keys(listeners) as ReadonlyArray<Action['type']>) {
     store.on(listener, listeners[listener]!)
   }
+
+  store.subscribe(() => {
+    const state = store.getState()
+    const feedbackTarget = activeTab(state)
+    if (feedbackTarget) {
+      if (feedbackTarget.feedbackTargetType === 'tab' && !feedbackTarget.parsedUrl) {
+        return browser.browserAction.setPopup({ popup: '/html/not-a-webpage.html' })
+      }
+    }
+    return browser.browserAction.setPopup({ popup: '/html/popup.html' })
+  })
 
   // Monitor various events managed by the chrome API, dispatching relevant information to the store
   // see https://developer.chrome.com/docs/extensions/reference/
